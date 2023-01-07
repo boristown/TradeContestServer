@@ -10,7 +10,9 @@ async def root():
 @app.get("/agent/")
 def agent(url):
     #访问url，获取返回值，并返回
+    print("req:",url)
     resp = requests.get(url)
+    print("res:",resp.text)
     return resp.text
 
 # 运行指令：
