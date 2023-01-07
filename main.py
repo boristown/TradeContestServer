@@ -11,15 +11,15 @@ async def root():
 @app.get("/agent/")
 async def agent(url):
     #访问url，获取返回值，并返回
-    print("req:",url)
     resp = requests.get(url)
-    print("res:",resp.text)
     return resp.text
 
 @app.get("/B/")
 async def B(x):
     url = "https://wwww.binance.com/" + x
+    print(url)
     resp = requests.get(url)
+    #print(resp.text)
     return resp.text
 
 # 运行指令：
