@@ -16,4 +16,5 @@ async def agent(url):
 # 运行指令：
 '''
 uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 2023 --reload
 '''
