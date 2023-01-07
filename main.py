@@ -5,7 +5,8 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    resp = requests.get("https://fapi.binance.com/fapi/v1/ticker/price")
+    return resp.text
 
 @app.get("/agent/")
 def agent(url):
