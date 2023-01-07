@@ -16,7 +16,7 @@ async def agent(url):
 
 @app.get("/B/")
 async def B(x):
-    url = "https://wwww.binance.com/" + x
+    url = "https://www.binance.com/" + x
     print(url)
     resp = requests.get(url)
     #print(resp.text)
