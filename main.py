@@ -28,18 +28,27 @@ async def B(x):
     return resp.text
 
 #get ticker
-@app.get("/ticker/{interval}")
-async def ticker(interval):
-    top_symbols = json.dumps(top100_symbols[:100]).replace(" ", "")
+@app.get("/ticker_u/{interval}")
+async def ticker_u(interval):
+    top_symbols = json.dumps(SYM_USDT[:100]).replace(" ", "")
     url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
     #print(url)
     url = "https://www.binance.com/" + url
     resp = requests.get(url)
     return json.loads(resp.text)
 
-@app.get("/symbols/")
-async def symbols():
-    return top100_symbols[:100]
+@app.get("/ticker_b/{interval}")
+async def ticker_b(interval):
+    top_symbols = json.dumps(SYM_BTC[:100]).replace(" ", "")
+    url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
+    #print(url)
+    url = "https://www.binance.com/" + url
+    resp = requests.get(url)
+    return json.loads(resp.text)
+
+# @app.get("/symbols/")
+# async def symbols():
+#     return top100_symbols[:100]
 
 # 运行指令：
 '''
