@@ -35,7 +35,7 @@ async def ticker(interval):
     #print(url)
     url = "https://www.binance.com/" + url
     resp = requests.get(url)
-    return resp.text
+    return json.loads(resp.text)
 
 @app.get("/symbols/")
 async def symbols():
