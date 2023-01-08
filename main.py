@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import  requests
+import base64
 
 app = FastAPI()
 
@@ -16,6 +17,8 @@ async def agent(url):
 
 @app.get("/B/")
 async def B(x):
+    #x是base64编码的字符串，需要解码后，拼接到url后面，访问url，获取返回值，并返回
+    x = base64.b64decode(x).decode()
     url = "https://www.binance.com/" + x
     print(url)
     resp = requests.get(url)
