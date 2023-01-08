@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 import  requests
 import base64
+from binanceAPI import *
+import json
 
 app = FastAPI()
 
@@ -24,6 +26,20 @@ async def B(x):
     resp = requests.get(url)
     #print(resp.text)
     return resp.text
+
+#get ticker
+@app.get("/ticker/{interval}")
+async def ticker(interval):
+    top_symbols = json.dumps(top100_symbols[:100]).replace(" ", "")
+    url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
+    #print(url)
+    url = "https://www.binance.com/" + url
+    resp = requests.get(url)
+    return resp.text
+
+@app.get("/symbols/")
+async def symbols():
+    return top100_symbols[:100]
 
 # 运行指令：
 '''
