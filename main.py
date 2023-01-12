@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import  requests
 import base64
 from binanceAPI import *
+from fastapi.responses import HTMLResponse
 import json
 
 app = FastAPI()
@@ -46,7 +47,7 @@ async def ticker_b(interval):
     resp = requests.get(url)
     return json.loads(resp.text)
 
-@app.get("/html/{id}")
+@app.get("/html/{id}", response_class=HTMLResponse)
 async def html(id):
     #返回本地html文件:html/id.html
     with open('html/'+id+'.html', 'r', encoding='utf-8') as f:
