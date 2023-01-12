@@ -53,9 +53,13 @@ async def html(id):
     with open('html/'+id+'.html', 'r', encoding='utf-8') as f:
         return f.read()
 
-# @app.get("/symbols/")
-# async def symbols():
-#     return top100_symbols[:100]
+
+#为了certbot认证，支持访问该路径：
+#.well-known/acme-challenge/{str}
+@app.get("/.well-known/acme-challenge/{str}")
+async def acme(str):
+    return str
+
 
 # 运行指令：
 '''
