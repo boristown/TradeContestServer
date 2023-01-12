@@ -46,6 +46,12 @@ async def ticker_b(interval):
     resp = requests.get(url)
     return json.loads(resp.text)
 
+@app.get("/html/{id}")
+async def html(id):
+    #返回本地html文件:html/id.html
+    with open('html/'+id+'.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 # @app.get("/symbols/")
 # async def symbols():
 #     return top100_symbols[:100]
