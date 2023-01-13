@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 import  requests
 import base64
 from binanceAPI import *
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse,PlainTextResponse
 import json
 
 app = FastAPI()
@@ -56,12 +56,12 @@ async def html(id):
 
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
-@app.get("/.well-known/acme-challenge/{str}")
+@app.get("/.well-known/acme-challenge/{str}",response_class=PlainTextResponse)
 async def acme(str):
     with open('.well-known/acme-challenge/'+str, 'r', encoding='utf-8') as f:
         s = f.read()
         print(s)
-        return json.loads(s)
+        return s
 
 
 # 运行指令：
