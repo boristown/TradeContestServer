@@ -59,7 +59,7 @@ async def html(id):
 @app.get("/.well-known/acme-challenge/{str}")
 async def acme(str):
     with open('.well-known/acme-challenge/'+str, 'r', encoding='utf-8') as f:
-        return f.read()
+        return json.loads(f.read())
 
 
 # 运行指令：
