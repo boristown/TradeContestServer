@@ -4,6 +4,7 @@ import base64
 from binanceAPI import *
 from fastapi.responses import HTMLResponse,PlainTextResponse
 import json
+import klines
 
 app = FastAPI()
 
@@ -49,16 +50,18 @@ async def ticker_b(interval):
 
 @app.get("/html/{id}", response_class=HTMLResponse)
 async def html(id):
+    id = id.upper()
+    fname = klines.draw_klines(id)
     #返回本地html文件:html/id.html
-    with open('html/'+id+'.html', 'r', encoding='utf-8') as f:
+    with open(fname, 'r', encoding='utf-8') as f:
         return f.read()
 
 
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
 @app.get("/.well-known/acme-challenge/{str}",response_class=PlainTextResponse)
-async def acme(str):
-    with open('.well-known/acme-challenge/'+str, 'r', encoding='utf-8') as f:
+async def acme(s):
+    with open('.well-known/acme-challenge/'+s, 'r', encoding='utf-8') as f:
         s = f.read()
         print(s)
         return s
