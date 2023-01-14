@@ -27,7 +27,7 @@ def draw_klines(symbol):
     for i in range(len(ohlcv_list)):
         x_data.append(ts2datetime(ohlcv_list[i][0]))
         y_data.append([ohlcv_list[i][1],ohlcv_list[i][4],ohlcv_list[i][2],ohlcv_list[i][3]])
-    c=Candlestick(init_opts=opts.InitOpts(width="1000px", height="600px")).add_xaxis(xaxis_data=x_data).add_yaxis(
+    c=Candlestick(init_opts=opts.InitOpts(width="380px", height="600px")).add_xaxis(xaxis_data=x_data).add_yaxis(
         series_name="",
         y_axis=y_data,
         itemstyle_opts=opts.ItemStyleOpts(
@@ -45,7 +45,7 @@ def draw_klines(symbol):
                 is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)
             ),
         ),
-        #datazoom_opts=[opts.DataZoomOpts(pos_bottom="-2%")],by AI纪元 
+        datazoom_opts=[opts.DataZoomOpts(pos_bottom="-2%")], 
         title_opts=opts.TitleOpts(title=symbol+":"+str(last_price) + "\n"+current_utc_yyyymmddhhmmss+" UTC\nby AI纪元", pos_left="0"),
     )
     c.render(filename_html)
