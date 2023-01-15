@@ -4,7 +4,7 @@ import datetime
 import requests
 import math
 
-kline_cnt = 24*5
+kline_cnt = 24*30
 
 def ts2datetime(ts):
     return datetime.datetime.fromtimestamp(ts/1000).strftime('%Y-%m-%d %H:%M:%S')
@@ -61,7 +61,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     for i in range(len(ohlcv_list)):
         x_data.append(ts2datetime(ohlcv_list[i][0]))
         y_data.append([ohlcv_list[i][1],ohlcv_list[i][4],ohlcv_list[i][2],ohlcv_list[i][3]])
-    c=Candlestick(init_opts=opts.InitOpts(width="380px", height="600px")).add_xaxis(xaxis_data=x_data).add_yaxis(
+    c=Candlestick(init_opts=opts.InitOpts(width="350px", height="550px",)).add_xaxis(xaxis_data=x_data).add_yaxis(
         series_name="",
         y_axis=y_data,
         itemstyle_opts=opts.ItemStyleOpts(
