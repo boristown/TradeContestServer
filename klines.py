@@ -15,6 +15,8 @@ max_kline_range = 1000 * 60 * 60 * 24 * 365
 def get_ohlcv_list(symbol='BTCUSDT', interval='1h', start_time=None, end_time=None):
     symbol = symbol.upper()
     ibase = interval[-1]
+    start_time = int(start_time)
+    end_time = int(end_time)
     try:
         icnt = int(interval[:-1])
     except Exception as e:
