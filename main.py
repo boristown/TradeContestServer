@@ -48,14 +48,13 @@ async def ticker_b(interval):
     resp = requests.get(url)
     return json.loads(resp.text)
 
-@app.get("/html/{id}", response_class=HTMLResponse)
-async def html(id):
-    id = id.upper()
-    fname = klines.draw_klines(id)
+@app.get("/kline/{symbol}", response_class=HTMLResponse)
+async def Kline(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):
+    symbol = symbol.upper()
+    fname = klines.draw_klines(symbol,interval,start_time,end_time,indicators)
     #返回本地html文件:html/id.html
     with open(fname, 'r', encoding='utf-8') as f:
         return f.read()
-
 
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}

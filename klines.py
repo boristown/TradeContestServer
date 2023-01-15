@@ -2,23 +2,57 @@ import pyecharts.options as opts
 from pyecharts.charts import Kline, Candlestick
 import datetime
 import requests
+import math
 
 kline_cnt = 24*5
 
 def ts2datetime(ts):
     return datetime.datetime.fromtimestamp(ts/1000).strftime('%Y-%m-%d %H:%M:%S')
 
-def get_ohlcv_list(symbol='BTCUSDT'):
+interval_base = {'s':1,'m':60,'h':60*60,'d':60*60*24,'w':60*60*24*7,'M':60*60*24*30}
+max_kline_range = 1000 * 60 * 60 * 24 * 365
+
+def get_ohlcv_list(symbol='BTCUSDT', interval='1h', start_time=None, end_time=None):
     symbol = symbol.upper()
+    ibase = interval[-1]
+    try:
+        icnt = int(interval[:-1])
+    except Exception as e:
+        print("invalid interval:"+interval)
+        return []
+    if ibase not in interval_base:
+        print("invalid interval:"+interval)
+        return []
+    #注意：start_time和end_time都是时间戳格式，单位是毫秒，不是秒
+    default_end_time = datetime.datetime.utcnow().timestamp()*1000
+    default_start_time = default_end_time - 60*60*24*5*1000
+    now_flag = False
+    if start_time is None:
+        start_time = default_start_time
+    if end_time is None:
+        now_flag = True
+        end_time = default_end_time
+    interval_time = interval_base[ibase]*icnt*1000
+    #计算时间差
+    global kline_cnt
+    time_diff = end_time - start_time
+    if time_diff > max_kline_range:
+        time_diff = max_kline_range
+        start_time = end_time - time_diff
+    kline_cnt = math.ceil(time_diff/interval_time)
+    if kline_cnt > 1000:
+        kline_cnt = 1000
+        time_diff = kline_cnt * interval_time
+        start_time = end_time - time_diff
+    url = 'https://api.binance.com/api/v3/klines?symbol='+ symbol +'&interval='+interval+'&startTime='+str(int(start_time))+'&endTime='+str(int(end_time))
     # 获取最近五天的BTCUSDT 30分钟K线数据
-    url = 'https://api.binance.com/api/v3/klines?symbol='+ symbol +'&interval=1h&limit=' + str(kline_cnt)
-    #url = 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=72'
+    #url = 'https://api.binance.com/api/v3/klines?symbol='+ symbol +'&interval=1h&limit=' + str(kline_cnt)
     r = requests.get(url)
     ohlcv_list = r.json()
     return ohlcv_list
 
-def draw_klines(symbol):
-    ohlcv_list = get_ohlcv_list(symbol)
+def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):
+    ohlcv_list = get_ohlcv_list(symbol, interval, start_time, end_time)
     filename_html = 'html/'+symbol+'.html'
     last_price = ohlcv_list[-1][4]
     x_data = []
@@ -31,10 +65,12 @@ def draw_klines(symbol):
         series_name="",
         y_axis=y_data,
         itemstyle_opts=opts.ItemStyleOpts(
-            color="#ec0000",
-            color0="#00da3c",
-            border_color="#8A0000",
-            border_color0="#008F28",
+            color0="#ec0000",
+            #color0="#00da3c",
+            color="#303030",
+            border_color0="#8A0000",
+            #border_color0="#008F28",
+            border_color="#000000",
         ),
     ).add_xaxis(xaxis_data=x_data
     ).set_global_opts(
