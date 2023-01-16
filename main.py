@@ -80,8 +80,8 @@ async def version():
 #下载最新的软件
 #软件路径：download/Ayyyymmddx.apk
 #注意返回的是文件流，不是默认的json
-@app.get("/download/")
-async def download():
+@app.get("/download_last/")
+async def download_last():
     #获取当前目录下的所有文件
     files = os.listdir('download')
     #print(files)
@@ -93,6 +93,12 @@ async def download():
             if v > version:
                 version = v
     #返回最新版本的文件流
+    return FileResponse('download/A'+str(version)+'.apk')
+
+#下载指定版本的软件
+@app.get("/download/{version}")
+async def download(version):
+    #返回指定版本的文件流
     return FileResponse('download/A'+str(version)+'.apk')
 
 #为了certbot认证，支持访问该路径：
