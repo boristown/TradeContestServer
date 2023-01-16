@@ -2,7 +2,7 @@
 import  requests
 import base64
 from binanceAPI import *
-from fastapi.responses import HTMLResponse,PlainTextResponse
+from fastapi.responses import HTMLResponse,PlainTextResponse,FileResponse
 import json
 import klines
 import os
@@ -77,6 +77,24 @@ async def version():
                 version = v
     return str(version)
 
+#下载最新的软件
+#软件路径：download/Ayyyymmddx.apk
+#注意返回的是文件流，不是默认的json
+@app.get("/download/")
+async def download():
+    #获取当前目录下的所有文件
+    files = os.listdir('download')
+    #print(files)
+    #获取最新的版本号
+    version = 0
+    for f in files:
+        if f[0] == 'A':
+            v = int(re.findall(r'\d+', f)[0])
+            if v > version:
+                version = v
+    #返回最新版本的文件流
+    return FileResponse('download/A'+str(version)+'.apk')
+
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
 @app.get("/.well-known/acme-challenge/{str}",response_class=PlainTextResponse)
@@ -85,7 +103,6 @@ async def acme(s):
         s = f.read()
         print(s)
         return s
-
 
 # 运行指令：
 '''
