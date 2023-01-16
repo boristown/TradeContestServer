@@ -106,12 +106,12 @@ async def download(version):
     return FileResponse(path=filepath,filename=filename)
 
 #返回程序启动时动态执行的代码
-@app.get("/start_up_code/")
+@app.get("/start_up_code/",response_class=PlainTextResponse)
 async def start_up_code():
-    #返回指定版本的文件流
     filename = 'dynamic/start_up_code.py'
-    filepath = filename
-    return FileResponse(path=filepath,filename=filename)
+    with open(filename, 'r', encoding='utf-8') as f:
+        s = f.read()
+        return s
 
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
