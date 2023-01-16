@@ -1,4 +1,104 @@
 global user_token
+global up_triangle
+global down_triangle
+global current_version
+
+user_token = None
+up_triangle = '▲'
+down_triangle = '▼'
+
+#version: yyyymmddx
+current_version = '202301150'
+
+global HCenterElem
+global ColumnBox
+global BlackLabel
+global FlexInput
+global FlexButton
+global FixedButton
+global FlexNumber
+global LayoutBox
+
+def HCenterElem(element):
+    return toga.Box(
+        children=[
+            element
+        ],
+        style=Pack(
+            direction=ROW,
+            alignment=CENTER,
+            padding=5
+        )
+    )
+
+
+def ColumnBox(children):
+    return toga.Box(
+        children=[HCenterElem(c) for c in children],
+        style=Pack(
+            direction=COLUMN,
+            alignment=CENTER,
+            padding=10
+        )
+    )
+
+def BlackLabel(text):
+    return toga.Label(
+        text,
+        #style=Pack(padding=(0, 5),color="black",alignment=CENTER,flex=1)
+        style=Pack(padding=(0, 5),color="black",alignment=CENTER)
+    )
+
+def FlexInput(placeholder,on_change=None):
+    return toga.TextInput(placeholder=placeholder,
+        style=Pack(padding=(0, 5), flex=1),
+        on_change=on_change
+    )
+
+def FlexButton(text,handler):
+    return toga.Button(
+        text,
+        on_press=handler,
+        style=Pack(padding=(0, 5),flex=1)
+    )
+
+def FixedButton(label, on_press, width):
+    return toga.Button(
+        label,
+        on_press=on_press,
+        style=Pack(padding=(0, 5),width=width)
+    )
+
+def FlexNumber():
+    return toga.NumberInput(
+        style=Pack(padding_left = 5, flex=1),
+    )
+
+def LayoutBox(ch):
+    children = []
+    for child in ch:
+        if isinstance(child,list):
+            children.append(
+                toga.Box(
+                children=child, 
+                style=Pack(
+                    flex=1,
+                    direction=ROW,
+                    alignment=LEFT,
+                    padding=5
+                )))
+        else:
+            children.append(child)
+    return toga.Box(
+        children=children,
+        style=Pack(
+            direction=COLUMN,
+            alignment=TOP,
+            padding=5,
+            flex = 1
+            )
+    )
+
 self.main_window = toga.MainWindow(title=self.formal_name)
 self.tabledata = defaultdict(list)
 self.realtabledata = defaultdict(list)
