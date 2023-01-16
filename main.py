@@ -77,7 +77,6 @@ async def version():
                 version = v
     return str(version)
 
-
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
 @app.get("/.well-known/acme-challenge/{str}",response_class=PlainTextResponse)
