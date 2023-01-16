@@ -1,3 +1,15 @@
+
+global CENTER, COLUMN, ROW, Pack, BOTTOM, TOP, LEFT, RIGHT
+global defaultdict
+
+#import toga
+from toga.style.pack import CENTER, COLUMN, ROW, Pack, BOTTOM, TOP, LEFT, RIGHT
+
+from collections import defaultdict
+# import time
+# import threading
+# import asyncio
+
 global user_token
 global up_triangle
 global down_triangle
