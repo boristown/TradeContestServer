@@ -5,6 +5,8 @@ from binanceAPI import *
 from fastapi.responses import HTMLResponse,PlainTextResponse
 import json
 import klines
+import os
+import re
 
 app = FastAPI()
 
@@ -55,6 +57,26 @@ async def Kline(symbol, interval='1h', start_time=None, end_time=None, indicator
     #返回本地html文件:html/id.html
     with open(fname, 'r', encoding='utf-8') as f:
         return f.read()
+
+#检查最新的软件版本
+#软件路径：download/Ayyyymmddx.apk
+#版本号为：yyyymmddx
+#例如：download/A202101010.apk
+#版本号为：202101010
+@app.get("/version/")
+async def version():
+    #获取当前目录下的所有文件
+    files = os.listdir('download')
+    #print(files)
+    #获取最新的版本号
+    version = 0
+    for f in files:
+        if f[0] == 'A':
+            v = int(re.findall(r'\d+', f)[0])
+            if v > version:
+                version = v
+    return str(version)
+
 
 #为了certbot认证，支持访问该路径：
 #.well-known/acme-challenge/{str}
