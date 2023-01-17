@@ -136,7 +136,7 @@ def market_page(self):
         items=['2小时','6小时','12小时','1天','3天','7天'],
         on_select=self.on_dropdown_interval_select,
     )
-    self.dropdown_interval.value = '1天'
+    #self.dropdown_interval.value = '1天'
 
     #2小时，6小时，12小时
     self.interval_2h_toggle = FlexButton('2小时',self.on_interval_2h_toggle)
@@ -211,7 +211,6 @@ def login_page(self):
         ]
     )
     return login_box
-
 
 def on_select(self, widget):
     print("选中的国家区号：", widget.value)
@@ -344,7 +343,7 @@ def symbol_chart_page(self,symbol):
     )
     #K线图测试url（中国的）
     #self.Klinewebview.url = 'https://gu.qq.com/sh000001/zs'
-    self.sel_interval = '3分钟'
+    self.sel_interval = '1小时'
     self.sel_period = '最近1天'
     self.sel_symbol = symbol
     self.Klinewebview.url = html_kline(self.sel_symbol,self.sel_interval,self.sel_period)
@@ -354,6 +353,7 @@ def symbol_chart_page(self,symbol):
                 on_select=self.on_select_interval,
                 style=Pack(flex=1),
             )
+    #self.interval_selection.value = self.sel_interval
     self.window_selection = toga.Selection(
                 items=['最近1天','最近3天','最近7天','最近1个月','最近3个月','最近6个月','最近1年'],
                 on_select=self.on_select_period,
@@ -639,7 +639,7 @@ def on_position(self, widget):
 
 def position_page(self):
     pass
-
+ 
 async def on_dropdown_symbol_base_select(self, widget):
     self.symbol_base = widget.value
     #self.interval = self.dropdown_interval.selected_option.replace('天','d').replace('小时','h')
@@ -652,7 +652,7 @@ async def on_dropdown_interval_select(self, widget):
     self.interval = self.interval.replace('天','d').replace('小时','h')
     self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
     await self.refresh_table(widget)
-    
+
 TradingContest.market_page = market_page
 TradingContest.login_page = login_page
 TradingContest.on_select = on_select
