@@ -136,7 +136,7 @@ def market_page(self):
         items=['2小时','6小时','12小时','1天','3天','7天'],
         on_select=self.on_dropdown_interval_select,
     )
-    self.dropdown_interval.select_item(3)
+    self.dropdown_interval.value = '1天'
 
     #2小时，6小时，12小时
     self.interval_2h_toggle = FlexButton('2小时',self.on_interval_2h_toggle)
