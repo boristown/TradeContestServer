@@ -380,7 +380,6 @@ def on_select_interval(self, widget):
     self.Klinewebview.url = html_kline(self.sel_symbol,self.sel_interval,self.sel_period)
     self.main_window.content = self.symbol_chart_page_static()
     
-
 def on_select_period(self, widget):
     self.sel_period = widget.value
     self.Klinewebview.url = html_kline(self.sel_symbol,self.sel_interval,self.sel_period)
@@ -579,7 +578,6 @@ async def install_last_version(self, widget=None, dialog=None):
 async def install_apkfile(self, apkfile):
     print("安装apk文件")
     #安装apk文件
-
     self.exit()
 
 async def refresh_table(self, widget):
