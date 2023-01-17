@@ -130,11 +130,13 @@ def market_page(self):
     self.dropdown_symbol_base = toga.Selection(
         items=['USDT','BTC'],
         on_select=self.on_dropdown_symbol_base_select,
+        style=Pack(flex=1)
     )
     #下拉：选项[2小时，6小时，12小时，1天，3天，7天]
     self.dropdown_interval = toga.Selection(
         items=['2小时','6小时','12小时','1天','3天','7天'],
         on_select=self.on_dropdown_interval_select,
+        style=Pack(flex=1)
     )
     #self.dropdown_interval.value = '1天'
 
