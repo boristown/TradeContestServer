@@ -2,7 +2,7 @@
 global CENTER, COLUMN, ROW, Pack, BOTTOM, TOP, LEFT, RIGHT
 global defaultdict
 
-#import toga
+import toga
 from toga.style.pack import CENTER, COLUMN, ROW, Pack, BOTTOM, TOP, LEFT, RIGHT
 
 from collections import defaultdict
@@ -126,6 +126,18 @@ def market_page(self):
     self.symbol_base = 'USDT'
     self.usdt_toggle = FlexButton('USDT',self.on_usdt_toggle)
     self.btc_toggle = FlexButton('BTC',self.on_btc_toggle)
+    #下拉：选项[USDT,BTC]
+    self.dropdown_symbol_base = toga.Selection(
+        items=['USDT','BTC'],
+        on_select=self.on_dropdown_symbol_base_select,
+    )
+    #下拉：选项[2小时，6小时，12小时，1天，3天，7天]
+    self.dropdown_interval = toga.Selection(
+        items=['2小时','6小时','12小时','1天','3天','7天'],
+        on_select=self.on_dropdown_interval_select,
+    )
+    self.dropdown_interval.select_item(3)
+
     #2小时，6小时，12小时
     self.interval_2h_toggle = FlexButton('2小时',self.on_interval_2h_toggle)
     self.interval_6h_toggle = FlexButton('6小时',self.on_interval_6h_toggle)
@@ -524,17 +536,17 @@ def market_page_static(self):
     return LayoutBox(
         [
             [self.refresh_button,self.start_trade_button,self.back_main_page_button],
-            # [self.refresh_button,FlexButton('默认排序',self.on_sort_by_default)],
-            # [FlexButton('按涨幅升序',self.on_sort_by_change1d),FlexButton('按涨幅降序',self.on_sort_by_change1d_desc)],
-            # [FlexButton('按周涨幅升序',self.on_sort_by_change7d),FlexButton('按周涨幅降序',self.on_sort_by_change7d_desc)],
-            [self.usdt_toggle,self.btc_toggle],
-            [self.interval_2h_toggle,self.interval_6h_toggle,self.interval_12h_toggle],
-            [self.interval_1d_toggle,self.interval_3d_toggle,self.interval_7d_toggle],
+            # [self.usdt_toggle,self.btc_toggle],
+            # [self.interval_2h_toggle,self.interval_6h_toggle,self.interval_12h_toggle],
+            # [self.interval_1d_toggle,self.interval_3d_toggle,self.interval_7d_toggle],
+            [self.dropdown_base_symbol,self.dropdown_interval],
             [self.search_input],
             [self.symbol_sort_button,self.price_sort_button,self.volume_sort_button,self.change_sort_button],
             [self.market_table]
         ]
     )
+
+
 
 def strmap(self, data):
     return [[str(x) for x in row] for row in data]
@@ -628,6 +640,18 @@ def on_position(self, widget):
 def position_page(self):
     pass
 
+async def on_dropdown_symbol_base_select(self, widget):
+    self.symbol_base = widget.selected_option
+    self.interval = self.dropdown_interval.selected_option.replace('天','d').replace('小时','h')
+    self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
+    await self.refresh_table(widget)
+
+async def on_dropdown_interval_select(self, widget):
+    self.symbol_base = self.dropdown_symbol_base.selected_option
+    self.interval = widget.selected_option.replace('天','d').replace('小时','h')
+    self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
+    await self.refresh_table(widget)
+    
 TradingContest.market_page = market_page
 TradingContest.login_page = login_page
 TradingContest.on_select = on_select
@@ -678,6 +702,8 @@ TradingContest.on_order = on_order
 TradingContest.order_page = order_page
 TradingContest.on_position = on_position
 TradingContest.position_page = position_page
+TradingContest.on_dropdown_symbol_base_select = on_dropdown_symbol_base_select
+TradingContest.on_dropdown_interval_select = on_dropdown_interval_select
 
 content = self.market_page()
 self.main_window.content = content
