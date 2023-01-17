@@ -351,13 +351,13 @@ def symbol_chart_page(self,symbol):
     self.Klinewebview.url = html_kline(self.sel_symbol,self.sel_interval,self.sel_period)
     print('K线图url：',self.Klinewebview.url)
     self.interval_selection = toga.Selection(
-                items=['3分钟','5分钟','15分钟','30分钟','1小时','2小时','4小时','6小时','12小时','1天','3天'],
+                items=['1小时','3分钟','5分钟','15分钟','30分钟','2小时','6小时','1天','3天','7天','14天'],
                 on_select=self.on_select_interval,
                 style=Pack(flex=1),
             )
     #self.interval_selection.value = self.sel_interval
     self.window_selection = toga.Selection(
-                items=['最近1天','最近3天','最近7天','最近1个月','最近3个月','最近6个月','最近1年'],
+                items=['最近1天','最近1小时','最近2小时','最近6小时','最近12小时','最近3天','最近7天','最近1个月','最近3个月','最近6个月','最近1年'],
                 on_select=self.on_select_period,
                 style=Pack(flex=1),
             )
