@@ -67,7 +67,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     
     #将链式调用分开写，方便调试
     kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
-    kline.add_xaxis(xaxis_data=x_data)
+    kline = kline.add_xaxis(xaxis_data=x_data)
     yaxis_itemstyle_opts=opts.ItemStyleOpts(
             color0="#ec0000",
             #color0="#00da3c",
@@ -76,7 +76,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
             #border_color0="#008F28",
             border_color="#000000",
         )
-    kline.add_yaxis(
+    kline = kline.add_yaxis(
         series_name="",
         y_axis=y_data,
         itemstyle_opts=yaxis_itemstyle_opts,
@@ -84,7 +84,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     yaxis_splitarea_opts = opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1))
     title = symbol
     title_opts = opts.TitleOpts(title=title, pos_left="0"),
-    kline.set_global_opts(
+    kline = kline.set_global_opts(
         xaxis_opts = opts.AxisOpts(is_scale=True),
         yaxis_opts = opts.AxisOpts(is_scale=True,splitarea_opts = yaxis_splitarea_opts),
         datazoom_opts = [opts.DataZoomOpts(pos_bottom="-2%")], 
