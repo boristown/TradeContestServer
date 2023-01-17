@@ -538,14 +538,12 @@ def market_page_static(self):
             # [self.usdt_toggle,self.btc_toggle],
             # [self.interval_2h_toggle,self.interval_6h_toggle,self.interval_12h_toggle],
             # [self.interval_1d_toggle,self.interval_3d_toggle,self.interval_7d_toggle],
-            [self.dropdown_base_symbol,self.dropdown_interval],
+            [self.dropdown_symbol_base,self.dropdown_interval],
             [self.search_input],
             [self.symbol_sort_button,self.price_sort_button,self.volume_sort_button,self.change_sort_button],
             [self.market_table]
         ]
     )
-
-
 
 def strmap(self, data):
     return [[str(x) for x in row] for row in data]
