@@ -641,14 +641,14 @@ def position_page(self):
     pass
 
 async def on_dropdown_symbol_base_select(self, widget):
-    self.symbol_base = widget.selected_option
-    self.interval = self.dropdown_interval.selected_option.replace('天','d').replace('小时','h')
+    self.symbol_base = widget.value
+    #self.interval = self.dropdown_interval.selected_option.replace('天','d').replace('小时','h')
     self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
     await self.refresh_table(widget)
 
 async def on_dropdown_interval_select(self, widget):
-    self.symbol_base = self.dropdown_symbol_base.selected_option
-    self.interval = widget.selected_option.replace('天','d').replace('小时','h')
+    #self.symbol_base = self.dropdown_symbol_base.selected_option
+    self.interval = widget.value.replace('天','d').replace('小时','h')
     self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
     await self.refresh_table(widget)
     
