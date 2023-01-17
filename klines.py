@@ -66,7 +66,8 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         y_data.append([ohlcv_list[i][1],ohlcv_list[i][4],ohlcv_list[i][2],ohlcv_list[i][3]])
     
     #将链式调用分开写，方便调试
-    kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
+    #kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
+    kline = Kline(init_opts=opts.InitOpts(width="550px", height="550px",))
     kline = kline.add_xaxis(xaxis_data=x_data)
     yaxis_itemstyle_opts=opts.ItemStyleOpts(
             color0="#ec0000",
@@ -83,11 +84,11 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         )
     yaxis_splitarea_opts = opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1))
     title = symbol
-    title_opts = opts.TitleOpts(title=title, pos_left="2"),
+    title_opts = opts.TitleOpts(title=title, pos_left="0"),
     kline = kline.set_global_opts(
         xaxis_opts = opts.AxisOpts(is_scale=True),
         yaxis_opts = opts.AxisOpts(is_scale=True,splitarea_opts = yaxis_splitarea_opts),
-        datazoom_opts = [opts.DataZoomOpts(pos_bottom="-4%")], 
+        datazoom_opts = [opts.DataZoomOpts(pos_bottom="0%")], 
         title_opts = title_opts
         )
     kline.render(filename_html)
