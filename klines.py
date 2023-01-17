@@ -83,11 +83,11 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         )
     yaxis_splitarea_opts = opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1))
     title = symbol
-    title_opts = opts.TitleOpts(title=title, pos_left="0"),
+    title_opts = opts.TitleOpts(title=title, pos_left="2"),
     kline = kline.set_global_opts(
         xaxis_opts = opts.AxisOpts(is_scale=True),
         yaxis_opts = opts.AxisOpts(is_scale=True,splitarea_opts = yaxis_splitarea_opts),
-        datazoom_opts = [opts.DataZoomOpts(pos_bottom="-2%")], 
+        datazoom_opts = [opts.DataZoomOpts(pos_bottom="-4%")], 
         title_opts = title_opts
         )
     kline.render(filename_html)
