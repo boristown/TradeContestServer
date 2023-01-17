@@ -7,6 +7,8 @@ import json
 import klines
 import os
 import re
+import time
+from collections import defaultdict
 
 app = FastAPI()
 
@@ -31,24 +33,43 @@ async def B(x):
     #print(resp.text)
     return resp.text
 
+
+#距离上次获取相同参数的数据的时间间隔，超过cache_time（毫秒），才重新获取数据
+cache_time = 1000 * 60
+
+cache_ticker_u = {}
+cache_ticker_u_time = defaultdict(int)
+cache_ticker_b = {}
+cache_ticker_b_time = defaultdict(int)
+
 #get ticker
 @app.get("/ticker_u/{interval}")
 async def ticker_u(interval):
+    t = int(time.time() * 1000)
+    if t - cache_ticker_u_time[interval] <= cache_time:
+        return cache_ticker_u[interval]
     top_symbols = json.dumps(SYM_USDT[:100]).replace(" ", "")
     url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
     #print(url)
     url = "https://www.binance.com/" + url
     resp = requests.get(url)
-    return json.loads(resp.text)
+    cache_ticker_u[interval] = json.loads(resp.text)
+    cache_ticker_u_time[interval] = t
+    return cache_ticker_u[interval]
 
 @app.get("/ticker_b/{interval}")
 async def ticker_b(interval):
+    t = int(time.time() * 1000)
+    if t - cache_ticker_b_time[interval] <= cache_time:
+        return cache_ticker_b[interval]
     top_symbols = json.dumps(SYM_BTC[:100]).replace(" ", "")
     url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
     #print(url)
     url = "https://www.binance.com/" + url
     resp = requests.get(url)
-    return json.loads(resp.text)
+    cache_ticker_b[interval] = json.loads(resp.text)
+    cache_ticker_b_time[interval] = t
+    return cache_ticker_b[interval]
 
 @app.get("/kline/{symbol}", response_class=HTMLResponse)
 async def Kline(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):

@@ -53,6 +53,7 @@ def get_ohlcv_list(symbol='BTCUSDT', interval='1h', start_time=None, end_time=No
     ohlcv_list = r.json()
     return ohlcv_list
 
+
 def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):
     ohlcv_list = get_ohlcv_list(symbol, interval, start_time, end_time)
     filename_html = 'html/'+symbol+'.html'
