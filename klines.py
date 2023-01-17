@@ -82,7 +82,8 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         itemstyle_opts=yaxis_itemstyle_opts,
         )
     yaxis_splitarea_opts = opts.SplitAreaOpts(is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1))
-    title_opts = opts.TitleOpts(title=symbol+":"+str(last_price) + "\n"+current_utc_yyyymmddhhmmss+" UTC\nby AI纪元", pos_left="0"),
+    title = symbol
+    title_opts = opts.TitleOpts(title=title, pos_left="0"),
     kline.set_global_opts(
         xaxis_opts = opts.AxisOpts(is_scale=True),
         yaxis_opts = opts.AxisOpts(is_scale=True,splitarea_opts = yaxis_splitarea_opts),
