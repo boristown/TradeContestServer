@@ -715,6 +715,7 @@ TradingContest.on_position = on_position
 TradingContest.position_page = position_page
 TradingContest.on_dropdown_symbol_base_select = on_dropdown_symbol_base_select
 TradingContest.on_dropdown_interval_select = on_dropdown_interval_select
+TradingContest.comming_soon_page = comming_soon_page
 
 content = self.market_page()
 self.main_window.content = content
