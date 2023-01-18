@@ -536,10 +536,8 @@ async def on_btc_toggle(self, widget):
 def market_page_static(self):
     return LayoutBox(
         [
-            [self.refresh_button,self.start_trade_button,self.back_main_page_button],
-            # [self.usdt_toggle,self.btc_toggle],
-            # [self.interval_2h_toggle,self.interval_6h_toggle,self.interval_12h_toggle],
-            # [self.interval_1d_toggle,self.interval_3d_toggle,self.interval_7d_toggle],
+            #[self.refresh_button,self.start_trade_button,self.back_main_page_button],
+            [self.refresh_button,self.back_main_page_button],
             [self.dropdown_symbol_base,self.dropdown_interval],
             [self.search_input],
             [self.symbol_sort_button,self.price_sort_button,self.volume_sort_button,self.change_sort_button],

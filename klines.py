@@ -67,7 +67,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     
     #将链式调用分开写，方便调试
     #kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
-    kline = Kline(init_opts=opts.InitOpts(width="550px", height="550px",))
+    kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
     kline = kline.add_xaxis(xaxis_data=x_data)
     yaxis_itemstyle_opts=opts.ItemStyleOpts(
             color0="#ec0000",
@@ -93,28 +93,3 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         )
     kline.render(filename_html)
     return filename_html
-    # c=Candlestick(init_opts=opts.InitOpts(width="350px", height="550px",)).add_xaxis(xaxis_data=x_data).add_yaxis(
-    #     series_name="",
-    #     y_axis=y_data,
-    #     itemstyle_opts=opts.ItemStyleOpts(
-    #         color0="#ec0000",
-    #         #color0="#00da3c",
-    #         color="#303030",
-    #         border_color0="#8A0000",
-    #         #border_color0="#008F28",
-    #         border_color="#000000",
-    #     ),
-    # ).add_xaxis(xaxis_data=x_data
-    # ).set_global_opts(
-    #     xaxis_opts=opts.AxisOpts(is_scale=True),
-    #     yaxis_opts=opts.AxisOpts(
-    #         is_scale=True,
-    #         splitarea_opts=opts.SplitAreaOpts(
-    #             is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)
-    #         ),
-    #     ),
-    #     datazoom_opts=[opts.DataZoomOpts(pos_bottom="-2%")], 
-    #     title_opts=opts.TitleOpts(title=symbol+":"+str(last_price) + "\n"+current_utc_yyyymmddhhmmss+" UTC\nby AI纪元", pos_left="0"),
-    # )
-    # c.render(filename_html)
-    # return filename_html
