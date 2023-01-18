@@ -371,7 +371,7 @@ def symbol_chart_page_static(self):
             self.interval_selection,
             self.window_selection
         ], #下拉列表
-        #[BlackLabel('---这是'+symbol+'的K线图---')],
+        [BlackLabel(self.symbol)],
         self.Klinewebview,
         #FlexButton('返回',self.on_market),
         ]
