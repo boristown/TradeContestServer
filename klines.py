@@ -56,7 +56,9 @@ def get_ohlcv_list(symbol='BTCUSDT', interval='1h', start_time=None, end_time=No
 
 def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):
     ohlcv_list = get_ohlcv_list(symbol, interval, start_time, end_time)
-    filename_html = 'html/'+symbol+'.html'
+    if len(ohlcv_list) == 0:
+        return 'template/no_data.html'
+    filename_html = 'html/'+symbol+'_'+interval+'.html'
     last_price = ohlcv_list[-1][4]
     x_data = []
     y_data = []
