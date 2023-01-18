@@ -447,7 +447,7 @@ async def on_interval_6h_toggle(self, widget):
 # 按钮：返回（传入一个要返回的页面标识）
 def comming_soon_page(self, last_page):
     def my_func(widget):
-        self.main_window.content = last_page
+        self.main_window.content = last_page()
     return ColumnBox([
         BlackLabel('该功能即将上线，敬请期待！'),
         FlexButton('返回',my_func),
