@@ -101,8 +101,8 @@ async def version():
 #下载最新的软件
 #软件路径：download/Ayyyymmddx.apk
 #注意返回的是文件流，不是默认的json
-@app.get("/download_last/")
-async def download_last():
+@app.get("/android")
+async def android():
     #获取当前目录下的所有文件
     files = os.listdir('download')
     #print(files)
@@ -114,7 +114,7 @@ async def download_last():
             if v > version:
                 version = v
     #返回最新版本的文件流
-    filename = 'A'+str(version)+'.apk'
+    filename = 'TradingContest_'+str(version)+'.apk'
     filepath = 'download/' + filename
     return FileResponse(path=filepath,filename=filename)
 
