@@ -291,6 +291,7 @@ async def show_market_page(self):
 async def get_market_data(self):
     #获取数据
     #if not self.loading_market: return
+    self.usdt_on = self.symbol_base == "USDT"
     data1d = await get_binance_ticker(self.usdt_on,self.interval)
     #if not self.loading_market: return
     #await asyncio.sleep(0.8)
