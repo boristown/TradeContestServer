@@ -537,7 +537,7 @@ def market_page_static(self):
     return LayoutBox(
         [
             #[self.refresh_button,self.start_trade_button,self.back_main_page_button],
-            [self.refresh_button,self.back_main_page_button],
+            [self.refresh_button,self.start_trade_button],
             [self.dropdown_symbol_base,self.dropdown_interval],
             [self.search_input],
             [self.symbol_sort_button,self.price_sort_button,self.volume_sort_button,self.change_sort_button],
