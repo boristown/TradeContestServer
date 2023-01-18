@@ -1,5 +1,6 @@
 import pyecharts.options as opts
-from pyecharts.charts import Kline, Candlestick
+from pyecharts.charts import Kline, Candlestick, Grid
+from pyecharts.globals import ThemeType
 import datetime
 import requests
 import math
@@ -93,5 +94,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         datazoom_opts = [opts.DataZoomOpts(pos_bottom="0%")], 
         title_opts = title_opts
         )
-    kline.render(filename_html)
+    klinegrid=Grid(init_opts=opts.InitOpts(theme=ThemeType.LIGHT))
+    klinegrid.add(kline,grid_opts=opts.GridOpts(pos_left='25%'))
+    klinegrid.render(filename_html)
     return filename_html
