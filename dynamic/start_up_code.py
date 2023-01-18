@@ -155,7 +155,7 @@ def market_page(self):
     self.volume_sort_button = FlexButton('交易额',self.on_volume_sort)
     self.change_sort_button = FlexButton('涨幅%',self.on_change_sort)
     self.sort_field = 'volume'
-    self.sort_desc = False
+    self.sort_desc = True
     self.usdt_toggle.enabled = False
     self.back_main_page_button = FlexButton('返回主页',self.on_main_page)
     self.start_trade_button = FlexButton('开始交易',self.on_trade)
