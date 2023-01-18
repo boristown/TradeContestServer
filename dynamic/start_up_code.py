@@ -442,6 +442,18 @@ async def on_interval_6h_toggle(self, widget):
     self.market_table.data = self.strmap(self.realtabledata[self.symbol_base+self.interval])
     await self.refresh_table(widget)
 
+#页面：
+# 文本：该功能即将上线，敬请期待
+# 按钮：返回（传入一个要返回的页面标识）
+def comming_soon_page(self, last_page):
+    def my_func(widget):
+        self.main_window.content = last_page
+    return ColumnBox([
+        BlackLabel('该功能即将上线，敬请期待！'),
+        FlexButton('返回',my_func),
+        ]
+    )
+
 #12h
 async def on_interval_12h_toggle(self, widget):
     if self.interval == '12h': return
@@ -612,7 +624,8 @@ def rank_page(self):
 
 def on_trade(self, widget):
     print("查看我的交易")
-    self.main_window.content = self.trade_page()
+    #self.main_window.content = self.trade_page()
+    self.main_window.content = self.comming_soon_page(self.market_page_static)
 
 def trade_page(self):
     return LayoutBox(
