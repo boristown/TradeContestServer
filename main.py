@@ -114,9 +114,10 @@ async def android():
             if v > version:
                 version = v
     #返回最新版本的文件流
-    filename = 'TradingContest_'+str(version)+'.apk'
-    filepath = 'download/' + filename
-    return FileResponse(path=filepath,filename=filename)
+    filename_client = 'TradingContest_'+str(version)+'.apk'
+    filename_server = 'A'+str(version)+'.apk'
+    filepath = 'download/' + filename_server
+    return FileResponse(path=filepath,filename=filename_client)
 
 #下载指定版本的软件
 @app.get("/download/{version}")
