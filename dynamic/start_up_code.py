@@ -358,7 +358,7 @@ def symbol_chart_page(self,symbol):
             )
     #self.interval_selection.value = self.sel_interval
     self.window_selection = toga.Selection(
-                items=['最近1天','最近1小时','最近2小时','最近6小时','最近12小时','最近3天','最近7天','最近1个月','最近3个月','最近6个月','最近1年'],
+                items=['最近1天','最近1小时','最近2小时','最近6小时','最近12小时','最近3天','最近7天','最近1月','最近3月','最近6月','最近1年'],
                 on_select=self.on_select_period,
                 style=Pack(flex=1),
             )
