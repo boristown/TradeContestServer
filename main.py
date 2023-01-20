@@ -9,14 +9,16 @@ import os
 import re
 import time
 from collections import defaultdict
+from pywebio.platform.fastapi import webio_routes
+import pywebio_app as myapp
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    url = "http://aitrad.in:80/"
-    response = RedirectResponse(url)
-    return response
+# @app.get("/")
+# async def root():
+#     url = "http://aitrad.in:80/"
+#     response = RedirectResponse(url)
+#     return response
 
 @app.get("/agent/")
 async def agent(url):
@@ -144,6 +146,14 @@ async def acme(s):
         s = f.read()
         print(s)
         return s
+
+def pywebio_task():
+    myapp.pywebio_run()
+    
+
+# `pywebio_task` is PyWebIO task function
+app.mount("/", FastAPI(routes=webio_routes(pywebio_task)))
+
 
 # 运行指令：
 '''
