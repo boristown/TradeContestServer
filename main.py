@@ -2,7 +2,7 @@
 import  requests
 import base64
 from binanceAPI import *
-from fastapi.responses import HTMLResponse,PlainTextResponse,FileResponse
+from fastapi.responses import HTMLResponse,PlainTextResponse,FileResponse,RedirectResponse
 import json
 import klines
 import os
@@ -14,8 +14,9 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    resp = requests.get("https://wwww.binance.com/fapi/v1/ticker/price")
-    return resp.text
+    url = "http://aitrad.in:80/"
+    response = RedirectResponse(url)
+    return response
 
 @app.get("/agent/")
 async def agent(url):
