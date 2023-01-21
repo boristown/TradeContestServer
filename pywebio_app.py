@@ -5,6 +5,9 @@ from pywebio.pin import *
 from klines import *
 import time
 
+up_triangle = '▲'
+down_triangle = '▼'
+
 #实现初始画面：
 #首先显示币种名称
 #然后显示k线图
@@ -27,10 +30,13 @@ def pywebio_run():
         #默认值是最近1天
         put_select('selectPeriod', options=['最近1天','最近1小时','最近2小时','最近6小时','最近12小时','最近3天','最近7天','最近1月','最近3月','最近6月','最近1年'])
     ])
+    #put_table([['市场名', '价格', '成交额', '涨幅']])
+    put_text(symbol)
     html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
     put_html(html)
     #put_select('交易货币', options=['USDT', 'BTC'])
     put_row([
         put_select('selectInterval', options=['1小时','3分钟','5分钟','15分钟','30分钟','2小时','6小时','1天','3天','7天','14天'])
     ])
+    put_buttons(['市场名', '价格', '成交额'+down_triangle, '涨幅'], onclick=change_symbol)
     #put_input('input', label='This is a input widget')
