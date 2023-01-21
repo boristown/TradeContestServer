@@ -12,12 +12,16 @@ import time
 #当选择列表中的市场名的时候，切换顶部的市场
 #默认排序：按成交额降序排列
 def pywebio_run():
+    def change_symbol(symbol):
+        pass
+        #set_scope('klines', clear=True)
+        #put_klines(symbol)
     interval = '1d'
     symbol = 'BTCUSDT'
     current_time = int(time.time() * 1000)
     period = 30 * 24 * 60 * 60 * 1000
     html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
     put_html(html)
-    
+    put_buttons(['USDT', 'BTC'], onclick=change_symbol)
     #put_button('BTCUSDT', onclick=lambda: put_html(html))
     #put_button('Clear', onclick=lambda: clear())
