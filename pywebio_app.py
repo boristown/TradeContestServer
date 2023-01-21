@@ -1,6 +1,8 @@
 from pywebio import *
 from pywebio.input import *
 from pywebio.output import *
+from klines import *
+import time
 
 #实现初始画面：
 #首先显示币种名称
@@ -10,8 +12,15 @@ from pywebio.output import *
 #当选择列表中的市场名的时候，切换顶部的市场
 #默认排序：按成交额降序排列
 def pywebio_run():
-    path = 'html/BTCUSDT_1h.html'
-    put_button('BTCUSDT', onclick=lambda: put_html(open(path, 'r', encoding='utf-8').read()))
+    interval = '1d'
+    symbol = 'BTCUSDT'
+    current_time = int(time.time() * 1000)
+    period = 30 * 24 * 60 * 60 * 1000
+    html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
+    #path = 'html/BTCUSDT_1h.html'
+    #html_str = open(path, 'r', encoding='utf-8').read()
+    #print(html_str)
+    put_button('BTCUSDT', onclick=lambda: put_html(html))
     #put_html(open(path, 'r', encoding='utf-8').read())
     #name = input.input("what's your name")
     #output.put_text("hello", name)

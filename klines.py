@@ -54,7 +54,7 @@ def get_ohlcv_list(symbol='BTCUSDT', interval='1h', start_time=None, end_time=No
     ohlcv_list = r.json()
     return ohlcv_list
 
-def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicators=[]):
+def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicators=[], notebook=False):
     ohlcv_list = get_ohlcv_list(symbol, interval, start_time, end_time)
     if len(ohlcv_list) == 0:
         return 'template/no_data.html'
@@ -95,5 +95,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         )
     klinegrid=Grid(init_opts=opts.InitOpts(theme=ThemeType.LIGHT,width="350px", height="550px",))
     klinegrid.add(kline,grid_opts=opts.GridOpts(pos_left='23%'))
+    if notebook:
+        return klinegrid.render_notebook()
     klinegrid.render(filename_html)
     return filename_html
