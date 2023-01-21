@@ -94,7 +94,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
         datazoom_opts = [opts.DataZoomOpts(pos_bottom="0%")], 
         title_opts = title_opts
         )
-    klinegrid=Grid(init_opts=opts.InitOpts(theme=ThemeType.LIGHT,width="350px", height="550px",))
+    klinegrid=Grid(init_opts=opts.InitOpts(theme=ThemeType.LIGHT,width="350px", height=height,))
     klinegrid.add(kline,grid_opts=opts.GridOpts(pos_left='23%'))
     if notebook:
         return klinegrid.render_notebook()
