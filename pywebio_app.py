@@ -21,6 +21,7 @@ def pywebio_run():
     symbol = 'BTCUSDT'
     current_time = int(time.time() * 1000)
     period = 30 * 24 * 60 * 60 * 1000
+    put_input('search', placeholder ='输入市场名。')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
         #默认值是最近1天
