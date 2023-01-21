@@ -1,4 +1,6 @@
 from pywebio import *
+from pywebio.input import *
+from pywebio.output import *
 
 #实现初始画面：
 #首先显示币种名称
@@ -8,6 +10,8 @@ from pywebio import *
 #当选择列表中的市场名的时候，切换顶部的市场
 #默认排序：按成交额降序排列
 def pywebio_run():
-    name = input.input("what's your name")
-    output.put_text("hello", name)
+    path = 'html/BTCUSDT_1h.html'
+    put_html(open(path, 'r', encoding='utf-8').read())
+    #name = input.input("what's your name")
+    #output.put_text("hello", name)
 
