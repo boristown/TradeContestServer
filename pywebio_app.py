@@ -21,7 +21,15 @@ def pywebio_run():
     symbol = 'BTCUSDT'
     current_time = int(time.time() * 1000)
     period = 30 * 24 * 60 * 60 * 1000
+    put_row([
+        put_select('selectBase', options=['USDT', 'BTC']),
+        #默认值是最近1天
+        put_select('selectPeriod', options=['最近1天','最近1小时','最近2小时','最近6小时','最近12小时','最近3天','最近7天','最近1月','最近3月','最近6月','最近1年'])
+    ])
     html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
-    #put_html(html)
+    put_html(html)
     #put_select('交易货币', options=['USDT', 'BTC'])
-    put_input('input', label='This is a input widget')
+    put_row([
+        put_select('selectInterval', options=['1小时','3分钟','5分钟','15分钟','30分钟','2小时','6小时','1天','3天','7天','14天'])
+    ])
+    #put_input('input', label='This is a input widget')
