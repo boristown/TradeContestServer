@@ -23,7 +23,8 @@ def pywebio_run():
     period = 30 * 24 * 60 * 60 * 1000
     html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
     put_html(html)
-    put_input('交易货币', type=SELECT, options=['USDT', 'BTC'], name='trade_currency', onchange=change_symbol)
+    put_select('交易货币', ['USDT', 'BTC'], onchange=change_symbol)
+    #put_input('交易货币', type=SELECT, options=['USDT', 'BTC'], name='trade_currency', onchange=change_symbol)
     #put_buttons(['USDT', 'BTC'], onclick=change_symbol)
     #put_button('BTCUSDT', onclick=lambda: put_html(html))
     #put_button('Clear', onclick=lambda: clear())
