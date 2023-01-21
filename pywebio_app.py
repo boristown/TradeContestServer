@@ -11,7 +11,8 @@ from pywebio.output import *
 #默认排序：按成交额降序排列
 def pywebio_run():
     path = 'html/BTCUSDT_1h.html'
-    put_html(open(path, 'r', encoding='utf-8').read())
+    put_button('BTCUSDT', onclick=lambda: put_html(open(path, 'r', encoding='utf-8').read()))
+    #put_html(open(path, 'r', encoding='utf-8').read())
     #name = input.input("what's your name")
     #output.put_text("hello", name)
 
