@@ -17,12 +17,6 @@ def pywebio_run():
     current_time = int(time.time() * 1000)
     period = 30 * 24 * 60 * 60 * 1000
     html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
-    #path = 'html/BTCUSDT_1h.html'
-    #html_str = open(path, 'r', encoding='utf-8').read()
-    #print(html_str)
     put_button('BTCUSDT', onclick=lambda: put_html(html))
-    put_button('Clear', onclick=lambda: clear())
-    #put_html(open(path, 'r', encoding='utf-8').read())
-    #name = input.input("what's your name")
-    #output.put_text("hello", name)
-
+    #put_button('Clear', onclick=lambda: clear())
+    

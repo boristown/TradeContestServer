@@ -69,7 +69,8 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     
     #将链式调用分开写，方便调试
     #kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
-    kline = Kline(init_opts=opts.InitOpts(width="350px", height="550px",))
+    height = "550px" if not notebook else "350px"
+    kline = Kline(init_opts=opts.InitOpts(width="350px", height=height,))
     kline = kline.add_xaxis(xaxis_data=x_data)
     yaxis_itemstyle_opts=opts.ItemStyleOpts(
             color0="#ec0000",
