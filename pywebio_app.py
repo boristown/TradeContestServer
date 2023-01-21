@@ -21,6 +21,7 @@ def pywebio_run():
     #html_str = open(path, 'r', encoding='utf-8').read()
     #print(html_str)
     put_button('BTCUSDT', onclick=lambda: put_html(html))
+    put_button('Clear', onclick=lambda: clear())
     #put_html(open(path, 'r', encoding='utf-8').read())
     #name = input.input("what's your name")
     #output.put_text("hello", name)
