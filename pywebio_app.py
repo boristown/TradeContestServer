@@ -48,7 +48,11 @@ def pywebio_run():
             value='最近1天',
             )
     ])
-    put_text(symbol)
+    def set_symbol(name):
+        nonlocal symbol
+        symbol = name
+        return symbol
+
     while True:
         changed = pin_wait_change(['search','selectBase', 'selectInterval', 'selectPeriod'])
         with use_scope('kline', clear=True):
@@ -60,7 +64,11 @@ def pywebio_run():
             current_time = int(time.time() * 1000)
             period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
             mdata = [['市场名','价格','成交额','涨幅%']]
-            mdata.extend(get_market_data(pin.selectBase == "USDT",period))
+            mbody = get_market_data(pin.selectBase == "USDT",period)
+            for row in mbody:
+                row[0]=put_buttons([row[0]],onclick=lambda : set_symbol(str(row[0])))
+                mdata.append(row)
+            #mdata.extend(mbody)
             period = period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
             period = period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
             period = period.replace('d', ' * 24 * 60 * 60 * 1000')
@@ -68,6 +76,7 @@ def pywebio_run():
             period = period.replace('m', ' * 60 * 1000')
             period = eval(period)
             html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
+            put_text(symbol) #显示市场名 居中
             put_html(html)
             put_table(mdata)
             put_table([
