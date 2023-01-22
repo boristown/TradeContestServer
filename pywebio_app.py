@@ -20,6 +20,7 @@ def pywebio_run():
     symbol = 'BTCUSDT'
     current_time = int(time.time() * 1000)
     period = 30 * 24 * 60 * 60 * 1000
+    period_min = 60 * 1000
     put_input('search', placeholder ='输入市场名。')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
@@ -57,6 +58,14 @@ def pywebio_run():
             selperiod = pin.selectPeriod
             put_text(selinterval+','+selperiod)
             interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+            current_time = int(time.time() * 1000)
+            period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+            period = period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
+            period = period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
+            period = period.replace('d', ' * 24 * 60 * 60 * 1000')
+            period = period.replace('h', ' * 60 * 60 * 1000')
+            period = period.replace('m', ' * 60 * 1000')
+            period = eval(period)
             html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
             put_html(html)
     #put_input('input', label='This is a input widget')
