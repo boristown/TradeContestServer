@@ -59,7 +59,8 @@ def pywebio_run():
             interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
             current_time = int(time.time() * 1000)
             period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-            mdata = get_market_data(pin.selectBase == "USDT",period)
+            mdata = [['市场名','价格','成交额','涨幅%']]
+            mdata.extend(get_market_data(pin.selectBase == "USDT",period))
             period = period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
             period = period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
             period = period.replace('d', ' * 24 * 60 * 60 * 1000')
