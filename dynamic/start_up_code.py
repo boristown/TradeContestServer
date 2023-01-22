@@ -289,31 +289,18 @@ async def show_market_page(self):
 
 #实现异步方法get_market_data
 async def get_market_data(self):
-    #获取数据
-    #if not self.loading_market: return
     self.usdt_on = self.symbol_base == "USDT"
     data1d = await get_binance_ticker(self.usdt_on,self.interval)
-    #if not self.loading_market: return
-    #await asyncio.sleep(0.8)
-    #if not self.loading_market: return
-    #data7d = await get_binance_ticker("7d")
-    #if not self.loading_market: return
     symbolinfo = defaultdict(dict)
     for d1d in data1d:
         symbol = d1d["symbol"]
         symbolinfo[symbol]["price"] = d1d["lastPrice"]
         symbolinfo[symbol]["Change1d"] = d1d["priceChangePercent"]
         symbolinfo[symbol]["Volume1d"] = d1d["quoteVolume"]
-    # for d7d in data7d:
-    #     symbol = d7d["symbol"]
-    #     symbolinfo[symbol]["Change7d"] = d7d["priceChangePercent"]
-    #     symbolinfo[symbol]["Volume7d"] = d7d["quoteVolume"]
     data = []
-    #top100_symbols = get_SYM_USDT() if self.usdt_on else get_SYM_BTC()
     for symbol in symbolinfo:
         info = symbolinfo[symbol]
         data.append([symbol,float(info["price"]),float(info["Volume1d"]),float(info["Change1d"])])
-    #data.sort(key=lambda x:x[2],reverse=True)
     data = [[d[0],d[1],d[2],d[3]] for d in data]
     return data
 

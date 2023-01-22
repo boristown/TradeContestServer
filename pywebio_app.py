@@ -68,4 +68,13 @@ def pywebio_run():
             period = eval(period)
             html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
             put_html(html)
+            put_table([
+                ['Type', 'Content'],
+                ['html', put_html('X<sup>2</sup>')],
+                ['text', '<hr/>'],
+                ['buttons', put_buttons(['A', 'B'], onclick=...)],  
+                ['markdown', put_markdown('`Awesome PyWebIO!`')],
+                ['file', put_file('hello.text', b'hello world')],
+                ['table', put_table([['A', 'B'], ['C', 'D']])]
+            ])
     #put_input('input', label='This is a input widget')
