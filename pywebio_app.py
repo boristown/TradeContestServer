@@ -101,3 +101,4 @@ def get_binance_ticker(self,usdt_on,interval):
     else:
         url = local_url + "ticker_b/" + interval
     data = requests.get(url).json()
+    return data
