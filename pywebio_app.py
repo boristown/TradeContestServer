@@ -95,10 +95,11 @@ def get_market_data(usdt_on,period):
     data = [[d[0],d[1],d[2],d[3]] for d in data]
     return data
 
-def get_binance_ticker(self,usdt_on,interval):
+def get_binance_ticker(usdt_on,interval):
     if usdt_on:
         url = local_url + "ticker_u/" + interval
     else:
         url = local_url + "ticker_b/" + interval
+    print(url)
     data = requests.get(url).json()
     return data
