@@ -3,7 +3,12 @@ from pywebio.input import *
 from pywebio.output import *
 from pywebio.pin import *
 from klines import *
+from binanceAPI import *
 import time
+from collections import defaultdict
+import requests
+
+local_url = 'https://aitrad.in/'
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -78,3 +83,26 @@ def pywebio_run():
                 ['table', put_table([['A', 'B'], ['C', 'D']])]
             ])
     #put_input('input', label='This is a input widget')
+
+def get_market_data():
+    usdt_on = self.symbol_base == "USDT"
+    data1d = get_binance_ticker(self.usdt_on,self.interval)
+    symbolinfo = defaultdict(dict)
+    for d1d in data1d:
+        symbol = d1d["symbol"]
+        symbolinfo[symbol]["price"] = d1d["lastPrice"]
+        symbolinfo[symbol]["Change1d"] = d1d["priceChangePercent"]
+        symbolinfo[symbol]["Volume1d"] = d1d["quoteVolume"]
+    data = []
+    for symbol in symbolinfo:
+        info = symbolinfo[symbol]
+        data.append([symbol,float(info["price"]),float(info["Volume1d"]),float(info["Change1d"])])
+    data = [[d[0],d[1],d[2],d[3]] for d in data]
+    return data
+
+def get_binance_ticker(self,usdt_on,interval):
+    if usdt_on:
+        url = local_url + "ticker_u/" + interval
+    else:
+        url = local_url + "ticker_b/" + interval
+    data = requests.get(url).json()
