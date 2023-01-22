@@ -56,7 +56,7 @@ def pywebio_run():
             name=changed['name']
             selinterval = pin.selectInterval
             selperiod = pin.selectPeriod
-            put_text(selinterval+','+selperiod)
+            #put_text(selinterval+','+selperiod)
             interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
             current_time = int(time.time() * 1000)
             period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
