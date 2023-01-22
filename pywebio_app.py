@@ -43,17 +43,20 @@ def pywebio_run():
             )
     ])
     put_text(symbol)
-    html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
-    put_html(html)
-    put_buttons(
-        ['市场名', '价格', '成交额'+down_triangle, '涨幅'], 
-        onclick=None
-        )
+    # html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
+    # put_html(html)
+    # put_buttons(
+    #     ['市场名', '价格', '成交额'+down_triangle, '涨幅'], 
+    #     onclick=None
+    #     )
     while True:
-        changed = pin_wait_change(['selectBase', 'selectInterval', 'selectPeriod'])
+        changed = pin_wait_change(['search','selectBase', 'selectInterval', 'selectPeriod'])
         with use_scope('kline', clear=True):
             name=changed['name']
             selinterval = pin.selectInterval
             selperiod = pin.selectPeriod
             put_text(selinterval+','+selperiod)
+            interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+            html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
+            put_html(html)
     #put_input('input', label='This is a input widget')
