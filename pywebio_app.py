@@ -51,6 +51,7 @@ def pywebio_run():
     def set_symbol(name):
         nonlocal symbol
         symbol = name
+        put_text(symbol)
         return symbol
 
     while True:
@@ -66,9 +67,9 @@ def pywebio_run():
             mdata = [['市场名','价格','成交额','涨幅%']]
             mbody = get_market_data(pin.selectBase == "USDT",period)
             for row in mbody:
-                row[0]=put_buttons([row[0]],onclick=lambda : set_symbol(str(row[0])))
+                sym = row[0]
+                row[0]=put_button(row[0],onclick=lambda : set_symbol(sym))
                 mdata.append(row)
-            #mdata.extend(mbody)
             period = period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
             period = period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
             period = period.replace('d', ' * 24 * 60 * 60 * 1000')
@@ -79,15 +80,15 @@ def pywebio_run():
             put_text(symbol) #显示市场名 居中
             put_html(html)
             put_table(mdata)
-            put_table([
-                ['Type', 'Content'],
-                ['html', put_html('X<sup>2</sup>')],
-                ['text', '<hr/>'],
-                ['buttons', put_buttons(['A', 'B'], onclick=...)],  
-                ['markdown', put_markdown('`Awesome PyWebIO!`')],
-                ['file', put_file('hello.text', b'hello world')],
-                ['table', put_table([['A', 'B'], ['C', 'D']])]
-            ])
+            # put_table([
+            #     ['Type', 'Content'],
+            #     ['html', put_html('X<sup>2</sup>')],
+            #     ['text', '<hr/>'],
+            #     ['buttons', put_buttons(['A', 'B'], onclick=...)],  
+            #     ['markdown', put_markdown('`Awesome PyWebIO!`')],
+            #     ['file', put_file('hello.text', b'hello world')],
+            #     ['table', put_table([['A', 'B'], ['C', 'D']])]
+            # ])
     #put_input('input', label='This is a input widget')
 
 def get_market_data(usdt_on,period):
