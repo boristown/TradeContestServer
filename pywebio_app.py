@@ -102,10 +102,10 @@ def pywebio_run():
             cli.period = eval(cli.period)
             html = draw_klines(
                 cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
-            put_text(cli.symbol) #显示市场名 居中
+            #put_text(cli.symbol) #显示市场名 居中
             put_html(html)
             put_table(mdata)
-            
+
 def get_market_data(usdt_on,period):
     data1d = get_binance_ticker(usdt_on,period)
     symbolinfo = defaultdict(dict)
