@@ -7,6 +7,7 @@ from binanceAPI import *
 import time
 from collections import defaultdict
 import requests
+import random
 
 local_url = 'https://aitrad.in/'
 
@@ -20,12 +21,31 @@ down_triangle = '▼'
 #底部是可以排序和滑动的市场清单（列：市场名，价格，成交额，涨幅）
 #当选择列表中的市场名的时候，切换顶部的市场
 #默认排序：按成交额降序排列
+class client:
+    def __init__(self, client_id, interval, symbol, current_time, period, period_min):
+        self.client_id = client_id
+        self.interval = interval
+        self.symbol = symbol
+        self.current_time = current_time
+        self.period = period
+        self.period_min = period_min
+
+def ramdom_str(length):
+    str = ''
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    for i in range(length):
+        str += chars[random.randint(0, len(chars) - 1)]
+    return str
+
 def pywebio_run():
-    interval = '1d'
-    symbol = 'BTCUSDT'
-    current_time = int(time.time() * 1000)
-    period = 30 * 24 * 60 * 60 * 1000
-    period_min = 60 * 1000
+    client_id = ramdom_str(32)
+    cli = client(client_id, '', '', 0, 0, 0)
+    cli.interval = '1d'
+    cli.symbol = 'BTCUSDT'
+    cli.current_time = int(time.time() * 1000)
+    cli.period = 30 * 24 * 60 * 60 * 1000
+    cli.period_min = 60 * 1000
+    #cli = client(client_id, interval, symbol, current_time, period, period_min)
     put_input('search', placeholder ='输入市场名。')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
@@ -48,49 +68,44 @@ def pywebio_run():
             value='最近1天',
             )
     ])
+    put_row([
+        put_input('symbol', value=cli.symbol, readonly=True),
+    ])
     def set_symbol(name):
-        nonlocal symbol
-        symbol = name
-        put_text(symbol)
-        return symbol
+        #nonlocal symbol
+        cli.symbol = name
+        pin.symbol = cli.symbol
+        #put_text(symbol)
+        return cli.symbol
 
     while True:
-        changed = pin_wait_change(['search','selectBase', 'selectInterval', 'selectPeriod'])
+        changed = pin_wait_change(['search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
         with use_scope('kline', clear=True):
             name=changed['name']
             selinterval = pin.selectInterval
             selperiod = pin.selectPeriod
             #put_text(selinterval+','+selperiod)
-            interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
-            current_time = int(time.time() * 1000)
-            period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+            cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+            cli.current_time = int(time.time() * 1000)
+            cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
             mdata = [['市场名','价格','成交额','涨幅%']]
-            mbody = get_market_data(pin.selectBase == "USDT",period)
+            mbody = get_market_data(pin.selectBase == "USDT",cli.period)
             for row in mbody:
                 sym = row[0]
                 row[0]=put_button(row[0],onclick=lambda : set_symbol(sym))
                 mdata.append(row)
-            period = period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
-            period = period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
-            period = period.replace('d', ' * 24 * 60 * 60 * 1000')
-            period = period.replace('h', ' * 60 * 60 * 1000')
-            period = period.replace('m', ' * 60 * 1000')
-            period = eval(period)
-            html = draw_klines(symbol, interval, current_time - period, current_time, [], 1)
-            put_text(symbol) #显示市场名 居中
+            cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
+            cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
+            cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
+            cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
+            cli.period = cli.period.replace('m', ' * 60 * 1000')
+            cli.period = eval(cli.period)
+            html = draw_klines(
+                cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+            put_text(cli.symbol) #显示市场名 居中
             put_html(html)
             put_table(mdata)
-            # put_table([
-            #     ['Type', 'Content'],
-            #     ['html', put_html('X<sup>2</sup>')],
-            #     ['text', '<hr/>'],
-            #     ['buttons', put_buttons(['A', 'B'], onclick=...)],  
-            #     ['markdown', put_markdown('`Awesome PyWebIO!`')],
-            #     ['file', put_file('hello.text', b'hello world')],
-            #     ['table', put_table([['A', 'B'], ['C', 'D']])]
-            # ])
-    #put_input('input', label='This is a input widget')
-
+            
 def get_market_data(usdt_on,period):
     data1d = get_binance_ticker(usdt_on,period)
     symbolinfo = defaultdict(dict)
