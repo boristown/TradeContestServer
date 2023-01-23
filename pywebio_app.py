@@ -47,8 +47,6 @@ def pywebio_run():
     cli.period_min = 60 * 1000
     cli.sort_key = '成交'
     cli.sort_reverse = True
-    cli.header = ['市场', '价格', '幅', '成交']
-    #cli = client(client_id, interval, symbol, current_time, period, period_min)
     put_input('search', placeholder ='输入市场名。')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
@@ -81,26 +79,26 @@ def pywebio_run():
         redraw(cli)
 
 def set_symbol(cli,name):
-    #nonlocal symbol
     cli.symbol = name
     pin.symbol = cli.symbol
     redraw(cli)
-    #put_text(symbol)
     return cli.symbol
 
 def set_sort(cli,label):
+    label = label.replace(up_triangle, '').replace(down_triangle, '')
     if cli.sort_key == label:
         cli.sort_reverse = not cli.sort_reverse
     else:
         cli.sort_key = label
         cli.sort_reverse = False
+    redraw(cli)
 
 def sort_button(cli,label):
-    return put_button(label, onclick=lambda cli=cli,label=label: set_sort(label))
+    return put_button(label, onclick=lambda cli=cli,label=label: set_sort(cli,label))
 
 def update_header(cli):
     cli.header = ['市场', '价格', '幅', '成交']
-    suffix = up_triangle if cli.sort_reverse else down_triangle
+    suffix = down_triangle if cli.sort_reverse else up_triangle
     for i in range(len(cli.header)):
         if cli.header[i] == cli.sort_key:
             cli.header[i] += suffix
@@ -117,6 +115,14 @@ def redraw(cli: client):
         cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
         mdata = [cli.header_row]
         mbody = get_market_data(pin.selectBase == "USDT",cli.period)
+        if cli.sort_key == '市场':
+            mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
+        elif cli.sort_key == '价格':
+            mbody.sort(key=lambda x: x[1], reverse=cli.sort_reverse)
+        elif cli.sort_key == '幅':
+            mbody.sort(key=lambda x: x[3], reverse=cli.sort_reverse)
+        elif cli.sort_key == '成交':
+            mbody.sort(key=lambda x: x[2], reverse=cli.sort_reverse)
         for row in mbody:
             sym = row[0]
             search_upper = pin.search.upper()
