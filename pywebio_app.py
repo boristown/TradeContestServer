@@ -94,14 +94,14 @@ def redraw(cli: client):
         cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
         cli.current_time = int(time.time() * 1000)
         cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-        mdata = [['市场名','价格','涨幅%','成交额']]
+        mdata = [['市场','价格','涨幅%','成交额']]
         mbody = get_market_data(pin.selectBase == "USDT",cli.period)
         for row in mbody:
             sym = row[0]
             search_upper = pin.search.upper()
             if search_upper and search_upper not in sym: continue
             row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
-            mdata.append([row[0],row[1],row[3],row[2]])
+            mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
         cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
         cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
         cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
