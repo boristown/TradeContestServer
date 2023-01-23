@@ -71,17 +71,23 @@ def pywebio_run():
     put_row([
         put_input('symbol', value=cli.symbol, readonly=True),
     ])
-    def set_symbol(name):
-        #nonlocal symbol
-        cli.symbol = name
-        pin.symbol = cli.symbol
-        #put_text(symbol)
-        return cli.symbol
-
+    
+    redraw(cli)
     while True:
         changed = pin_wait_change(['search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
-        with use_scope('kline', clear=True):
-            name=changed['name']
+        redraw(cli)
+
+def set_symbol(cli,name):
+    #nonlocal symbol
+    cli.symbol = name
+    pin.symbol = cli.symbol
+    redraw(cli)
+    #put_text(symbol)
+    return cli.symbol
+
+def redraw(cli: client):
+    with use_scope('kline', clear=True):
+            #name=changed['name']
             selinterval = pin.selectInterval
             selperiod = pin.selectPeriod
             #put_text(selinterval+','+selperiod)
@@ -92,7 +98,7 @@ def pywebio_run():
             mbody = get_market_data(pin.selectBase == "USDT",cli.period)
             for row in mbody:
                 sym = row[0]
-                row[0]=put_button(row[0],onclick=lambda : set_symbol(sym))
+                row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
                 mdata.append(row)
             cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
             cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
