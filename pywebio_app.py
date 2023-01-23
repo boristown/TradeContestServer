@@ -45,6 +45,9 @@ def pywebio_run():
     cli.current_time = int(time.time() * 1000)
     cli.period = 30 * 24 * 60 * 60 * 1000
     cli.period_min = 60 * 1000
+    cli.sort_key = '成交'
+    cli.sort_reverse = True
+    cli.header = ['市场', '价格', '幅', '成交']
     #cli = client(client_id, interval, symbol, current_time, period, period_min)
     put_input('search', placeholder ='输入市场名。')
     put_row([
@@ -85,16 +88,34 @@ def set_symbol(cli,name):
     #put_text(symbol)
     return cli.symbol
 
+def set_sort(cli,label):
+    if cli.sort_key == label:
+        cli.sort_reverse = not cli.sort_reverse
+    else:
+        cli.sort_key = label
+        cli.sort_reverse = False
+
+def sort_button(cli,label):
+    return put_button(label, onclick=lambda cli=cli,label=label: set_sort(label))
+
+def update_header(cli):
+    cli.header = ['市场', '价格', '幅', '成交']
+    suffix = up_triangle if cli.sort_reverse else down_triangle
+    for i in range(len(cli.header)):
+        if cli.header[i] == cli.sort_key:
+            cli.header[i] += suffix
+            break
+    cli.header_row = [sort_button(cli, label) for label in cli.header]
+    
 def redraw(cli: client):
     with use_scope('kline', clear=True):
-        #name=changed['name']
+        update_header(cli)
         selinterval = pin.selectInterval
         selperiod = pin.selectPeriod
-        #put_text(selinterval+','+selperiod)
         cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
         cli.current_time = int(time.time() * 1000)
         cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-        mdata = [['市场','价格','涨幅%','成交额']]
+        mdata = [cli.header_row]
         mbody = get_market_data(pin.selectBase == "USDT",cli.period)
         for row in mbody:
             sym = row[0]
