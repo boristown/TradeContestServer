@@ -8,6 +8,7 @@ import time
 from collections import defaultdict
 import requests
 import random
+from copy import deepcopy
 
 local_url = 'https://aitrad.in/'
 
@@ -29,6 +30,8 @@ class client:
         self.current_time = current_time
         self.period = period
         self.period_min = period_min
+        self.ticker_cache = {}
+        self.kline_cache = {}
 
 def ramdom_str(length):
     str = ''
@@ -47,7 +50,7 @@ def pywebio_run():
     cli.period_min = 60 * 1000
     cli.sort_key = '成交'
     cli.sort_reverse = True
-    put_input('search', placeholder ='输入市场名。')
+    put_input('search', placeholder ='输入市场名:')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
         put_select('selectInterval', 
@@ -114,7 +117,7 @@ def redraw(cli: client):
         cli.current_time = int(time.time() * 1000)
         cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
         mdata = [cli.header_row]
-        mbody = get_market_data(pin.selectBase == "USDT",cli.period)
+        mbody = get_market_data(cli,pin.selectBase == "USDT",cli.period)
         if cli.sort_key == '市场':
             mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
         elif cli.sort_key == '价格':
@@ -135,13 +138,22 @@ def redraw(cli: client):
         cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
         cli.period = cli.period.replace('m', ' * 60 * 1000')
         cli.period = eval(cli.period)
-        html = draw_klines(
-            cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+        key = (cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time)
+        if key in cli.kline_cache:
+            html = cli.kline_cache[key]
+        else:
+            html = draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+            cli.kline_cache[key] = html
+        #html = draw_klines(
+        #    cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
         #put_text(cli.symbol) #显示市场名 居中
         put_html(html)
         put_table(mdata)
 
-def get_market_data(usdt_on,period):
+def get_market_data(cli,usdt_on,period):
+    key=(usdt_on,period)
+    #if key in cli.ticker_cache:
+    #    return cli.ticker_cache[key]
     data1d = get_binance_ticker(usdt_on,period)
     symbolinfo = defaultdict(dict)
     for d1d in data1d:
@@ -154,6 +166,7 @@ def get_market_data(usdt_on,period):
         info = symbolinfo[symbol]
         data.append([symbol,float(info["price"]),float(info["Volume1d"]),float(info["Change1d"])])
     data = [[d[0],d[1],d[2],d[3]] for d in data]
+    #cli.ticker_cache[key] = deepcopy(data)
     return data
 
 def get_binance_ticker(usdt_on,interval):
