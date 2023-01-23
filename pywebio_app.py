@@ -71,7 +71,7 @@ def pywebio_run():
     put_row([
         put_input('symbol', value=cli.symbol, readonly=True),
     ])
-    
+    pin.search = ''
     redraw(cli)
     while True:
         changed = pin_wait_change(['search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
@@ -87,30 +87,32 @@ def set_symbol(cli,name):
 
 def redraw(cli: client):
     with use_scope('kline', clear=True):
-            #name=changed['name']
-            selinterval = pin.selectInterval
-            selperiod = pin.selectPeriod
-            #put_text(selinterval+','+selperiod)
-            cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
-            cli.current_time = int(time.time() * 1000)
-            cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-            mdata = [['市场名','价格','成交额','涨幅%']]
-            mbody = get_market_data(pin.selectBase == "USDT",cli.period)
-            for row in mbody:
-                sym = row[0]
-                row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
-                mdata.append(row)
-            cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
-            cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
-            cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
-            cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
-            cli.period = cli.period.replace('m', ' * 60 * 1000')
-            cli.period = eval(cli.period)
-            html = draw_klines(
-                cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
-            #put_text(cli.symbol) #显示市场名 居中
-            put_html(html)
-            put_table(mdata)
+        #name=changed['name']
+        selinterval = pin.selectInterval
+        selperiod = pin.selectPeriod
+        #put_text(selinterval+','+selperiod)
+        cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+        cli.current_time = int(time.time() * 1000)
+        cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+        mdata = [['市场名','价格','涨幅%','成交额']]
+        mbody = get_market_data(pin.selectBase == "USDT",cli.period)
+        for row in mbody:
+            sym = row[0]
+            search_upper = pin.search.upper()
+            if search_upper and search_upper not in sym: continue
+            row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
+            mdata.append([row[0],row[1],row[3],row[2]])
+        cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
+        cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
+        cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
+        cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
+        cli.period = cli.period.replace('m', ' * 60 * 1000')
+        cli.period = eval(cli.period)
+        html = draw_klines(
+            cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+        #put_text(cli.symbol) #显示市场名 居中
+        put_html(html)
+        put_table(mdata)
 
 def get_market_data(usdt_on,period):
     data1d = get_binance_ticker(usdt_on,period)
@@ -128,6 +130,8 @@ def get_market_data(usdt_on,period):
     return data
 
 def get_binance_ticker(usdt_on,interval):
+    if 'M' in interval or 'y' in interval:
+        interval = '7d'
     if usdt_on:
         url = local_url + "ticker_u/" + interval
     else:
