@@ -151,10 +151,7 @@ def redraw(cli: client):
         put_table(mdata)
 
 def get_market_data(cli,usdt_on,period):
-    key=(usdt_on,period)
-    #if key in cli.ticker_cache:
-    #    return cli.ticker_cache[key]
-    data1d = get_binance_ticker(usdt_on,period)
+    data1d = get_binance_ticker(cli,usdt_on,period)
     symbolinfo = defaultdict(dict)
     for d1d in data1d:
         symbol = d1d["symbol"]
@@ -166,10 +163,12 @@ def get_market_data(cli,usdt_on,period):
         info = symbolinfo[symbol]
         data.append([symbol,float(info["price"]),float(info["Volume1d"]),float(info["Change1d"])])
     data = [[d[0],d[1],d[2],d[3]] for d in data]
-    #cli.ticker_cache[key] = deepcopy(data)
     return data
 
-def get_binance_ticker(usdt_on,interval):
+def get_binance_ticker(cli,usdt_on,interval):
+    key=(usdt_on,interval)
+    if key in cli.ticker_cache:
+        return cli.ticker_cache[key]
     if 'M' in interval or 'y' in interval:
         interval = '7d'
     if usdt_on:
@@ -178,4 +177,5 @@ def get_binance_ticker(usdt_on,interval):
         url = local_url + "ticker_b/" + interval
     print(url)
     data = requests.get(url).json()
+    cli.ticker_cache[key] = deepcopy(data)
     return data
