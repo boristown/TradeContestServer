@@ -51,6 +51,34 @@ def pywebio_run():
     cli.period_min = 60 * 1000
     cli.sort_key = '成交'
     cli.sort_reverse = True
+    #市场 / 模拟交易 / 比赛排行
+    put_radio('switch_tab', 
+    options=['市场', '模拟交易', '比赛排行'],
+    inline=True,
+    value='市场', 
+    #onclick=lambda tab: redraw(cli)
+    )
+    pin.search = ''
+    redraw(cli)
+    while True:
+        changed = pin_wait_change(['switch_tab','search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
+        name = changed['name']
+        value = changed['value']
+        if name == 'switch_tab':
+            if value == '市场':
+                redraw(cli)
+            elif value == '模拟交易':
+                #get_scope('market').clear()
+                clear('market')
+                clear('sponsor')
+                redraw_login(cli)
+                #show_sponsors(cli)
+        else:
+            show_market_kline(cli)
+            show_market_table(cli)
+
+@use_scope('market_header', clear=True)
+def show_market_header(cli):
     put_input('search', placeholder ='输入市场名:')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
@@ -76,11 +104,6 @@ def pywebio_run():
     put_row([
         put_input('symbol', value=cli.symbol, readonly=True),
     ])
-    pin.search = ''
-    redraw(cli)
-    while True:
-        changed = pin_wait_change(['search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
-        redraw(cli)
 
 def set_symbol(cli,name):
     cli.symbol = name
@@ -114,13 +137,45 @@ def update_header(cli):
     cli.header_row = [sort_button(cli, label) for label in cli.header]
 
 def redraw(cli: client):
-    #Thread(target=redraw_thread, args=(cli,)).start()
     while True:
         tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
         redraw_thread(cli)
         show_sponsors()
         if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
             break
+
+@use_scope('login', clear=True)
+def redraw_login(cli: client):
+    #输入密钥点击登陆
+    #如果没有密钥，点击注册
+    #点击注册后，输出一个32为随机在字符串
+    #提示用户：该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回
+    #请将该密钥复制到上方输入框中，点击登陆
+    put_input('key', placeholder='输入密钥')
+    put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
+
+def login(cli: client, btn):
+    if btn == '登陆':
+        key = pin.key
+        if key == '':
+            with use_scope('login_error', clear=True):
+                put_error('请输入密钥')
+        else:
+            cli = client(key, '', '', 0, 0, 0)
+            cli.interval = '1d'
+            cli.symbol = 'BTCUSDT'
+            cli.current_time = int(time.time() * 1000)
+            cli.period = 30 * 24 * 60 * 60 * 1000
+            cli.period_min = 60 * 1000
+            cli.sort_key = '成交'
+            cli.sort_reverse = True
+            redraw(cli)
+    elif btn == '注册':
+        key = ramdom_str(32)
+        put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+        put_text('请将该密钥复制到上方输入框中，点击登陆')
+        put_input('user_key', value=key, readonly=True)
+
 
 @use_scope('sponsor', clear=True)
 def show_sponsors():
@@ -159,13 +214,7 @@ def show_market_kline(cli: client):
     cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
     cli.current_time = int(time.time() * 1000)
     cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-    #市场 / 模拟交易 / 比赛排行
-    put_radio('tab', 
-    options=['市场', '模拟交易', '比赛排行'],
-    inline=True,
-    value='市场', 
-    #onclick=lambda tab: redraw(cli)
-    )
+    
     cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
@@ -208,6 +257,7 @@ def show_market_table(cli: client):
 
 @use_scope('market', clear=True)
 def redraw_thread(cli: client):
+    show_market_header(cli)
     show_market_kline(cli)
     show_market_table(cli)
         
