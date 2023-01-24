@@ -85,7 +85,7 @@ def pywebio_run():
 def set_symbol(cli,name):
     cli.symbol = name
     pin.symbol = cli.symbol
-    redraw(cli)
+    show_market_kline(cli)
     return cli.symbol
 
 def set_sort(cli,label):
@@ -95,7 +95,7 @@ def set_sort(cli,label):
     else:
         cli.sort_key = label
         cli.sort_reverse = False
-    redraw(cli)
+    show_market_table(cli)
 
 def sort_button(cli,label):
     return put_button(label, onclick=lambda cli=cli,label=label: set_sort(cli,label))
@@ -114,86 +114,99 @@ def redraw(cli: client):
     while True:
         tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
         redraw_thread(cli)
+        show_sponsors()
         if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
             break
 
+@use_scope('sponsor', clear=True)
+def show_sponsors():
+    #输出赞助人（并输出感谢的话）：
+    #淘淘
+    #熊*添
+    #刘*超
+    #小点点
+    #秦汉
+    #张*勇
+    #赵磊
+    #冯*俊
+    #徐坚
+    #于*万
+    #居中显示
+    put_text('By AI纪元')
+    put_text('感谢以下赞助人的支持！')
+    put_text('淘淘')
+    put_text('熊*添')
+    put_text('刘*超')
+    put_text('小点点')
+    put_text('秦汉')
+    put_text('张*勇')
+    put_text('赵磊')
+    put_text('冯*俊')
+    put_text('徐坚')
+    put_text('于*万')
+    put_text('如果您也想成为赞助人，请联系：tbziy@foxmail.com')
+    #超链接：
+    put_link('项目地址','https://github.com/boristown/TradeContestServer')
+
+@use_scope('market_kline', clear=True)
+def show_market_kline(cli: client):
+    selinterval = pin.selectInterval
+    selperiod = pin.selectPeriod
+    cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+    cli.current_time = int(time.time() * 1000)
+    cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+    #市场 / 模拟交易 / 比赛排行
+    put_radio('tab', 
+    options=['市场', '模拟交易', '比赛排行'],
+    inline=True,
+    value='市场', 
+    #onclick=lambda tab: redraw(cli)
+    )
+    cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
+    cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
+    cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
+    cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
+    cli.period = cli.period.replace('m', ' * 60 * 1000')
+    cli.period = eval(cli.period)
+    key = (cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time)
+    if key in cli.kline_cache:
+        html = cli.kline_cache[key]
+    else:
+        html = draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+        cli.kline_cache[key] = html
+    put_html(html)
+
+@use_scope('market_table', clear=True)
+def show_market_table(cli: client):
+    selinterval = pin.selectInterval
+    selperiod = pin.selectPeriod
+    cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+    cli.current_time = int(time.time() * 1000)
+    cli.period_s = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+    update_header(cli)
+    mdata = [cli.header_row]
+    mbody = get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
+    if cli.sort_key == '市场':
+        mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
+    elif cli.sort_key == '价格':
+        mbody.sort(key=lambda x: x[1], reverse=cli.sort_reverse)
+    elif cli.sort_key == '幅':
+        mbody.sort(key=lambda x: x[3], reverse=cli.sort_reverse)
+    elif cli.sort_key == '成交':
+        mbody.sort(key=lambda x: x[2], reverse=cli.sort_reverse)
+    for row in mbody:
+        sym = row[0]
+        search_upper = pin.search.upper()
+        if search_upper and search_upper not in sym: continue
+        row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
+        mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
+    put_table(mdata)
+
+@use_scope('market', clear=True)
 def redraw_thread(cli: client):
-    with use_scope('kline', clear=True):
-        update_header(cli)
-        selinterval = pin.selectInterval
-        selperiod = pin.selectPeriod
-        cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
-        cli.current_time = int(time.time() * 1000)
-        cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-        #市场 / 模拟交易 / 比赛排行
-        put_radio('tab', 
-        options=['市场', '模拟交易', '比赛排行'],
-        inline=True,
-        value='市场', 
-        #onclick=lambda tab: redraw(cli)
-        )
-        mdata = [cli.header_row]
-        mbody = get_market_data(cli,pin.selectBase == "USDT",cli.period)
-        if cli.sort_key == '市场':
-            mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
-        elif cli.sort_key == '价格':
-            mbody.sort(key=lambda x: x[1], reverse=cli.sort_reverse)
-        elif cli.sort_key == '幅':
-            mbody.sort(key=lambda x: x[3], reverse=cli.sort_reverse)
-        elif cli.sort_key == '成交':
-            mbody.sort(key=lambda x: x[2], reverse=cli.sort_reverse)
-        for row in mbody:
-            sym = row[0]
-            search_upper = pin.search.upper()
-            if search_upper and search_upper not in sym: continue
-            row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
-            mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
-        cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
-        cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
-        cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
-        cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
-        cli.period = cli.period.replace('m', ' * 60 * 1000')
-        cli.period = eval(cli.period)
-        key = (cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time)
-        if key in cli.kline_cache:
-            html = cli.kline_cache[key]
-        else:
-            html = draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
-            cli.kline_cache[key] = html
-        #html = draw_klines(
-        #    cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
-        #put_text(cli.symbol) #显示市场名 居中
-        put_html(html)
-        put_table(mdata)
-        #输出赞助人（并输出感谢的话）：
-        #淘淘
-        #熊*添
-        #刘*超
-        #小点点
-        #秦汉
-        #张*勇
-        #赵磊
-        #冯*俊
-        #徐坚
-        #于*万
-
-        #居中显示
-        put_text('By AI纪元')
-        put_text('感谢以下赞助人的支持！')
-        put_text('淘淘')
-        put_text('熊*添')
-        put_text('刘*超')
-        put_text('小点点')
-        put_text('秦汉')
-        put_text('张*勇')
-        put_text('赵磊')
-        put_text('冯*俊')
-        put_text('徐坚')
-        put_text('于*万')
-        put_text('如果您也想成为赞助人，请联系：tbziy@foxmail.com')
-        #超链接：
-        put_link('项目地址','https://github.com/boristown/TradeContestServer')
-
+    show_market_kline(cli)
+    show_market_table(cli)
+        
 def get_market_data(cli,usdt_on,period):
     data1d = get_binance_ticker(cli,usdt_on,period)
     symbolinfo = defaultdict(dict)
