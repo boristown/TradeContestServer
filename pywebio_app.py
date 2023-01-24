@@ -35,13 +35,11 @@ class client:
         self.kline_cache = {}
         self.switch_tab = ''
         self.sort_field = ''
-
-def ramdom_str(length):
-    str = ''
-    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    for i in range(length):
-        str += chars[random.randint(0, len(chars) - 1)]
-    return str
+        self.sort_reverse = False
+        self.selectBase = ''
+        self.selectInterval = ''
+        self.selectPeriod = ''
+        self.search = ''
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -54,33 +52,93 @@ def pywebio_run():
     cli.sort_key = '成交'
     cli.sort_reverse = True
     #市场 / 模拟交易 / 比赛排行
-    put_radio('switch_tab', 
-    options=['市场', '模拟交易', '比赛排行'],
-    inline=True,
-    value='市场', 
-    #onclick=lambda tab: redraw(cli)
+    put_radio(
+        'switch_tab', 
+        options=['市场', '模拟交易', '比赛排行'],
+        inline=True,
+        value='市场',
     )
     pin.search = ''
-    redraw(cli)
+    global_redraw(cli)
+    # while True:
+    #     changed = pin_wait_change([
+    #         'switch_tab', 'search', 'symbol',
+    #         'selectBase', 'selectInterval', 'selectPeriod'
+    #         ])
+    #     name = changed['name']
+    #     value = changed['value']
+    #     if name == 'switch_tab':
+    #         if value == '市场':
+    #             redraw(cli)
+    #         elif value == '模拟交易':
+    #             #get_scope('market').clear()
+    #             clear('market')
+    #             clear('sponsor')
+    #             redraw_login(cli)
+    #             #show_sponsors(cli)
+    #     else:
+    #         redraw_market_kline(cli)
+    #         redraw_market_table(cli)
+
+#全局重绘
+def global_redraw(cli):
     while True:
-        changed = pin_wait_change(['switch_tab','search','symbol','selectBase', 'selectInterval', 'selectPeriod'])
-        name = changed['name']
-        value = changed['value']
-        if name == 'switch_tab':
-            if value == '市场':
-                redraw(cli)
-            elif value == '模拟交易':
-                #get_scope('market').clear()
-                clear('market')
-                clear('sponsor')
-                redraw_login(cli)
-                #show_sponsors(cli)
+        redraw_content(cli)
+
+#内容重绘
+@use_scope('content', clear=True)
+def redraw_content(cli):
+    if pin.switch_tab == '市场':
+        if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘
+            temp_switch_tab = pin.switch_tab
+            redraw_market(cli)
+            cli.switch_tab = temp_switch_tab
+        else: #没切换tab，局部重绘
+            #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
+            if cli.symbol != pin.symbol or \
+                cli.selectInterval != pin.selectInterval or \
+                cli.selectPeriod != pin.selectPeriod:
+                temp_symbol = pin.symbol
+                temp_selectInterval = pin.selectInterval
+                temp_selectPeriod = pin.selectPeriod
+                redraw_market_kline(cli)
+            #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
+            if cli.search != pin.search or \
+                cli.selectBase != pin.selectBase or \
+                cli.selectPeriod != pin.selectPeriod or \
+                cli.sort_field != pin.sort_field or \
+                cli.sort_reverse != pin.sort_reverse:
+                temp_search = pin.search
+                temp_selectBase = pin.selectBase
+                temp_selectPeriod = pin.selectPeriod
+                temp_sort_field = pin.sort_field
+                temp_sort_reverse = pin.sort_reverse
+                redraw_market_table(cli)
+            cli.symbol = temp_symbol
+            cli.selectInterval = temp_selectInterval
+            cli.selectPeriod = temp_selectPeriod
+            cli.search = temp_search
+            cli.selectBase = temp_selectBase
+            cli.selectPeriod = temp_selectPeriod
+            cli.sort_field = temp_sort_field
+            cli.sort_reverse = temp_sort_reverse
+
+    elif pin.switch_tab == '模拟交易':
+        if cli.switch_tab != pin.switch_tab:
+            temp_switch_tab = pin.switch_tab
+            redraw_login(cli)
+            cli.switch_tab = temp_switch_tab
         else:
-            show_market_kline(cli)
-            show_market_table(cli)
+            pass
+    pin_wait_change(
+        [
+            'switch_tab', 'search', 'symbol',
+            'selectBase', 'selectInterval', 'selectPeriod'
+        ]
+    )
 
 @use_scope('market_header', clear=True)
-def show_market_header(cli):
+def redraw_market_header(cli):
     put_input('search', placeholder ='输入市场名:')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
@@ -110,7 +168,7 @@ def show_market_header(cli):
 def set_symbol(cli,name):
     cli.symbol = name
     pin.symbol = cli.symbol
-    show_market_kline(cli)
+    redraw_market_kline(cli)
     return cli.symbol
 
 def set_sort(cli,label):
@@ -120,7 +178,7 @@ def set_sort(cli,label):
     else:
         cli.sort_key = label
         cli.sort_reverse = False
-    show_market_table(cli)
+    redraw_market_table(cli)
 
 def sort_button(cli,label):
     return put_button(
@@ -138,14 +196,14 @@ def update_header(cli):
             break
     cli.header_row = [sort_button(cli, label) for label in cli.header]
 
-@use_scope('content', clear=True)
-def redraw(cli: client):
-    while True:
-        tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
-        redraw_thread(cli)
-        show_sponsors()
-        if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
-            break
+# @use_scope('content', clear=True)
+# def redraw(cli: client):
+#     while True:
+#         tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
+#         redraw_thread(cli)
+#         show_sponsors()
+#         if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
+#             break
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
@@ -180,7 +238,7 @@ def login(cli: client, btn):
         put_input('user_key', value=key, readonly=True)
 
 @use_scope('sponsor', clear=True)
-def show_sponsors():
+def redraw_sponsor(cli: client):
     #输出赞助人（并输出感谢的话）：
     #淘淘
     #熊*添
@@ -210,7 +268,7 @@ def show_sponsors():
     put_link('项目地址','https://github.com/boristown/TradeContestServer')
 
 @use_scope('market_kline', clear=True)
-def show_market_kline(cli: client):
+def redraw_market_kline(cli: client):
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
     cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
@@ -232,7 +290,7 @@ def show_market_kline(cli: client):
     put_html(html)
 
 @use_scope('market_table', clear=True)
-def show_market_table(cli: client):
+def redraw_market_table(cli: client):
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
     cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
@@ -258,10 +316,11 @@ def show_market_table(cli: client):
     put_table(mdata)
 
 @use_scope('market', clear=True)
-def redraw_thread(cli: client):
-    show_market_header(cli)
-    show_market_kline(cli)
-    show_market_table(cli)
+def redraw_market(cli: client):
+    redraw_market_header(cli)
+    redraw_market_kline(cli)
+    redraw_market_table(cli)
+    redraw_sponsor(cli)
         
 def get_market_data(cli,usdt_on,period):
     data1d = get_binance_ticker(cli,usdt_on,period)
@@ -292,3 +351,10 @@ def get_binance_ticker(cli,usdt_on,interval):
     data = requests.get(url).json()
     cli.ticker_cache[key] = deepcopy(data)
     return data
+
+def ramdom_str(length):
+    str = ''
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    for i in range(length):
+        str += chars[random.randint(0, len(chars) - 1)]
+    return str
