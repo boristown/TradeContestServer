@@ -200,6 +200,7 @@ def redraw_login(cli: client):
     #请将该密钥复制到上方输入框中，点击登陆
     put_input('key', placeholder='输入密钥')
     put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
+    put_scope('login_info')
 
 def login(cli: client, btn):
     if btn == '登陆':
