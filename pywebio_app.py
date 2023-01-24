@@ -111,7 +111,11 @@ def update_header(cli):
 
 def redraw(cli: client):
     #Thread(target=redraw_thread, args=(cli,)).start()
-    redraw_thread(cli)
+    while True:
+        tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
+        redraw_thread(cli)
+        if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
+            break
 
 def redraw_thread(cli: client):
     with use_scope('kline', clear=True):
@@ -172,7 +176,7 @@ def redraw_thread(cli: client):
         #冯*俊
         #徐坚
         #于*万
-        
+
         #居中显示
         put_text('By AI纪元')
         put_text('感谢以下赞助人的支持！')
