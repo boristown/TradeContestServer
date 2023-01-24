@@ -33,6 +33,8 @@ class client:
         self.period_min = period_min
         self.ticker_cache = {}
         self.kline_cache = {}
+        self.switch_tab = ''
+        self.sort_field = ''
 
 def ramdom_str(length):
     str = ''
@@ -136,6 +138,7 @@ def update_header(cli):
             break
     cli.header_row = [sort_button(cli, label) for label in cli.header]
 
+@use_scope('content', clear=True)
 def redraw(cli: client):
     while True:
         tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
@@ -175,7 +178,6 @@ def login(cli: client, btn):
         put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
         put_text('请将该密钥复制到上方输入框中，点击登陆')
         put_input('user_key', value=key, readonly=True)
-
 
 @use_scope('sponsor', clear=True)
 def show_sponsors():
