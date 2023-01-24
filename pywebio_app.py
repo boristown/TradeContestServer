@@ -34,8 +34,8 @@ class client:
         self.ticker_cache = {}
         self.kline_cache = {}
         self.switch_tab = ''
-        self.sort_field = ''
-        self.sort_reverse = False
+        self.sort_field = '成交'
+        self.sort_reverse = True
         self.selectBase = ''
         self.selectInterval = ''
         self.selectPeriod = ''
@@ -60,25 +60,6 @@ def pywebio_run():
     )
     pin.search = ''
     global_redraw(cli)
-    # while True:
-    #     changed = pin_wait_change([
-    #         'switch_tab', 'search', 'symbol',
-    #         'selectBase', 'selectInterval', 'selectPeriod'
-    #         ])
-    #     name = changed['name']
-    #     value = changed['value']
-    #     if name == 'switch_tab':
-    #         if value == '市场':
-    #             redraw(cli)
-    #         elif value == '模拟交易':
-    #             #get_scope('market').clear()
-    #             clear('market')
-    #             clear('sponsor')
-    #             redraw_login(cli)
-    #             #show_sponsors(cli)
-    #     else:
-    #         redraw_market_kline(cli)
-    #         redraw_market_table(cli)
 
 #全局重绘
 def global_redraw(cli):
@@ -88,54 +69,68 @@ def global_redraw(cli):
 #内容重绘
 @use_scope('content', clear=True)
 def redraw_content(cli):
-    if pin.switch_tab == '市场':
-        if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘
-            temp_switch_tab = pin.switch_tab
-            redraw_market(cli)
-            cli.switch_tab = temp_switch_tab
-        else: #没切换tab，局部重绘
-            #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
-            if cli.symbol != pin.symbol or \
-                cli.selectInterval != pin.selectInterval or \
-                cli.selectPeriod != pin.selectPeriod:
-                temp_symbol = pin.symbol
-                temp_selectInterval = pin.selectInterval
-                temp_selectPeriod = pin.selectPeriod
-                redraw_market_kline(cli)
-            #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
-            if cli.search != pin.search or \
-                cli.selectBase != pin.selectBase or \
-                cli.selectPeriod != pin.selectPeriod or \
-                cli.sort_field != pin.sort_field or \
-                cli.sort_reverse != pin.sort_reverse:
-                temp_search = pin.search
-                temp_selectBase = pin.selectBase
-                temp_selectPeriod = pin.selectPeriod
-                temp_sort_field = pin.sort_field
-                temp_sort_reverse = pin.sort_reverse
-                redraw_market_table(cli)
-            cli.symbol = temp_symbol
-            cli.selectInterval = temp_selectInterval
-            cli.selectPeriod = temp_selectPeriod
-            cli.search = temp_search
-            cli.selectBase = temp_selectBase
-            cli.selectPeriod = temp_selectPeriod
-            cli.sort_field = temp_sort_field
-            cli.sort_reverse = temp_sort_reverse
+    while True:
+        if pin.switch_tab == '市场':
+            print('redraw market')
+            if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘
+                print('redraw market all')
+                temp_switch_tab = pin.switch_tab
+                redraw_market(cli)
+                print('redraw market all done',pin.selectInterval, pin.selectPeriod)
+                cli.switch_tab = temp_switch_tab            
+                cli.symbol = pin.symbol
+                cli.selectInterval = pin.selectInterval
+                cli.selectPeriod = pin.selectPeriod
+                cli.search = pin.search
+                cli.selectBase = pin.selectBase
+                cli.selectPeriod = pin.selectPeriod
+            else: #没切换tab，局部重绘
+                print('redraw market part')
+                #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
+                if cli.symbol != pin.symbol or \
+                    cli.selectInterval != pin.selectInterval or \
+                    cli.selectPeriod != pin.selectPeriod:
+                    temp_symbol = pin.symbol
+                    temp_selectInterval = pin.selectInterval
+                    temp_selectPeriod = pin.selectPeriod
+                    print('redraw market kline',pin.selectInterval, pin.selectPeriod)
+                    redraw_market_kline(cli)
+                    cli.symbol = temp_symbol
+                    cli.selectInterval = temp_selectInterval
+                    cli.selectPeriod = temp_selectPeriod
+                #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
+                if cli.search != pin.search or \
+                    cli.selectBase != pin.selectBase or \
+                    cli.selectPeriod != pin.selectPeriod:
+                    temp_search = pin.search
+                    temp_selectBase = pin.selectBase
+                    temp_selectPeriod = pin.selectPeriod
+                    print('redraw market table')
+                    redraw_market_table(cli)
+                    cli.selectPeriod = temp_selectPeriod
+                    cli.search = temp_search
+                    cli.selectBase = temp_selectBase
 
-    elif pin.switch_tab == '模拟交易':
+        elif pin.switch_tab == '模拟交易':
+            print('redraw login')
+            if cli.switch_tab != pin.switch_tab:
+                print('redraw login all')
+                temp_switch_tab = pin.switch_tab
+                redraw_login(cli)
+                cli.switch_tab = temp_switch_tab
+            else:
+                pass
+        print('global_redraw waiting change...')
+        changed = pin_wait_change(
+            [
+                'switch_tab', 'search', 'symbol',
+                'selectBase', 'selectInterval', 'selectPeriod'
+            ]
+        )
+        print('change detected:' + str(changed))
         if cli.switch_tab != pin.switch_tab:
-            temp_switch_tab = pin.switch_tab
-            redraw_login(cli)
-            cli.switch_tab = temp_switch_tab
-        else:
-            pass
-    pin_wait_change(
-        [
-            'switch_tab', 'search', 'symbol',
-            'selectBase', 'selectInterval', 'selectPeriod'
-        ]
-    )
+            print('change detected: switch_tab')
+            break
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -196,15 +191,6 @@ def update_header(cli):
             break
     cli.header_row = [sort_button(cli, label) for label in cli.header]
 
-# @use_scope('content', clear=True)
-# def redraw(cli: client):
-#     while True:
-#         tuple = (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod)
-#         redraw_thread(cli)
-#         show_sponsors()
-#         if tuple == (pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod):
-#             break
-
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
     #输入密钥点击登陆
@@ -219,7 +205,7 @@ def login(cli: client, btn):
     if btn == '登陆':
         key = pin.key
         if key == '':
-            with use_scope('login_error', clear=True):
+            with use_scope('login_info', clear=True):
                 put_error('请输入密钥')
         else:
             cli = client(key, '', '', 0, 0, 0)
@@ -230,12 +216,13 @@ def login(cli: client, btn):
             cli.period_min = 60 * 1000
             cli.sort_key = '成交'
             cli.sort_reverse = True
-            redraw(cli)
+            #redraw(cli)
     elif btn == '注册':
         key = ramdom_str(32)
-        put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
-        put_text('请将该密钥复制到上方输入框中，点击登陆')
-        put_input('user_key', value=key, readonly=True)
+        with use_scope('login_info', clear=True):
+            put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+            put_text('请将该密钥复制到上方输入框中，点击登陆')
+            put_input('user_key', value=key, readonly=True)
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
@@ -271,17 +258,16 @@ def redraw_sponsor(cli: client):
 def redraw_market_kline(cli: client):
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
-    cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+    cli.interval = selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
     cli.current_time = int(time.time() * 1000)
     cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
-    
     cli.period = cli.period.replace('y', ' * 365 * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('M', ' * 30 * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
     cli.period = cli.period.replace('m', ' * 60 * 1000')
     cli.period = eval(cli.period)
-    key = (cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time)
+    key = (cli.symbol, cli.interval, cli.period)
     if key in cli.kline_cache:
         html = cli.kline_cache[key]
     else:
@@ -296,9 +282,12 @@ def redraw_market_table(cli: client):
     cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
     cli.current_time = int(time.time() * 1000)
     cli.period_s = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+    print("redraw market table update header begin")
     update_header(cli)
+    print("redraw market table update header end")
     mdata = [cli.header_row]
     mbody = get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
+    print("redraw market table get market data end",cli.sort_key,cli.sort_reverse)
     if cli.sort_key == '市场':
         mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
     elif cli.sort_key == '价格':
@@ -311,7 +300,7 @@ def redraw_market_table(cli: client):
         sym = row[0]
         search_upper = pin.search.upper()
         if search_upper and search_upper not in sym: continue
-        row[0]=put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
+        row[0] = put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
         mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
     put_table(mdata)
 
