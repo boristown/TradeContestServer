@@ -98,7 +98,11 @@ def set_sort(cli,label):
     show_market_table(cli)
 
 def sort_button(cli,label):
-    return put_button(label, onclick=lambda cli=cli,label=label: set_sort(cli,label))
+    return put_button(
+        label, 
+        onclick=lambda cli=cli,label=label: 
+        set_sort(cli,label)
+        )
 
 def update_header(cli):
     cli.header = ['市场', '价格', '幅', '成交']
