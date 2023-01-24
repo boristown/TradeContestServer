@@ -9,6 +9,7 @@ from collections import defaultdict
 import requests
 import random
 from copy import deepcopy
+from threading import Thread
 
 local_url = 'https://aitrad.in/'
 
@@ -107,8 +108,12 @@ def update_header(cli):
             cli.header[i] += suffix
             break
     cli.header_row = [sort_button(cli, label) for label in cli.header]
-    
+
 def redraw(cli: client):
+    #Thread(target=redraw_thread, args=(cli,)).start()
+    redraw_thread(cli)
+
+def redraw_thread(cli: client):
     with use_scope('kline', clear=True):
         update_header(cli)
         selinterval = pin.selectInterval
@@ -116,6 +121,13 @@ def redraw(cli: client):
         cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
         cli.current_time = int(time.time() * 1000)
         cli.period = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+        #市场 / 模拟交易 / 比赛排行
+        put_radio('tab', 
+        options=['市场', '模拟交易', '比赛排行'],
+        inline=True,
+        value='市场', 
+        #onclick=lambda tab: redraw(cli)
+        )
         mdata = [cli.header_row]
         mbody = get_market_data(cli,pin.selectBase == "USDT",cli.period)
         if cli.sort_key == '市场':
@@ -149,6 +161,34 @@ def redraw(cli: client):
         #put_text(cli.symbol) #显示市场名 居中
         put_html(html)
         put_table(mdata)
+        #输出赞助人（并输出感谢的话）：
+        #淘淘
+        #熊*添
+        #刘*超
+        #小点点
+        #秦汉
+        #张*勇
+        #赵磊
+        #冯*俊
+        #徐坚
+        #于*万
+        
+        #居中显示
+        put_text('By AI纪元')
+        put_text('感谢以下赞助人的支持！')
+        put_text('淘淘')
+        put_text('熊*添')
+        put_text('刘*超')
+        put_text('小点点')
+        put_text('秦汉')
+        put_text('张*勇')
+        put_text('赵磊')
+        put_text('冯*俊')
+        put_text('徐坚')
+        put_text('于*万')
+        put_text('如果您也想成为赞助人，请联系：tbziy@foxmail.com')
+        #超链接：
+        put_link('项目地址','https://github.com/boristown/TradeContestServer')
 
 def get_market_data(cli,usdt_on,period):
     data1d = get_binance_ticker(cli,usdt_on,period)
