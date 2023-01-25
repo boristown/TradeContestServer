@@ -3,3 +3,4 @@ html/*.html
 *.apk
 *.pyc
 db/*
+*.pyc

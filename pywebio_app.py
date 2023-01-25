@@ -185,6 +185,7 @@ def set_symbol(cli,name):
     cli.symbol = name
     pin.symbol = cli.symbol
     redraw_market_kline(cli)
+    redraw_market_table(cli)
     return cli.symbol
 
 def set_sort(cli,label):
@@ -200,7 +201,9 @@ def sort_button(cli,label):
     return put_button(
         label, 
         onclick=lambda cli=cli,label=label: 
-        set_sort(cli,label)
+        set_sort(cli,label),
+        color = 'success' if cli.sort_key in label else 'secondary',
+        small = True
         )
 
 def update_header(cli):
@@ -444,9 +447,13 @@ def redraw_market_kline(cli: client):
             second_button('卖出'),
             second_button('做多'),
             second_button('做空'),
+            second_button('趋势'),
             second_button('网格'),
-            second_button('趋势')
-            ], onclick=None)
+            ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
+        put_scope("trade_options")
+
+def trade_btn_click(btn,cli):
+    pass
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
@@ -473,7 +480,13 @@ def redraw_market_table(cli: client):
         sym = row[0]
         search_upper = pin.search.upper()
         if search_upper and search_upper not in sym: continue
-        row[0] = put_button(row[0],onclick=lambda cli=cli,s=sym: set_symbol(cli,s))
+        row[0] = put_button(
+            row[0],
+            onclick=lambda cli=cli,
+            s=sym: set_symbol(cli,s),
+            color='success' if cli.symbol == sym else 'secondary',
+            small=True
+            )
         mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
     put_table(mdata)
 
