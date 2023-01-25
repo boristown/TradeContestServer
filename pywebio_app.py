@@ -384,10 +384,10 @@ def redraw_market_table(cli: client):
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
-    redraw_market_header(cli)
-    redraw_market_kline(cli)
-    redraw_market_table(cli)
-    redraw_sponsor(cli)
+    if pin.switch_tab == '市场': redraw_market_header(cli)
+    if pin.switch_tab == '市场': redraw_market_kline(cli)
+    if pin.switch_tab == '市场': redraw_market_table(cli)
+    if pin.switch_tab == '市场': redraw_sponsor(cli)
     
 def get_market_data(cli,usdt_on,period):
     data1d = get_binance_ticker(cli,usdt_on,period)
