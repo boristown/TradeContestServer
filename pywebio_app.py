@@ -121,12 +121,19 @@ def redraw_content(cli):
             else:
                 pass
         print('global_redraw waiting change...')
-        changed = pin_wait_change(
-            [
-                'switch_tab', 'search', 'symbol',
-                'selectBase', 'selectInterval', 'selectPeriod'
-            ]
-        )
+        #change detection
+        if cli.switch_tab == pin.switch_tab \
+            and cli.search == pin.search \
+            and cli.selectBase == pin.selectBase \
+            and cli.selectInterval == pin.selectInterval \
+            and cli.selectPeriod == pin.selectPeriod \
+            and cli.symbol == pin.symbol:
+            changed = pin_wait_change(
+                [
+                    'switch_tab', 'search', 'symbol',
+                    'selectBase', 'selectInterval', 'selectPeriod'
+                ]
+            )
         print('change detected:' + str(changed))
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
