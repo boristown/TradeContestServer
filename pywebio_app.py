@@ -11,6 +11,7 @@ import random
 from copy import deepcopy
 from threading import Thread
 import json
+from functools import cache,lru_cache
 
 local_url = 'https://aitrad.in/'
 
@@ -213,6 +214,8 @@ def update_header(cli):
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
+    #当前时间戳（10秒）
+    ts10 = int(time.time() / 10)
     #输入密钥点击登陆
     #如果没有密钥，点击注册
     #点击注册后，输出一个32为随机在字符串
@@ -239,8 +242,72 @@ def redraw_login(cli: client):
             #欢迎：用户名
             with use_scope('login_welcome', clear=True):
                 put_text('欢迎：' + cli.user_name)
+                res = '账户信息：'
+                #格式：{'BTC':0,'USDT':1000}
+                price = get_price_btc()
+                #格式：{'BTC':10000,'USDT':1}
+                #res = get_contest_text() + '\n'
+                #res = '用户：' + cli.user_name + '\n'
+                res = 'BTC：' + str(user_account['BTC']) + '\n'
+                res += 'USDT：' + str(user_account['USDT']) + '\n'
+                res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
+                res += '杠杆率：' + str(get_leverage(user_account))
+                btc_price = get_price_btc(ts10)
+                user_account = cli.user_account
             put_buttons(['登出'], onclick=lambda btn: login(cli, btn))
             put_scope('login_info')
+
+def get_leverage(user_account):
+    #杠杆率
+    #本金 = USDT余额 + BTC数量*当前价格
+    # 当USDT余额为负数时，杠杆率为:abs(USDT余额)/本金
+    # 当BTC数量为负数时，杠杆率为:abs(BTC数量)*当前价格/本金
+    ts10 = int(time.time() / 10)
+    leverage = 0
+    price_btc = get_price_btc(ts10)
+    price_eth = get_price_eth(ts10)
+    #price_symbol = get_price_symbol(curr_usdt)
+    balance = leverage_amount = 0
+    for symbol in user_account:
+        if symbol == 'USDT':
+            delta = user_account[symbol]
+        elif symbol == 'BTC':
+            delta = user_account[symbol] * price_btc
+        elif symbol == 'ETH':
+            delta = user_account[symbol] * price_eth
+        else:
+            curr_usdt = symbol + 'USDT'
+            price_symbol = get_price_symbol(curr_usdt, ts10)
+            delta = user_account[symbol] * price_symbol
+        if delta < 0:
+            leverage_amount -= delta
+        balance += delta
+    leverage = leverage_amount / balance
+    return leverage
+
+@lru_cache
+def get_price_btc(ts10):
+    # 获取当前BTCUSDT价格
+    url = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+    r = requests.get(url)
+    price = float(r.json()['price'])
+    return price
+
+@lru_cache
+def get_price_eth(ts10):
+    # 获取当前ETHUSDT价格
+    url = 'https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT'
+    r = requests.get(url)
+    price = float(r.json()['price'])
+    return price
+
+@lru_cache
+def get_price_symbol(symbol, ts10):
+    # 获取当前symbol价格
+    url = 'https://api.binance.com/api/v3/ticker/price?symbol=' + symbol
+    r = requests.get(url)
+    price = float(r.json()['price'])
+    return price
 
 def conf_name(cli, btn):
     if btn == '确认用户名':
@@ -284,6 +351,7 @@ def login(cli: client, btn):
                 cli.reg_key = ''
                 cli.user_key = key
                 cli.user_name = users[key]['name']
+                cli.user_account = users[key]['account']
                 redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):
@@ -296,7 +364,15 @@ def login(cli: client, btn):
         #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
         with open('db/user.json', 'r') as f:
             users = json.load(f)
-        users[key] = {'name': '', 'reg_time': int(time.time() * 1000), 'last_login_time': int(time.time() * 1000)}
+        users[key] = {
+            'name': '', 
+            'reg_time': int(time.time() * 1000), 
+            'last_login_time': int(time.time() * 1000),
+            'account': {
+                "USDT":1000000.0,
+                "BTC":0.0,
+                }
+            }
         with open('db/user.json', 'w') as f:
             json.dump(users, f)
         cli.reg_key = key
