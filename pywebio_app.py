@@ -244,7 +244,7 @@ def redraw_login(cli: client):
                 put_text('欢迎：' + cli.user_name)
                 res = '账户信息：'
                 #格式：{'BTC':0,'USDT':1000}
-                price = get_price_btc()
+                price = get_price_btc(ts10)
                 #格式：{'BTC':10000,'USDT':1}
                 #res = get_contest_text() + '\n'
                 #res = '用户：' + cli.user_name + '\n'
@@ -252,8 +252,9 @@ def redraw_login(cli: client):
                 res += 'USDT：' + str(user_account['USDT']) + '\n'
                 res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
                 res += '杠杆率：' + str(get_leverage(user_account))
-                btc_price = get_price_btc(ts10)
+                #btc_price = get_price_btc(ts10)
                 user_account = cli.user_account
+                put_text(res)
             put_buttons(['登出'], onclick=lambda btn: login(cli, btn))
             put_scope('login_info')
 
