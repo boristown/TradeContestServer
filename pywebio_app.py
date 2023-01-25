@@ -40,6 +40,7 @@ class client:
         self.selectInterval = ''
         self.selectPeriod = ''
         self.search = ''
+        self.reg_key = ''
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -121,13 +122,11 @@ def redraw_content(cli):
             else:
                 pass
         print('global_redraw waiting change...')
+        #print('cli vars:', cli.switch_tab, cli.search, cli.symbol, cli.selectBase, cli.selectInterval, cli.selectPeriod)
+        #print('pin vars:', pin.switch_tab, pin.search, pin.symbol, pin.selectBase, pin.selectInterval, pin.selectPeriod)
         #change detection
-        if cli.switch_tab == pin.switch_tab \
-            and cli.search == pin.search \
-            and cli.selectBase == pin.selectBase \
-            and cli.selectInterval == pin.selectInterval \
-            and cli.selectPeriod == pin.selectPeriod \
-            and cli.symbol == pin.symbol:
+        if not pin_changed(cli, pin):
+            print('no change detected, waiting change...')
             changed = pin_wait_change(
                 [
                     'switch_tab', 'search', 'symbol',
@@ -138,6 +137,18 @@ def redraw_content(cli):
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
             break
+
+def pin_changed(cli, pin):
+    if cli.switch_tab != pin.switch_tab:
+        return True
+    if pin.switch_tab == '市场':
+        if cli.search != pin.search \
+        or cli.selectBase != pin.selectBase \
+        or cli.selectInterval != pin.selectInterval \
+        or cli.selectPeriod != pin.selectPeriod \
+        or cli.symbol != pin.symbol:
+            return True
+    return False
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -206,9 +217,16 @@ def redraw_login(cli: client):
     #提示用户：该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回
     #请将该密钥复制到上方输入框中，点击登陆
     put_input('key', placeholder='输入密钥')
-    put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
-    put_scope('login_info')
-
+    if cli.reg_key == '':
+        put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
+        put_scope('login_info')
+    else:
+        put_buttons(['登陆'], onclick=lambda btn: login(cli, btn))
+        with use_scope('login_info', clear=True):
+            put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+            put_text('请将该密钥复制到上方输入框中，点击登陆')
+            put_input('user_key', value=cli.reg_key, readonly=True)
+    
 def login(cli: client, btn):
     if btn == '登陆':
         key = pin.key
@@ -226,11 +244,16 @@ def login(cli: client, btn):
             cli.sort_reverse = True
             #redraw(cli)
     elif btn == '注册':
+        #将注册按钮设置为不可用
+        
+        #输出一个32为随机在字符串
         key = ramdom_str(32)
-        with use_scope('login_info', clear=True):
-            put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
-            put_text('请将该密钥复制到上方输入框中，点击登陆')
-            put_input('user_key', value=key, readonly=True)
+        cli.reg_key = key
+        redraw_login(cli)
+        # with use_scope('login_info', clear=True):
+        #     put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+        #     put_text('请将该密钥复制到上方输入框中，点击登陆')
+        #     put_input('user_key', value=key, readonly=True)
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
