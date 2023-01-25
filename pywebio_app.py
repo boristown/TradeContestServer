@@ -252,7 +252,7 @@ def conf_name(cli, btn):
             #验证用户名是否存在
             #如果存在，提示用户：用户名已存在，请重新输入
             #如果不存在，更新用户名
-            with open('db/users.json', 'r') as f:
+            with open('db/user.json', 'r') as f:
                 users = json.load(f)
             for key in users:
                 if users[key]['name'] == name:
@@ -261,7 +261,7 @@ def conf_name(cli, btn):
                     return
             users[cli.user_key]['name'] = name
             cli.user_name = name
-            with open('db/users.json', 'w') as f:
+            with open('db/user.json', 'w') as f:
                 json.dump(users, f)
         redraw_login(cli)
 
@@ -275,11 +275,11 @@ def login(cli: client, btn):
             #验证key是否存在
             #如果存在，更新last_login_time
             #如果不存在，提示用户：密钥不存在，请重新输入
-            with open('db/users.json', 'r') as f:
+            with open('db/user.json', 'r') as f:
                 users = json.load(f)
             if key in users:
                 users[key]['last_login_time'] = int(time.time() * 1000)
-                with open('db/users.json', 'w') as f:
+                with open('db/user.json', 'w') as f:
                     json.dump(users, f)
                 cli.reg_key = ''
                 cli.user_key = key
@@ -292,12 +292,12 @@ def login(cli: client, btn):
     elif btn == '注册':
         #输出一个32为随机在字符串
         key = ramdom_str(32)
-        #存储key到服务端 db/users.json
+        #存储key到服务端 db/user.json
         #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
-        with open('db/users.json', 'r') as f:
+        with open('db/user.json', 'r') as f:
             users = json.load(f)
         users[key] = {'name': '', 'reg_time': int(time.time() * 1000), 'last_login_time': int(time.time() * 1000)}
-        with open('db/users.json', 'w') as f:
+        with open('db/user.json', 'w') as f:
             json.dump(users, f)
         cli.reg_key = key
         redraw_login(cli)
