@@ -2,3 +2,4 @@
 html/*.html
 *.apk
 *.pyc
+db/*
