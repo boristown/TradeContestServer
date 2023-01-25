@@ -409,6 +409,13 @@ def redraw_sponsor(cli: client):
     #超链接：
     put_link('项目地址','https://github.com/boristown/TradeContestServer')
 
+def second_button(label):
+    return {
+        'label': label,
+        'value': label,
+        'color': 'secondary'
+    }
+
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
     selinterval = pin.selectInterval
@@ -429,6 +436,17 @@ def redraw_market_kline(cli: client):
         html = draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
         cli.kline_cache[key] = html
     put_html(html)
+
+    if cli.user_key != '':
+        #买入、卖出、做多、做空、网格交易，趋势追踪
+        put_buttons([
+            second_button('买入'),
+            second_button('卖出'),
+            second_button('做多'),
+            second_button('做空'),
+            second_button('网格'),
+            second_button('趋势')
+            ], onclick=None)
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
