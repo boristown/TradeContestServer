@@ -10,6 +10,7 @@ import requests
 import random
 from copy import deepcopy
 from threading import Thread
+import json
 
 local_url = 'https://aitrad.in/'
 
@@ -41,6 +42,8 @@ class client:
         self.selectPeriod = ''
         self.search = ''
         self.reg_key = ''
+        self.user_key = ''
+        self.user_name = ''
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -77,14 +80,8 @@ def redraw_content(cli):
                 print('redraw market all')
                 temp_switch_tab = pin.switch_tab
                 redraw_market(cli)
-                print('redraw market all done',pin.selectInterval, pin.selectPeriod)
-                cli.switch_tab = temp_switch_tab            
-                cli.symbol = pin.symbol
-                cli.selectInterval = pin.selectInterval
-                cli.selectPeriod = pin.selectPeriod
-                cli.search = pin.search
-                cli.selectBase = pin.selectBase
-                cli.selectPeriod = pin.selectPeriod
+                print('redraw market all done')
+                cli.switch_tab = temp_switch_tab
             else: #没切换tab，局部重绘
                 print('redraw market part')
                 #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
@@ -122,10 +119,8 @@ def redraw_content(cli):
             else:
                 pass
         print('global_redraw waiting change...')
-        #print('cli vars:', cli.switch_tab, cli.search, cli.symbol, cli.selectBase, cli.selectInterval, cli.selectPeriod)
-        #print('pin vars:', pin.switch_tab, pin.search, pin.symbol, pin.selectBase, pin.selectInterval, pin.selectPeriod)
         #change detection
-        if not pin_changed(cli, pin):
+        if not pin_changed(cli):
             print('no change detected, waiting change...')
             changed = pin_wait_change(
                 [
@@ -133,12 +128,14 @@ def redraw_content(cli):
                     'selectBase', 'selectInterval', 'selectPeriod'
                 ]
             )
-        print('change detected:' + str(changed))
+        print('change detected')
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
             break
 
-def pin_changed(cli, pin):
+def pin_changed(cli):
+    print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
+    print('cli vars:', cli.switch_tab, cli.search, cli.selectBase, cli.selectInterval, cli.selectPeriod, cli.symbol)
     if cli.switch_tab != pin.switch_tab:
         return True
     if pin.switch_tab == '市场':
@@ -177,6 +174,11 @@ def redraw_market_header(cli):
     put_row([
         put_input('symbol', value=cli.symbol, readonly=True),
     ])
+    cli.search = pin.search
+    cli.selectBase = pin.selectBase
+    cli.selectInterval = pin.selectInterval
+    cli.selectPeriod = pin.selectPeriod
+    cli.symbol = pin.symbol
 
 def set_symbol(cli,name):
     cli.symbol = name
@@ -216,17 +218,53 @@ def redraw_login(cli: client):
     #点击注册后，输出一个32为随机在字符串
     #提示用户：该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回
     #请将该密钥复制到上方输入框中，点击登陆
-    put_input('key', placeholder='输入密钥')
-    if cli.reg_key == '':
-        put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
-        put_scope('login_info')
+    if cli.user_key == '': #未登录
+        put_input('key', placeholder='输入密钥')
+        if cli.reg_key == '':
+            put_buttons(['登陆', '注册'], onclick=lambda btn: login(cli, btn))
+            put_scope('login_info')
+        else:
+            put_buttons(['登陆'], onclick=lambda btn: login(cli, btn))
+            with use_scope('login_info', clear=True):
+                put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+                put_text('请将该密钥复制到上方输入框中，点击登陆')
+                put_input('user_key', value=cli.reg_key, readonly=True)
     else:
-        put_buttons(['登陆'], onclick=lambda btn: login(cli, btn))
-        with use_scope('login_info', clear=True):
-            put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
-            put_text('请将该密钥复制到上方输入框中，点击登陆')
-            put_input('user_key', value=cli.reg_key, readonly=True)
-    
+        #请输入用户名
+        if cli.user_name == '':
+            put_input('user_name', placeholder='输入用户名')
+            put_buttons(['确认用户名'], onclick=lambda btn: conf_name(cli, btn))
+            put_scope('login_info')
+        else:
+            #欢迎：用户名
+            with use_scope('login_welcome', clear=True):
+                put_text('欢迎：' + cli.user_name)
+            put_buttons(['登出'], onclick=lambda btn: login(cli, btn))
+            put_scope('login_info')
+
+def conf_name(cli, btn):
+    if btn == '确认用户名':
+        name = pin.user_name
+        if name == '':
+            with use_scope('login_info', clear=True):
+                put_error('请输入用户名')
+        else:
+            #验证用户名是否存在
+            #如果存在，提示用户：用户名已存在，请重新输入
+            #如果不存在，更新用户名
+            with open('db/users.json', 'r') as f:
+                users = json.load(f)
+            for key in users:
+                if users[key]['name'] == name:
+                    with use_scope('login_info', clear=True):
+                        put_error('用户名已存在，请重新输入')
+                    return
+            users[cli.user_key]['name'] = name
+            cli.user_name = name
+            with open('db/users.json', 'w') as f:
+                json.dump(users, f)
+        redraw_login(cli)
+
 def login(cli: client, btn):
     if btn == '登陆':
         key = pin.key
@@ -234,26 +272,35 @@ def login(cli: client, btn):
             with use_scope('login_info', clear=True):
                 put_error('请输入密钥')
         else:
-            cli = client(key, '', '', 0, 0, 0)
-            cli.interval = '1d'
-            cli.symbol = 'BTCUSDT'
-            cli.current_time = int(time.time() * 1000)
-            cli.period = 30 * 24 * 60 * 60 * 1000
-            cli.period_min = 60 * 1000
-            cli.sort_key = '成交'
-            cli.sort_reverse = True
-            #redraw(cli)
+            #验证key是否存在
+            #如果存在，更新last_login_time
+            #如果不存在，提示用户：密钥不存在，请重新输入
+            with open('db/users.json', 'r') as f:
+                users = json.load(f)
+            if key in users:
+                users[key]['last_login_time'] = int(time.time() * 1000)
+                with open('db/users.json', 'w') as f:
+                    json.dump(users, f)
+                cli.reg_key = ''
+                cli.user_key = key
+                cli.user_name = users[key]['name']
+                redraw_login(cli)
+            else:
+                with use_scope('login_info', clear=True):
+                    put_error('密钥不存在，请重新输入')
+
     elif btn == '注册':
-        #将注册按钮设置为不可用
-        
         #输出一个32为随机在字符串
         key = ramdom_str(32)
+        #存储key到服务端 db/users.json
+        #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
+        with open('db/users.json', 'r') as f:
+            users = json.load(f)
+        users[key] = {'name': '', 'reg_time': int(time.time() * 1000), 'last_login_time': int(time.time() * 1000)}
+        with open('db/users.json', 'w') as f:
+            json.dump(users, f)
         cli.reg_key = key
         redraw_login(cli)
-        # with use_scope('login_info', clear=True):
-        #     put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
-        #     put_text('请将该密钥复制到上方输入框中，点击登陆')
-        #     put_input('user_key', value=key, readonly=True)
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
@@ -341,7 +388,7 @@ def redraw_market(cli: client):
     redraw_market_kline(cli)
     redraw_market_table(cli)
     redraw_sponsor(cli)
-        
+    
 def get_market_data(cli,usdt_on,period):
     data1d = get_binance_ticker(cli,usdt_on,period)
     symbolinfo = defaultdict(dict)
