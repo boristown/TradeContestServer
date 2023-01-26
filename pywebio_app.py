@@ -693,7 +693,7 @@ def trade_btn_click(btn,cli):
             [
                 put_text('单侧订单数量'),
                 put_input('grid_order_num',type=NUMBER,placeholder='1~999'),
-                put_select('grid_order_num_type', [quote,base]),
+                put_text('个'),
             ],
             size = f"30% auto 30%",
         )
