@@ -474,7 +474,7 @@ def trade_btn_click(btn,cli):
     if btn == '买入':
         put_text('低于市场价')
         #put_input('买入价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
-        put_input('买入价格',value = '0.0',type = 'number',placeholder='买入价格')
+        put_input('buy_price',placeholder='-100~99999')
         put_text('%，使用')
         #put_input('买入数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
         put_input('买入数量', '0.0')
