@@ -478,7 +478,7 @@ def trade_btn_click(btn,cli):
                 put_input('buy_price_perc',type=FLOAT,placeholder='-100~99999'),
                 put_text('%'),
             ],
-            size = f"40% 40% 20%",
+            size = f"30% 40% 30%",
         )
         put_row(
             [
@@ -486,32 +486,40 @@ def trade_btn_click(btn,cli):
                 put_input('buy_base_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(base),
             ],
-            size = f"40% 40% 20%",
+            size = f"30% 40% 30%",
         )
         put_row(
             [
                 put_text('消耗'),
                 put_input('buy_amount_perc',type=FLOAT,placeholder='0~100'),
                 put_text('%'),
-            ]
+            ],
+            size = f"30% 40% 30%",
         )
         put_row(
             [
                 put_text('买入'),
                 put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(quote),
-            ]
+            ],
+            size = f"30% 40% 30%",
         )
         put_row(
             [
                 put_text('相对于'),
                 put_select('buy_stop_loss_type', ['成交时','最大盈利']),
+            ],
+            size = f"30% auto",
+        )
+        put_row(
+            [
                 put_text('亏损占比资产'),
                 put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('% 时止损'),
-            ]
+                put_text('%时止损'),
+            ],
+            size = f"30% 40% 30%",
         )
-        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '卖出':
         put_text('高于市场价')
         put_input('卖出价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
