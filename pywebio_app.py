@@ -478,7 +478,7 @@ def trade_btn_click(btn,cli):
                 put_input('buy_price_perc',type=FLOAT,placeholder='-100~99999'),
                 put_text('%'),
             ],
-            small=True
+            size = f"40% 40% 20%",
         )
         put_row(
             [
@@ -486,7 +486,7 @@ def trade_btn_click(btn,cli):
                 put_input('buy_base_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(base),
             ],
-            small=True
+            size = f"40% 40% 20%",
         )
         put_row(
             [
