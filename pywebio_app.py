@@ -441,25 +441,186 @@ def redraw_market_kline(cli: client):
     put_html(html)
 
     if cli.user_key != '':
+        #显示一行小字，内容是：*交易手续费0.1%。
+        put_text('*交易手续费0.1%。')
         #买入、卖出、做多、做空、网格交易，趋势追踪
         put_buttons([
             second_button('买入'),
             second_button('卖出'),
             second_button('做多'),
             second_button('做空'),
-            second_button('趋势'),
-            second_button('网格'),
+            second_button('网格交易'),
             ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
         put_scope("trade_options")
 
+@use_scope('trade_options', clear=True)
 def trade_btn_click(btn,cli):
-    #买入、卖出、做多、做空、网格，趋势
-    #买入：输入：溢价___%，使用___USDT，买入___XXX。
-    #卖出：输入溢价幅度、数量、确认
-    #做多：输入溢价幅度、数量、确认
-    #做空：输入溢价幅度、数量、确认
-    #趋势：输入溢价幅度、数量、确认
-    #网格：订单间隔、数量、确认
+    # 将当前symbol拆成base和quote, base是symbol末尾的BTC或者USDT，quote是symbol前面的部分。
+    # 例如：BTCUSDT -> BTC, USDT，ETHBTC -> ETH, BTC
+    # 买入、卖出、做多、做空、网格,点击后在按钮下方出现一个输入界面，第二行开始是如下输入界面。
+    # 点击其它交易按钮时切换输入界面，再次点击时隐藏输入界面
+    #买入：低于市场价___%，使用___[base]，消耗___%，买入___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #卖出：高于市场价___%，卖出___[quote]，消耗___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #做多：低于市场价___%，使用___[base]，杠杆率___%，做多___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #做空：高于市场价___%，做空___[quote]，杠杆率___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
+    symbol = cli.symbol
+    if symbol[-4:] == 'USDT':
+        base = symbol[-4:]
+        quote = symbol[:-4]
+    else:
+        base = symbol[-3:]
+        quote = symbol[:-3]
+    if btn == '买入':
+        put_text('低于市场价')
+        put_input('买入价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
+        put_text('%，使用')
+        put_input('买入数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text(base)
+        put_text('，消耗')
+        put_input('买入金额', '0.0', onchange=lambda x,cli=cli:trade_cost_change(x,cli))
+        put_text(quote)
+        put_text('，相对于')
+        put_select('止损方式', ['成交时', '最大盈利'], onchange=lambda x,cli=cli:trade_stop_mode_change(x,cli))
+        put_text('亏损占比总资产')
+        put_input('止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
+        put_text('%时止损。')
+        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+    elif btn == '卖出':
+        put_text('高于市场价')
+        put_input('卖出价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
+        put_text('%，卖出')
+        put_input('卖出数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text(quote)
+        put_text('，价值')
+        put_input('卖出金额', '0.0', onchange=lambda x,cli=cli:trade_cost_change(x,cli))
+        put_text(base)
+        put_text('，相对于')
+        put_select('止损方式', ['成交时', '最大盈利'], onchange=lambda x,cli=cli:trade_stop_mode_change(x,cli))
+        put_text('亏损占比总资产')
+        put_input('止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
+        put_text('%时止损。')
+        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+    elif btn == '做多':
+        put_text('低于市场价')
+        put_input('做多价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
+        put_text('%，使用')
+        put_input('做多数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text(base)
+        put_text('，杠杆率')
+        put_input('做多杠杆率', '0.0', onchange=lambda x,cli=cli:trade_leverage_change(x,cli))
+        put_text('%，做多')
+        put_input('做多金额', '0.0', onchange=lambda x,cli=cli:trade_cost_change(x,cli))
+        put_text(quote)
+        put_text('，相对于')
+        put_select('止损方式', ['成交时', '最大盈利'], onchange=lambda x,cli=cli:trade_stop_mode_change(x,cli))
+        put_text('亏损占比总资产')
+        put_input('止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
+        put_text('%时止损。')
+        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+    elif btn == '做空':
+        put_text('高于市场价')
+        put_input('做空价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
+        put_text('%，做空')
+        put_input('做空数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text(base)
+        put_text('，杠杆率')
+        put_input('做空杠杆率', '0.0', onchange=lambda x,cli=cli:trade_leverage_change(x,cli))
+        put_text('%，做空')
+        put_input('做空金额', '0.0', onchange=lambda x,cli=cli:trade_cost_change(x,cli))
+        put_text(quote)
+        put_text('，相对于')
+        put_select('止损方式', ['成交时', '最大盈利'], onchange=lambda x,cli=cli:trade_stop_mode_change(x,cli))
+        put_text('亏损占比总资产')
+        put_input('止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
+        put_text('%时止损。')
+        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+    elif btn == '网格交易':
+        #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
+        put_text('首单位置')
+        put_input('网格首单价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
+        put_text('%，每单间隔')
+        put_input('网格间隔', '0.0', onchange=lambda x,cli=cli:trade_interval_change(x,cli))
+        put_text('%，单侧订单数量')
+        put_input('网格单侧数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text('，每单数量')
+        put_input('网格每单数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
+        put_text('，整体杠杆率')
+        put_input('网格杠杆率', '0.0', onchange=lambda x,cli=cli:trade_leverage_change(x,cli))
+        put_text('%，亏损占比总资产')
+        put_input('网格止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
+        put_text('%时止损。')
+        put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+
+def trade_confirm_click(btn,cli):
+    #确认按钮点击事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_price_change(x,cli):
+    #价格输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_amount_change(x,cli):
+    #数量输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_cost_change(x,cli):
+    #金额输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_leverage_change(x,cli):
+    #杠杆率输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_stop_mode_change(x,cli):
+    #止损方式下拉框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_stop_ratio_change(x,cli):
+    #止损比例输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_stop_mode_change(x,cli):
+    #止损方式下拉框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_stop_price_change(x,cli):
+    #止损价格输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
+
+def trade_interval_change(x,cli):
+    #间隔输入框内容改变事件
+    #获取输入框内容
+    #调用交易接口
+    #显示交易结果
+    pass
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
