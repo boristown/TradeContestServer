@@ -472,24 +472,45 @@ def trade_btn_click(btn,cli):
         base = symbol[-3:]
         quote = symbol[:-3]
     if btn == '买入':
-        put_text('低于市场价')
-        #put_input('买入价格', '0.0', onchange=lambda x,cli=cli:trade_price_change(x,cli))
-        put_input('buy_price',placeholder='-100~99999')
-        put_text('%，使用')
-        #put_input('买入数量', '0.0', onchange=lambda x,cli=cli:trade_amount_change(x,cli))
-        put_input('买入数量', '0.0')
-        put_text(base)
-        put_text('，消耗')
-        #put_input('买入金额', '0.0', onchange=lambda x,cli=cli:trade_cost_change(x,cli))
-        put_input('买入金额', '0.0')
-        put_text(quote)
-        put_text('，相对于')
-        #put_select('止损方式', ['成交时', '最大盈利'], onchange=lambda x,cli=cli:trade_stop_mode_change(x,cli))
-        put_select('止损方式', ['成交时', '最大盈利'])
-        put_text('亏损占比总资产')
-        #put_input('止损比例', '0.0', onchange=lambda x,cli=cli:trade_stop_ratio_change(x,cli))
-        put_input('止损比例', '0.0')
-        put_text('%时止损。')
+        put_row(
+            [
+                put_text('低于市场价'),
+                put_input('buy_price_perc',type=FLOAT,placeholder='-100~99999'),
+                put_text('%'),
+            ],
+            small=True
+        )
+        put_row(
+            [
+                put_text('使用'),
+                put_input('buy_base_amount',type=FLOAT,placeholder='0~9999999'),
+                put_text(base),
+            ],
+            small=True
+        )
+        put_row(
+            [
+                put_text('消耗'),
+                put_input('buy_amount_perc',type=FLOAT,placeholder='0~100'),
+                put_text('%'),
+            ]
+        )
+        put_row(
+            [
+                put_text('买入'),
+                put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
+                put_text(quote),
+            ]
+        )
+        put_row(
+            [
+                put_text('相对于'),
+                put_select('buy_stop_loss_type', ['成交时','最大盈利']),
+                put_text('亏损占比资产'),
+                put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+                put_text('% 时止损'),
+            ]
+        )
         put_buttons(['确认'], onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '卖出':
         put_text('高于市场价')
