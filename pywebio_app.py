@@ -453,7 +453,13 @@ def redraw_market_kline(cli: client):
         put_scope("trade_options")
 
 def trade_btn_click(btn,cli):
-    pass
+    #买入、卖出、做多、做空、网格，趋势
+    #买入：输入：溢价___%，使用___USDT，买入___XXX。
+    #卖出：输入溢价幅度、数量、确认
+    #做多：输入溢价幅度、数量、确认
+    #做空：输入溢价幅度、数量、确认
+    #趋势：输入溢价幅度、数量、确认
+    #网格：订单间隔、数量、确认
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
