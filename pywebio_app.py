@@ -510,6 +510,10 @@ def trade_btn_click(btn,cli):
         base = symbol[-3:]
         quote = symbol[:-3]
     if btn == '买入':
+        if cli.trade_type == '买入':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '买入'
         put_row(
             [
                 put_text('低于市场价'),
@@ -560,6 +564,10 @@ def trade_btn_click(btn,cli):
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '卖出':
+        if cli.trade_type == '卖出':
+            cli.trade_type = ''
+        else:
+            cli.trade_type = '卖出'
         put_row(
             [
                 put_text('高于市场价'),
@@ -610,6 +618,10 @@ def trade_btn_click(btn,cli):
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '做多':
+        if cli.trade_type == '做多':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '做多'
         put_row(
             [
                 put_text('低于市场价'),
@@ -660,6 +672,10 @@ def trade_btn_click(btn,cli):
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '做空':
+        if cli.trade_type == '做空':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '做空'
         put_row(
             [
                 put_text('高于市场价'),
@@ -710,6 +726,10 @@ def trade_btn_click(btn,cli):
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
     elif btn == '网格交易':
+        if cli.trade_type == '网格交易':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '网格交易'
         #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
         put_row(
             [
@@ -761,11 +781,27 @@ def trade_btn_click(btn,cli):
         )
 
 def trade_confirm_click(btn,cli):
-    #确认按钮点击事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
+    if btn == '确认':
+        if cli.trade_type == '买入':
+            cli.buy_price_perc = get_value('buy_price_perc')
+            cli.buy_quote_amount = get_value('buy_quote_amount')
+            cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
+            cli.buy_stop_loss_perc = get_value('buy_stop_loss_perc')
+            cli.buy()
+        elif cli.trade_type == '卖出':
+            cli.sell_price_perc = get_value('sell_price_perc')
+            cli.sell_quote_amount = get_value('sell_quote_amount')
+            cli.sell_stop_loss_type = get_value('sell_stop_loss_type')
+            cli.sell_stop_loss_perc = get_value('sell_stop_loss_perc')
+            cli.sell()
+        elif cli.trade_type == '网格交易':
+            cli.grid_first_price_perc = get_value('grid_first_price_perc')
+            cli.grid_interval_perc = get_value('grid_interval_perc')
+            cli.grid_order_num = get_value('grid_order_num')
+            cli.grid_order_amount = get_value('grid_order_amount')
+            cli.grid_order_amount_type = get_value('grid_order_amount_type')
+            cli.grid_stop_loss_perc = get_value('grid_stop_loss_perc')
+            cli.grid()
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
