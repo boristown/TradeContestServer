@@ -119,6 +119,15 @@ def redraw_content(cli):
                 cli.switch_tab = temp_switch_tab
             else:
                 pass
+        elif pin.switch_tab == '比赛排行':
+            print('redraw rank')
+            if cli.switch_tab != pin.switch_tab:
+                print('redraw rank all')
+                temp_switch_tab = pin.switch_tab
+                redraw_rank(cli)
+                cli.switch_tab = temp_switch_tab
+            else:
+                pass
         print('global_redraw waiting change...')
         #change detection
         if not pin_changed(cli):
@@ -133,6 +142,33 @@ def redraw_content(cli):
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
             break
+
+@use_scope('rank', clear=True)
+def redraw_rank(cli):
+    #比赛实时排行
+    # 第0轮模拟交易竞赛
+    # 我的排名：第1名
+    # 我的余额：1000000
+    # 我的收益：0%
+    #
+    # 排名 用户名   余额    ELO分 分数变化
+    # 1    基准账户 1000000 1500  +0
+    # 2    ak-bot  1000000 1500  +0
+
+    if cli.user_key:
+        put_text('第0轮模拟交易竞赛')
+        put_text('我的排名：第2名')
+        put_text('我的余额：1000000')
+        put_text('我的收益：0%')
+
+    data = [
+        ['排名', '用户名', '余额', 'ELO分', '分数变化'],
+        ['1', '基准账户', '1000000', '1500', '+0'],
+        ['2', 'ak-bot', '1000000', '1500', '+0']
+    ]
+
+    put_table(data)
+
 
 def pin_changed(cli):
     print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
