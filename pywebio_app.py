@@ -45,6 +45,7 @@ class client:
         self.reg_key = ''
         self.user_key = ''
         self.user_name = ''
+        self.user_elo = 1500
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -282,6 +283,7 @@ def redraw_login(cli: client):
             with use_scope('login_welcome', clear=True):
                 put_text('欢迎：' + cli.user_name)
                 res = '账户信息：\n'
+                res += 'ELO分：' + str(cli.user_elo) + '\n'
                 #格式：{'BTC':0,'USDT':1000}
                 price = get_price_btc(ts10)
                 user_account = cli.user_account
