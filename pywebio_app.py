@@ -457,6 +457,13 @@ def second_button(label):
         'color': 'secondary'
     }
 
+def success_button(label):
+    return {
+        'label': label,
+        'value': label,
+        'color': 'success'
+    }
+
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
     selinterval = pin.selectInterval
@@ -479,29 +486,20 @@ def redraw_market_kline(cli: client):
     put_html(html)
 
     if cli.user_key != '':
-        #显示一行小字，内容是：*交易手续费0.1%。
-        put_text('*交易手续费0.1%。')
-        #买入、卖出、做多、做空、网格交易，趋势追踪
-        put_buttons([
-            second_button('买入'),
-            second_button('卖出'),
-            second_button('做多'),
-            second_button('做空'),
-            second_button('网格交易'),
-            ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
-        put_scope("trade_options")
+        redraw_trade_options(cli)
 
 @use_scope('trade_options', clear=True)
-def trade_btn_click(btn,cli):
-    # 将当前symbol拆成base和quote, base是symbol末尾的BTC或者USDT，quote是symbol前面的部分。
-    # 例如：BTCUSDT -> BTC, USDT，ETHBTC -> ETH, BTC
-    # 买入、卖出、做多、做空、网格,点击后在按钮下方出现一个输入界面，第二行开始是如下输入界面。
-    # 点击其它交易按钮时切换输入界面，再次点击时隐藏输入界面
-    #买入：低于市场价___%，使用___[base]，消耗___%，买入___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
-    #卖出：高于市场价___%，卖出___[quote]，消耗___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
-    #做多：低于市场价___%，使用___[base]，杠杆率___%，做多___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
-    #做空：高于市场价___%，做空___[quote]，杠杆率___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
-    #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
+def redraw_trade_options(cli: client):
+    #显示一行小字，内容是：*交易手续费0.1%。
+    put_text('*交易手续费0.1%。')
+    #买入、卖出、做多、做空、网格交易，趋势追踪
+    put_buttons([
+        second_button('买入') if cli.trade_type != '买入' else success_button('买入'),
+        second_button('卖出') if cli.trade_type != '卖出' else success_button('卖出'),
+        second_button('做多') if cli.trade_type != '做多' else success_button('做多'),
+        second_button('做空') if cli.trade_type != '做空' else success_button('做空'),
+        second_button('网格交易') if cli.trade_type != '网格交易' else success_button('网格交易'),
+        ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
     symbol = cli.symbol
     if symbol[-4:] == 'USDT':
         base = symbol[-4:]
@@ -509,11 +507,7 @@ def trade_btn_click(btn,cli):
     else:
         base = symbol[-3:]
         quote = symbol[:-3]
-    if btn == '买入':
-        if cli.trade_type == '买入':
-            cli.trade_type = None
-        else:
-            cli.trade_type = '买入'
+    if cli.trade_type == '买入':
         put_row(
             [
                 put_text('低于市场价'),
@@ -563,11 +557,7 @@ def trade_btn_click(btn,cli):
             size = f"30% auto 30%",
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
-    elif btn == '卖出':
-        if cli.trade_type == '卖出':
-            cli.trade_type = ''
-        else:
-            cli.trade_type = '卖出'
+    elif cli.trade_type == '卖出':
         put_row(
             [
                 put_text('高于市场价'),
@@ -617,11 +607,7 @@ def trade_btn_click(btn,cli):
             size = f"30% auto 30%",
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
-    elif btn == '做多':
-        if cli.trade_type == '做多':
-            cli.trade_type = None
-        else:
-            cli.trade_type = '做多'
+    elif cli.trade_type == '做多':
         put_row(
             [
                 put_text('低于市场价'),
@@ -671,11 +657,7 @@ def trade_btn_click(btn,cli):
             size = f"30% auto 30%",
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
-    elif btn == '做空':
-        if cli.trade_type == '做空':
-            cli.trade_type = None
-        else:
-            cli.trade_type = '做空'
+    elif cli.trade_type == '做空':
         put_row(
             [
                 put_text('高于市场价'),
@@ -725,11 +707,7 @@ def trade_btn_click(btn,cli):
             size = f"30% auto 30%",
         )
         put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
-    elif btn == '网格交易':
-        if cli.trade_type == '网格交易':
-            cli.trade_type = None
-        else:
-            cli.trade_type = '网格交易'
+    elif cli.trade_type == '网格交易':
         #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
         put_row(
             [
@@ -779,29 +757,69 @@ def trade_btn_click(btn,cli):
             ],
             size = f"30% auto 30%",
         )
+        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+
+@use_scope('trade_options', clear=True)
+def trade_btn_click(btn,cli):
+    # 将当前symbol拆成base和quote, base是symbol末尾的BTC或者USDT，quote是symbol前面的部分。
+    # 例如：BTCUSDT -> BTC, USDT，ETHBTC -> ETH, BTC
+    # 买入、卖出、做多、做空、网格,点击后在按钮下方出现一个输入界面，第二行开始是如下输入界面。
+    # 点击其它交易按钮时切换输入界面，再次点击时隐藏输入界面
+    #买入：低于市场价___%，使用___[base]，消耗___%，买入___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #卖出：高于市场价___%，卖出___[quote]，消耗___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #做多：低于市场价___%，使用___[base]，杠杆率___%，做多___[quote]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #做空：高于市场价___%，做空___[quote]，杠杆率___%，价值___[base]，相对于____(下拉：成交时/最大盈利）亏损占比总资产___%时止损。确认按钮。
+    #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
+    if btn == '买入':
+        if cli.trade_type == '买入':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '买入'
+    elif btn == '卖出':
+        if cli.trade_type == '卖出':
+            cli.trade_type = ''
+        else:
+            cli.trade_type = '卖出'
+    elif btn == '做多':
+        if cli.trade_type == '做多':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '做多'
+    elif btn == '做空':
+        if cli.trade_type == '做空':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '做空'
+    elif btn == '网格交易':
+        if cli.trade_type == '网格交易':
+            cli.trade_type = None
+        else:
+            cli.trade_type = '网格交易'
+    redraw_trade_options(cli)
 
 def trade_confirm_click(btn,cli):
-    if btn == '确认':
-        if cli.trade_type == '买入':
-            cli.buy_price_perc = get_value('buy_price_perc')
-            cli.buy_quote_amount = get_value('buy_quote_amount')
-            cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
-            cli.buy_stop_loss_perc = get_value('buy_stop_loss_perc')
-            cli.buy()
-        elif cli.trade_type == '卖出':
-            cli.sell_price_perc = get_value('sell_price_perc')
-            cli.sell_quote_amount = get_value('sell_quote_amount')
-            cli.sell_stop_loss_type = get_value('sell_stop_loss_type')
-            cli.sell_stop_loss_perc = get_value('sell_stop_loss_perc')
-            cli.sell()
-        elif cli.trade_type == '网格交易':
-            cli.grid_first_price_perc = get_value('grid_first_price_perc')
-            cli.grid_interval_perc = get_value('grid_interval_perc')
-            cli.grid_order_num = get_value('grid_order_num')
-            cli.grid_order_amount = get_value('grid_order_amount')
-            cli.grid_order_amount_type = get_value('grid_order_amount_type')
-            cli.grid_stop_loss_perc = get_value('grid_stop_loss_perc')
-            cli.grid()
+    # if btn == '确认':
+    #     if cli.trade_type == '买入':
+    #         cli.buy_price_perc = get_value('buy_price_perc')
+    #         cli.buy_quote_amount = get_value('buy_quote_amount')
+    #         cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
+    #         cli.buy_stop_loss_perc = get_value('buy_stop_loss_perc')
+    #         cli.buy()
+    #     elif cli.trade_type == '卖出':
+    #         cli.sell_price_perc = get_value('sell_price_perc')
+    #         cli.sell_quote_amount = get_value('sell_quote_amount')
+    #         cli.sell_stop_loss_type = get_value('sell_stop_loss_type')
+    #         cli.sell_stop_loss_perc = get_value('sell_stop_loss_perc')
+    #         cli.sell()
+    #     elif cli.trade_type == '网格交易':
+    #         cli.grid_first_price_perc = get_value('grid_first_price_perc')
+    #         cli.grid_interval_perc = get_value('grid_interval_perc')
+    #         cli.grid_order_num = get_value('grid_order_num')
+    #         cli.grid_order_amount = get_value('grid_order_amount')
+    #         cli.grid_order_amount_type = get_value('grid_order_amount_type')
+    #         cli.grid_stop_loss_perc = get_value('grid_stop_loss_perc')
+    #         cli.grid()
+    pass
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
