@@ -46,6 +46,7 @@ class client:
         self.user_key = ''
         self.user_name = ''
         self.user_elo = 1500
+        self.trade_type = None
 
 def pywebio_run():
     client_id = ramdom_str(32)
