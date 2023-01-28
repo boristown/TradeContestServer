@@ -843,10 +843,9 @@ def trade_confirm_click(cli):
         else:
             redraw_trade_options_msg(cli, '成功做空。', False)
     elif cli.trade_type == '网格交易':
-        if not pin.grid_base_amount \
-            and not pin.grid_amount_perc \
-            and not pin.grid_quote_amount:
-            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+        if not pin.grid_first_price_perc \
+            and not pin.grid_interval_perc:
+            redraw_trade_options_msg(cli, '请填写首单位置或每单间隔！', True)
         else:
             redraw_trade_options_msg(cli, '成功网格交易。', False)
     
