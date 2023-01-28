@@ -348,30 +348,8 @@ def get_leverage_amount(user_account):
 
 def get_leverage(user_account):
     #杠杆率
-    #本金 = USDT余额 + BTC数量*当前价格
-    # 当USDT余额为负数时，杠杆率为:abs(USDT余额)/本金
-    # 当BTC数量为负数时，杠杆率为:abs(BTC数量)*当前价格/本金
-    ts10 = int(time.time() / 10)
-    leverage = 0
-    price_btc = get_price_btc(ts10)
-    price_eth = get_price_eth(ts10)
-    #price_symbol = get_price_symbol(curr_usdt)
-    balance = leverage_amount = 0
-    for symbol in user_account:
-        if symbol == 'USDT':
-            delta = user_account[symbol]
-        elif symbol == 'BTC':
-            delta = user_account[symbol] * price_btc
-        elif symbol == 'ETH':
-            delta = user_account[symbol] * price_eth
-        else:
-            curr_usdt = symbol + 'USDT'
-            price_symbol = get_price_symbol(curr_usdt, ts10)
-            delta = user_account[symbol] * price_symbol
-        if delta < 0:
-            leverage_amount -= delta
-        balance += delta
-    leverage = leverage_amount / balance
+    #杠杆率 = 杠杆金额 / 总资产
+    leverage = get_leverage_amount() / get_total_balance()
     return leverage
 
 @lru_cache
