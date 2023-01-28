@@ -299,6 +299,53 @@ def redraw_login(cli: client):
             put_buttons(['登出'], onclick=lambda btn: login(cli, btn))
             put_scope('login_info')
 
+def get_total_balance(user_account):
+    #总资产
+    #本金 = USDT余额 + BTC数量*当前价格
+    ts10 = int(time.time() / 10)
+    price_btc = get_price_btc(ts10)
+    price_eth = get_price_eth(ts10)
+    #price_symbol = get_price_symbol(curr_usdt)
+    balance = 0
+    for symbol in user_account:
+        if symbol == 'USDT':
+            delta = user_account[symbol]
+        elif symbol == 'BTC':
+            delta = user_account[symbol] * price_btc
+        elif symbol == 'ETH':
+            delta = user_account[symbol] * price_eth
+        else:
+            curr_usdt = symbol + 'USDT'
+            price_symbol = get_price_symbol(curr_usdt, ts10)
+            delta = user_account[symbol] * price_symbol
+        balance += delta
+    return balance
+
+def get_leverage_amount(user_account):
+    #杠杆金额
+    #本金 = USDT余额 + BTC数量*当前价格
+    # 当USDT余额为负数时，杠杆金额为:abs(USDT余额)
+    # 当BTC数量为负数时，杠杆金额为:abs(BTC数量)*当前价格
+    ts10 = int(time.time() / 10)
+    price_btc = get_price_btc(ts10)
+    price_eth = get_price_eth(ts10)
+    #price_symbol = get_price_symbol(curr_usdt)
+    leverage = 0
+    for symbol in user_account:
+        if symbol == 'USDT':
+            delta = user_account[symbol]
+        elif symbol == 'BTC':
+            delta = user_account[symbol] * price_btc
+        elif symbol == 'ETH':
+            delta = user_account[symbol] * price_eth
+        else:
+            curr_usdt = symbol + 'USDT'
+            price_symbol = get_price_symbol(curr_usdt, ts10)
+            delta = user_account[symbol] * price_symbol
+        if delta < 0:
+            leverage -= delta
+    return leverage
+
 def get_leverage(user_account):
     #杠杆率
     #本金 = USDT余额 + BTC数量*当前价格
@@ -813,7 +860,9 @@ def trade_btn_click(btn,cli):
     redraw_trade_options(cli)
 
 def trade_confirm_click(cli):
-    print('trade_confirm_click')
+    account = cli.account
+
+    # 点击确认按钮后，根据当前交易类型，判断输入是否合法，如果合法则发送交易请求，否则提示错误信息。
     if cli.trade_type == '买入':
         if not pin.buy_base_amount \
             and not pin.buy_amount_perc \
@@ -854,26 +903,6 @@ def trade_confirm_click(cli):
         else:
             redraw_trade_options_msg(cli, '成功网格交易。', False)
     
-    #         cli.buy_price_perc = get_value('buy_price_perc')
-    #         cli.buy_quote_amount = get_value('buy_quote_amount')
-    #         cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
-    #         cli.buy_stop_loss_perc = get_value('buy_stop_loss_perc')
-    #         cli.buy()
-    #     elif cli.trade_type == '卖出':
-    #         cli.sell_price_perc = get_value('sell_price_perc')
-    #         cli.sell_quote_amount = get_value('sell_quote_amount')
-    #         cli.sell_stop_loss_type = get_value('sell_stop_loss_type')
-    #         cli.sell_stop_loss_perc = get_value('sell_stop_loss_perc')
-    #         cli.sell()    
-    #     elif cli.trade_type == '网格交易':
-    #         cli.grid_first_price_perc = get_value('grid_first_price_perc')
-    #         cli.gr id_interval_perc = get_value('grid_interval_perc')
-    #         cli.grid_order_num = get_value('grid_order_num')
-    #         cli.grid_order_amount = get_value('grid_order_amount')
-    #         cli.grid_order_amount_type = get_value('grid_order_amount_type')
-    #         cli.grid_stop_loss_perc = get_value('grid_stop_loss_perc')
-    #         cli.grid()
-    pass
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
