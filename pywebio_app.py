@@ -349,7 +349,7 @@ def get_leverage_amount(user_account):
 def get_leverage(user_account):
     #杠杆率
     #杠杆率 = 杠杆金额 / 总资产
-    leverage = get_leverage_amount() / get_total_balance()
+    leverage = get_leverage_amount(user_account) / get_total_balance(user_account)
     return leverage
 
 @lru_cache
