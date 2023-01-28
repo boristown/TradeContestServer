@@ -396,6 +396,7 @@ def login(cli: client, btn):
                 cli.user_name = users[key]['name']
                 cli.user_account = users[key]['account']
                 cli.user_elo = users[key]['ELO']
+                cli.user_orders = users[key]['orders']
                 redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):
@@ -416,7 +417,8 @@ def login(cli: client, btn):
             'account': {
                 "USDT":1000000.0,
                 "BTC":0.0,
-                }
+                },
+            'orders': [],
             }
         with open('db/user.json', 'w') as f:
             json.dump(users, f)
