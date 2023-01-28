@@ -132,12 +132,14 @@ def redraw_content(cli):
                 pass
         print('global_redraw waiting change...')
         #change detection
-        if not pin_changed(cli):
+        changed = pin_changed(cli)
+        if not changed:
             print('no change detected, waiting change...')
             changed = pin_wait_change(
                 [
                     'switch_tab', 'search', 'symbol',
-                    'selectBase', 'selectInterval', 'selectPeriod'
+                    'selectBase', 'selectInterval', 'selectPeriod',
+                    'buy_amount_perc'
                 ]
             )
         print('change detected')
@@ -167,23 +169,31 @@ def redraw_rank(cli):
         ['1', '基准账户', '1000000', '1500', '+0'],
         ['2', 'ak-bot', '1000000', '1500', '+0']
     ]
-
     put_table(data)
 
 
 def pin_changed(cli):
+    changed = set()
     print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
     print('cli vars:', cli.switch_tab, cli.search, cli.selectBase, cli.selectInterval, cli.selectPeriod, cli.symbol)
     if cli.switch_tab != pin.switch_tab:
-        return True
+        changed.add('switch_tab')
+        return changed
     if pin.switch_tab == '市场':
-        if cli.search != pin.search \
-        or cli.selectBase != pin.selectBase \
-        or cli.selectInterval != pin.selectInterval \
-        or cli.selectPeriod != pin.selectPeriod \
-        or cli.symbol != pin.symbol:
-            return True
-    return False
+        if cli.search != pin.search:
+            changed.add('search')
+        if cli.selectBase != pin.selectBase:
+            changed.add('selectBase')
+        if cli.selectInterval != pin.selectInterval:
+            changed.add('selectInterval')
+        if cli.selectPeriod != pin.selectPeriod:
+            changed.add('selectPeriod')
+        if cli.symbol != pin.symbol:
+            changed.add('symbol')
+        #buy_amount_perc
+        if cli.buy_amount_perc != pin.buy_amount_perc:
+            changed.add('buy_amount_perc')
+    return changed
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -269,8 +279,8 @@ def redraw_login(cli: client):
         else:
             put_buttons(['登陆'], onclick=lambda btn: login(cli, btn))
             with use_scope('login_info', clear=True):
-                put_text('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
-                put_text('请将该密钥复制到上方输入框中，点击登陆')
+                put_success('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
+                put_success('请将该密钥复制到上方输入框中，点击登陆')
                 put_input('user_key', value=cli.reg_key, readonly=True)
     else:
         #请输入用户名
@@ -839,7 +849,8 @@ def trade_btn_click(btn,cli):
 
 def trade_confirm_click(cli):
     account = cli.account
-
+    lev_amt = get_leverage_amount(account)
+    tot_balance = get_total_balance(account)
     # 点击确认按钮后，根据当前交易类型，判断输入是否合法，如果合法则发送交易请求，否则提示错误信息。
     if cli.trade_type == '买入':
         if not pin.buy_base_amount \
