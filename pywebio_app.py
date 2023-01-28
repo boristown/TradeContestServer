@@ -846,6 +846,11 @@ def trade_confirm_click(cli):
         if not pin.grid_first_price_perc \
             and not pin.grid_interval_perc:
             redraw_trade_options_msg(cli, '请填写首单位置或每单间隔！', True)
+        elif not pin.grid_order_num:
+            redraw_trade_options_msg(cli, '请填写单侧订单数量！', True)
+        elif not pin.grid_order_amount \
+            and not pin.grid_leverage:
+            redraw_trade_options_msg(cli, '请填写每单数量或整体杠杆率！', True)
         else:
             redraw_trade_options_msg(cli, '成功网格交易。', False)
     
@@ -859,10 +864,10 @@ def trade_confirm_click(cli):
     #         cli.sell_quote_amount = get_value('sell_quote_amount')
     #         cli.sell_stop_loss_type = get_value('sell_stop_loss_type')
     #         cli.sell_stop_loss_perc = get_value('sell_stop_loss_perc')
-    #         cli.sell()
+    #         cli.sell()    
     #     elif cli.trade_type == '网格交易':
     #         cli.grid_first_price_perc = get_value('grid_first_price_perc')
-    #         cli.grid_interval_perc = get_value('grid_interval_perc')
+    #         cli.gr id_interval_perc = get_value('grid_interval_perc')
     #         cli.grid_order_num = get_value('grid_order_num')
     #         cli.grid_order_amount = get_value('grid_order_amount')
     #         cli.grid_order_amount_type = get_value('grid_order_amount_type')
