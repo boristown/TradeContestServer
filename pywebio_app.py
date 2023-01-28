@@ -497,8 +497,10 @@ def redraw_market_kline(cli: client):
 @use_scope('trade_options_msg', clear=True)
 def redraw_trade_options_msg(cli: client, msg, is_error):
     if is_error:
+        print('error', msg)
         put_error(msg)
     else:
+        print('success', msg)
         put_success(msg)
 
 @use_scope('trade_options', clear=True)
@@ -811,6 +813,7 @@ def trade_btn_click(btn,cli):
     redraw_trade_options(cli)
 
 def trade_confirm_click(btn,cli):
+    print('trade_confirm_click')
     if btn == '确认':
         if cli.trade_type == '买入':
             redraw_trade_options_msg(cli, '买入', False)
