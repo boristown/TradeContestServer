@@ -395,6 +395,7 @@ def login(cli: client, btn):
                 cli.user_key = key
                 cli.user_name = users[key]['name']
                 cli.user_account = users[key]['account']
+                cli.user_elo = users[key]['ELO']
                 redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):
@@ -409,6 +410,7 @@ def login(cli: client, btn):
             users = json.load(f)
         users[key] = {
             'name': '', 
+            'ELO': 1500.0,
             'reg_time': int(time.time() * 1000), 
             'last_login_time': int(time.time() * 1000),
             'account': {
