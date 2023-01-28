@@ -529,7 +529,7 @@ def redraw_trade_options(cli: client):
                 put_text('%'),
             ],
             size = f"30% auto 30%",
-        )
+        ),
         put_row(
             [
                 put_text('使用'),
@@ -815,7 +815,13 @@ def trade_btn_click(btn,cli):
 def trade_confirm_click(cli):
     print('trade_confirm_click')
     if cli.trade_type == '买入':
-        redraw_trade_options_msg(cli, '买入', False)
+        if not pin.buy_base_amount \
+            and not pin.buy_amount_perc \
+            and not pin.buy_quote_amount:
+            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+        else:
+            redraw_trade_options_msg(cli, '买入', False)
+    
     #         cli.buy_price_perc = get_value('buy_price_perc')
     #         cli.buy_quote_amount = get_value('buy_quote_amount')
     #         cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
