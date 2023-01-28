@@ -63,7 +63,7 @@ def pywebio_run():
         'switch_tab', 
         options=['市场', '模拟交易', '比赛排行'],
         inline=True,
-        value='市场',
+        value='模拟交易',
     )
     pin.search = ''
     global_redraw(cli)
@@ -156,7 +156,6 @@ def redraw_rank(cli):
     # 排名 用户名   余额    ELO分 分数变化
     # 1    基准账户 1000000 1500  +0
     # 2    ak-bot  1000000 1500  +0
-
     if cli.user_key:
         put_text('第0轮模拟交易竞赛')
         put_text('我的排名：第2名')
@@ -571,7 +570,8 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        print('trade_confirm_button')
+        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
     elif cli.trade_type == '卖出':
         put_row(
             [
@@ -621,7 +621,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做多':
         put_row(
             [
@@ -671,7 +671,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做空':
         put_row(
             [
@@ -721,7 +721,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
     elif cli.trade_type == '网格交易':
         #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
         put_row(
@@ -772,7 +772,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda btn,cli=cli:trade_confirm_click(btn,cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
 
 @use_scope('trade_options', clear=True)
 def trade_btn_click(btn,cli):
@@ -812,11 +812,10 @@ def trade_btn_click(btn,cli):
             cli.trade_type = '网格交易'
     redraw_trade_options(cli)
 
-def trade_confirm_click(btn,cli):
+def trade_confirm_click(cli):
     print('trade_confirm_click')
-    if btn == '确认':
-        if cli.trade_type == '买入':
-            redraw_trade_options_msg(cli, '买入', False)
+    if cli.trade_type == '买入':
+        redraw_trade_options_msg(cli, '买入', False)
     #         cli.buy_price_perc = get_value('buy_price_perc')
     #         cli.buy_quote_amount = get_value('buy_quote_amount')
     #         cli.buy_stop_loss_type = get_value('buy_stop_loss_type')
