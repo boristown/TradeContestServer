@@ -829,16 +829,16 @@ def trade_confirm_click(cli):
         else:
             redraw_trade_options_msg(cli, '成功卖出。', False)
     elif cli.trade_type == '做多':
-        if not pin.long_base_amount \
-            and not pin.long_amount_perc \
-            and not pin.long_quote_amount:
+        if not pin.buy_base_amount \
+            and not pin.buy_leverage \
+            and not pin.buy_quote_amount:
             redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
             redraw_trade_options_msg(cli, '成功做多。', False)
     elif cli.trade_type == '做空':
-        if not pin.short_quote_amount \
-            and not pin.short_amount_perc \
-            and not pin.short_base_amount:
+        if not pin.sell_quote_amount \
+            and not pin.sell_leverage \
+            and not pin.sell_base_amount:
             redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
             redraw_trade_options_msg(cli, '成功做空。', False)
