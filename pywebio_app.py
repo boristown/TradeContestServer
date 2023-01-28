@@ -539,6 +539,8 @@ def redraw_trade_options_msg(cli: client, msg, is_error):
 
 @use_scope('trade_options', clear=True)
 def redraw_trade_options(cli: client):
+    print("account")
+    account = cli.user_account
     #显示一行小字，内容是：*交易手续费0.1%。
     put_text('*交易手续费0.1%。')
     #买入、卖出、做多、做空、网格交易，趋势追踪
@@ -568,7 +570,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('使用'),
-                put_input('buy_base_amount',type=FLOAT,placeholder='0~9999999'),
+                put_input('buy_base_amount',type=FLOAT,placeholder='0~'+str(account.get('USDT',0))),
                 put_text(base),
             ],
             size = f"30% auto 30%",
@@ -848,7 +850,7 @@ def trade_btn_click(btn,cli):
     redraw_trade_options(cli)
 
 def trade_confirm_click(cli):
-    account = cli.account
+    account = cli.user_account
     lev_amt = get_leverage_amount(account)
     tot_balance = get_total_balance(account)
     # 点击确认按钮后，根据当前交易类型，判断输入是否合法，如果合法则发送交易请求，否则提示错误信息。
