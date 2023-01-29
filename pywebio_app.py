@@ -147,7 +147,6 @@ def redraw_content(cli):
                     cli.selectPeriod = temp_selectPeriod
                     cli.search = temp_search
                     cli.selectBase = temp_selectBase
-
         elif pin.switch_tab == '模拟交易':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
@@ -207,11 +206,8 @@ def redraw_rank(cli):
     ]
     put_table(data)
 
-
 def pin_changed(cli):
     changed = set()
-    #print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
-    #print('cli vars:', cli.switch_tab, cli.search, cli.selectBase, cli.selectInterval, cli.selectPeriod, cli.symbol)
     if cli.switch_tab != pin.switch_tab:
         changed.add('switch_tab')
         return changed
