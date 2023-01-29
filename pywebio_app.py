@@ -18,6 +18,9 @@ local_url = 'https://aitrad.in/'
 up_triangle = '▲'
 down_triangle = '▼'
 
+#最大杠杆倍数
+max_leverage_ratio = 20
+
 #实现初始画面：
 #首先显示币种名称
 #然后显示k线图
@@ -222,9 +225,7 @@ def pin_changed(cli):
             changed.add('selectPeriod')
         if cli.symbol != pin.symbol:
             changed.add('symbol')
-        #buy_amount_perc
-        print('buy_amount_perc:', cli.buy_amount_perc, pin.buy_amount_perc)
-        if cli.buy_amount_perc and pin.buy_amount_perc and cli.buy_amount_perc != pin.buy_amount_perc:
+        if cli.buy_amount_perc != pin.buy_amount_perc:
             changed.add('buy_amount_perc')
     return changed
 
