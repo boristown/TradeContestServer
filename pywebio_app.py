@@ -47,7 +47,42 @@ class client:
         self.user_name = ''
         self.user_elo = 1500
         self.trade_type = None
-        self.buy_amount_percs = None
+        #买入
+        self.buy_price_perc = None
+        self.buy_base_amount = None
+        self.buy_amount_perc = None
+        self.buy_quote_amount = None
+        self.buy_stop_loss_type = None
+        self.buy_stop_loss_perc = None
+        #卖出
+        self.sell_price_perc = None
+        self.sell_quote_amount = None
+        self.sell_amount_perc = None
+        self.sell_base_amount = None
+        self.sell_stop_loss_type = None
+        self.sell_stop_loss_perc = None
+        #做多
+        self.long_price_perc = None
+        self.long_base_amount = None
+        self.long_leverage = None
+        self.long_quote_amount = None
+        self.long_stop_loss_type = None
+        self.long_stop_loss_perc = None
+        #做空
+        self.short_price_perc = None
+        self.short_quote_amount = None
+        self.short_leverage = None
+        self.short_base_amount = None
+        self.short_stop_loss_type = None
+        self.short_stop_loss_perc = None
+        #网格交易
+        self.grid_first_price_perc = None
+        self.grid_interval_perc = None
+        self.grid_order_num = None
+        self.grid_order_amount = None
+        self.grid_order_amount_type = None
+        self.grid_leverage = None
+        self.grid_stop_loss_perc = None
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -610,7 +645,7 @@ def redraw_trade_options(cli: client):
             size = f"30% auto 30%",
         )
         print('trade_confirm_button')
-        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
+        put_button('确认', onclick=lambda clsi=cli:trade_confirm_click(cli), small=True)
     elif cli.trade_type == '卖出':
         put_row(
             [
@@ -665,7 +700,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('低于市场价'),
-                put_input('buy_price_perc',type=FLOAT,placeholder='-99999~100'),
+                put_input('long_price_perc',type=FLOAT,placeholder='-99999~100'),
                 put_text('%'),
             ],
             size = f"30% auto 30%",
@@ -673,7 +708,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('使用'),
-                put_input('buy_base_amount',type=FLOAT,placeholder='0~9999999'),
+                put_input('long_base_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(base),
             ],
             size = f"30% auto 30%",
@@ -681,7 +716,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('杠杆率'),
-                put_input('buy_leverage',type=FLOAT,placeholder='0~100'),
+                put_input('long_leverage',type=FLOAT,placeholder='0~100'),
                 put_text('%'),
             ],
             size = f"30% auto 30%",
@@ -689,7 +724,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('做多'),
-                put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
+                put_input('long_quote_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(quote),
             ],
             size = f"30% auto 30%",
@@ -697,7 +732,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('相对于'),
-                put_select('buy_stop_loss_type', ['成交时','最大盈利']),
+                put_select('long_stop_loss_type', ['成交时','最大盈利']),
                 None
             ],
             size = f"30% auto 30%",
@@ -705,7 +740,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('亏损占比资产'),
-                put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+                put_input('long_stop_loss_perc',type=FLOAT,placeholder='0~99'),
                 put_text('%时止损'),
             ],
             size = f"30% auto 30%",
@@ -715,7 +750,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('高于市场价'),
-                put_input('sell_price_perc',type=FLOAT,placeholder='-100~99999'),
+                put_input('short_price_perc',type=FLOAT,placeholder='-100~99999'),
                 put_text('%'),
             ],
             size = f"30% auto 30%",
@@ -723,7 +758,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('做空'),
-                put_input('sell_quote_amount',type=FLOAT,placeholder='0~9999999'),
+                put_input('short_quote_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(quote),
             ],
             size = f"30% auto 30%",
@@ -731,7 +766,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('杠杆率'),
-                put_input('sell_leverage',type=FLOAT,placeholder='0~100'),
+                put_input('short_leverage',type=FLOAT,placeholder='0~100'),
                 put_text('%'),
             ],
             size = f"30% auto 30%",
@@ -739,7 +774,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('价值'),
-                put_input('sell_base_amount',type=FLOAT,placeholder='0~9999999'),
+                put_input('short_base_amount',type=FLOAT,placeholder='0~9999999'),
                 put_text(base),
             ],
             size = f"30% auto 30%",
@@ -747,7 +782,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('相对于'),
-                put_select('sell_stop_loss_type', ['成交时','最大盈利']),
+                put_select('short_stop_loss_type', ['成交时','最大盈利']),
                 None
             ],
             size = f"30% auto 30%",
@@ -755,7 +790,7 @@ def redraw_trade_options(cli: client):
         put_row(
             [
                 put_text('亏损占比资产'),
-                put_input('sell_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+                put_input('short_stop_loss_perc',type=FLOAT,placeholder='0~99'),
                 put_text('%时止损'),
             ],
             size = f"30% auto 30%",
@@ -871,16 +906,16 @@ def trade_confirm_click(cli):
         else:
             redraw_trade_options_msg(cli, '成功卖出。', False)
     elif cli.trade_type == '做多':
-        if not pin.buy_base_amount \
-            and not pin.buy_leverage \
-            and not pin.buy_quote_amount:
+        if not pin.long_base_amount \
+            and not pin.long_leverage \
+            and not pin.long_quote_amount:
             redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
             redraw_trade_options_msg(cli, '成功做多。', False)
     elif cli.trade_type == '做空':
-        if not pin.sell_quote_amount \
-            and not pin.sell_leverage \
-            and not pin.sell_base_amount:
+        if not pin.short_quote_amount \
+            and not pin.short_leverage \
+            and not pin.short_base_amount:
             redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
             redraw_trade_options_msg(cli, '成功做空。', False)
