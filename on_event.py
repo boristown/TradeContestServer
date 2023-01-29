@@ -82,6 +82,32 @@ def conf_name(cli, btn):
                 json.dump(users, f)
         redraw.redraw_login(cli)
 
+def pin_changed(cli):
+    changed = {}
+    if cli.switch_tab != pin.switch_tab:
+        changed['switch_tab'] = pin.switch_tab
+        return changed
+    if pin.switch_tab == '市场':
+        if cli.search != pin.search:
+            changed['search'] = pin.search
+            #changed.add('search')
+        if cli.selectBase != pin.selectBase:
+            changed['selectBase'] = pin.selectBase
+            #changed.add('selectBase')
+        if cli.selectInterval != pin.selectInterval:
+            changed['selectInterval'] = pin.selectInterval
+            #changed.add('selectInterval')
+        if cli.selectPeriod != pin.selectPeriod:
+            changed['selectPeriod'] = pin.selectPeriod
+            #changed.add('selectPeriod')
+        if cli.symbol != pin.symbol:
+            changed['symbol'] = pin.symbol
+            #changed.add('symbol')
+        if cli.buy_amount_perc != pin.buy_amount_perc:
+            changed['buy_amount_perc'] = pin.buy_amount_perc
+            #changed.add('buy_amount_perc')
+    return changed
+
 def trade_confirm_click(cli):
     account = cli.user_account
     lev_amt = commons.get_leverage_amount(account)
@@ -91,41 +117,41 @@ def trade_confirm_click(cli):
         if not pin.buy_base_amount \
             and not pin.buy_amount_perc \
             and not pin.buy_quote_amount:
-            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+            redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw_trade_options_msg(cli, '成功买入。', False)
+            redraw.redraw_trade_options_msg(cli, '成功买入。', False)
     elif cli.trade_type == '卖出':
         if not pin.sell_quote_amount \
             and not pin.sell_amount_perc \
             and not pin.sell_base_amount:
-            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+            redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw_trade_options_msg(cli, '成功卖出。', False)
+            redraw.redraw_trade_options_msg(cli, '成功卖出。', False)
     elif cli.trade_type == '做多':
         if not pin.long_base_amount \
             and not pin.long_leverage \
             and not pin.long_quote_amount:
-            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+            redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw_trade_options_msg(cli, '成功做多。', False)
+            redraw.redraw_trade_options_msg(cli, '成功做多。', False)
     elif cli.trade_type == '做空':
         if not pin.short_quote_amount \
             and not pin.short_leverage \
             and not pin.short_base_amount:
-            redraw_trade_options_msg(cli, '交易数量不能为空！', True)
+            redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw_trade_options_msg(cli, '成功做空。', False)
+            redraw.redraw_trade_options_msg(cli, '成功做空。', False)
     elif cli.trade_type == '网格交易':
         if not pin.grid_first_price_perc \
             and not pin.grid_interval_perc:
-            redraw_trade_options_msg(cli, '请填写首单位置或每单间隔！', True)
+            redraw.redraw_trade_options_msg(cli, '请填写首单位置或每单间隔！', True)
         elif not pin.grid_order_num:
-            redraw_trade_options_msg(cli, '请填写单侧订单数量！', True)
+            redraw.redraw_trade_options_msg(cli, '请填写单侧订单数量！', True)
         elif not pin.grid_order_amount \
             and not pin.grid_leverage:
-            redraw_trade_options_msg(cli, '请填写每单数量或整体杠杆率！', True)
+            redraw.redraw_trade_options_msg(cli, '请填写每单数量或整体杠杆率！', True)
         else:
-            redraw_trade_options_msg(cli, '成功网格交易。', False)
+            redraw.redraw_trade_options_msg(cli, '成功网格交易。', False)
 
 def set_symbol(cli,name):
     cli.symbol = name
@@ -135,14 +161,14 @@ def set_symbol(cli,name):
     return cli.symbol
 
 def set_sort(cli,label):
-    label = label.replace(up_triangle, '').replace(down_triangle, '')
+    label = label.replace(commons.up_triangle, '').replace(commons.down_triangle, '')
     if cli.sort_key == label:
         cli.sort_reverse = not cli.sort_reverse
     else:
         cli.sort_key = label
         cli.sort_reverse = False
     redraw.redraw_market_table(cli)
-    
+
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
     #获取输入框内容

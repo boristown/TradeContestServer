@@ -6,6 +6,7 @@ from client import client
 import on_event
 import time
 import commons
+import klines
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -40,6 +41,82 @@ def redraw_market_header(cli):
     cli.selectPeriod = pin.selectPeriod
     cli.symbol = pin.symbol
 
+#内容重绘
+@use_scope('content', clear=True)
+def redraw_content(cli):
+    while True:
+        if pin.switch_tab == '市场':
+            print('redraw market')
+            if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘
+                print('redraw market all')
+                temp_switch_tab = pin.switch_tab
+                redraw_market(cli)
+                print('redraw market all done')
+                cli.switch_tab = temp_switch_tab
+            else: #没切换tab，局部重绘
+                print('redraw market part')
+                #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
+                if cli.symbol != pin.symbol or \
+                    cli.selectInterval != pin.selectInterval or \
+                    cli.selectPeriod != pin.selectPeriod:
+                    temp_symbol = pin.symbol
+                    temp_selectInterval = pin.selectInterval
+                    temp_selectPeriod = pin.selectPeriod
+                    print('redraw market kline',pin.selectInterval, pin.selectPeriod)
+                    redraw_market_kline(cli)
+                    cli.symbol = temp_symbol
+                    cli.selectInterval = temp_selectInterval
+                    cli.selectPeriod = temp_selectPeriod
+                #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
+                if cli.search != pin.search or \
+                    cli.selectBase != pin.selectBase or \
+                    cli.selectPeriod != pin.selectPeriod:
+                    temp_search = pin.search
+                    temp_selectBase = pin.selectBase
+                    temp_selectPeriod = pin.selectPeriod
+                    print('redraw market table')
+                    redraw_market_table(cli)
+                    cli.selectPeriod = temp_selectPeriod
+                    cli.search = temp_search
+                    cli.selectBase = temp_selectBase
+        elif pin.switch_tab == '模拟交易':
+            print('redraw login')
+            if cli.switch_tab != pin.switch_tab:
+                print('redraw login all')
+                temp_switch_tab = pin.switch_tab
+                redraw_login(cli)
+                cli.switch_tab = temp_switch_tab
+            else:
+                pass
+        elif pin.switch_tab == '比赛排行':
+            print('redraw rank')
+            if cli.switch_tab != pin.switch_tab:
+                print('redraw rank all')
+                temp_switch_tab = pin.switch_tab
+                redraw_rank(cli)
+                cli.switch_tab = temp_switch_tab
+            else:
+                pass
+        print('global_redraw waiting change...')
+        #change detection
+        changed = on_event.pin_changed(cli)
+        if not changed:
+            print('no change detected, waiting change...')
+            changed = pin_wait_change(
+                [
+                    'switch_tab', 'search', 'symbol',
+                    'selectBase', 'selectInterval', 'selectPeriod',
+                    'buy_price_perc', 'buy_base_amount', 'buy_amount_perc', 'buy_quote_amount', 'buy_stop_loss_type', 'buy_stop_loss_perc',
+                    'sell_price_perc', 'sell_base_amount', 'sell_amount_perc', 'sell_quote_amount', 'sell_stop_loss_type', 'sell_stop_loss_perc',
+                    'long_price_perc', 'long_base_amount', 'long_leverage', 'long_quote_amount', 'long_stop_loss_type', 'long_stop_loss_perc',
+                    'short_price_perc', 'short_base_amount', 'short_leverage', 'short_quote_amount', 'short_stop_loss_type', 'short_stop_loss_perc',
+                    'grid_first_price_perc', 'grid_interval_perc', 'grid_order_num', 'grid_order_amount', 'grid_order_amount_type', 'grid_leverage', 'grid_stop_loss_perc',
+                ]
+            )
+        print('change detected')
+        if cli.switch_tab != pin.switch_tab:
+            print('change detected: switch_tab')
+            break
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
@@ -95,6 +172,102 @@ def redraw_market(cli: client):
     if pin.switch_tab == '市场': redraw_market_table(cli)
     if pin.switch_tab == '市场': redraw_sponsor(cli)
 
+@use_scope('sponsor', clear=True)
+def redraw_sponsor(cli: client):
+    #输出赞助人（并输出感谢的话）：
+    #淘淘
+    #熊*添
+    #刘*超
+    #小点点
+    #秦汉
+    #张*勇
+    #赵磊
+    #冯*俊
+    #徐坚
+    #于*万
+    #居中显示
+    put_text('By AI纪元')
+    put_text('感谢以下赞助人的支持！')
+    put_text('淘淘')
+    put_text('熊*添')
+    put_text('刘*超')
+    put_text('小点点')
+    put_text('秦汉')
+    put_text('张*勇')
+    put_text('赵磊')
+    put_text('冯*俊')
+    put_text('徐坚')
+    put_text('于*万')
+    put_text('如果您也想成为赞助人，请联系：tbziy@foxmail.com')
+    #超链接：
+    put_link('项目地址','https://github.com/boristown/TradeContestServer')
+
+def second_button(label):
+    return {
+        'label': label,
+        'value': label,
+        'color': 'secondary'
+    }
+
+def success_button(label):
+    return {
+        'label': label,
+        'value': label,
+        'color': 'success'
+    }
+
+def sort_button(cli,label):
+    return put_button(
+        label, 
+        onclick=lambda cli=cli,label=label: 
+        on_event.set_sort(cli,label),
+        color = 'success' if cli.sort_key in label else 'secondary',
+        small = True
+        )
+
+def update_header(cli):
+    cli.header = ['市场', '价格', '幅', '成交']
+    suffix = commons.down_triangle if cli.sort_reverse else commons.up_triangle
+    for i in range(len(cli.header)):
+        if cli.header[i] == cli.sort_key:
+            cli.header[i] += suffix
+            break
+    cli.header_row = [sort_button(cli, label) for label in cli.header]
+
+@use_scope('market_table', clear=True)
+def redraw_market_table(cli: client):
+    selinterval = pin.selectInterval
+    selperiod = pin.selectPeriod
+    cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+    cli.current_time = int(time.time() * 1000)
+    cli.period_s = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+    print("redraw market table update header begin")
+    update_header(cli)
+    print("redraw market table update header end")
+    mdata = [cli.header_row]
+    mbody = commons.get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
+    print("redraw market table get market data end",cli.sort_key,cli.sort_reverse)
+    if cli.sort_key == '市场':
+        mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
+    elif cli.sort_key == '价格':
+        mbody.sort(key=lambda x: x[1], reverse=cli.sort_reverse)
+    elif cli.sort_key == '幅':
+        mbody.sort(key=lambda x: x[3], reverse=cli.sort_reverse)
+    elif cli.sort_key == '成交':
+        mbody.sort(key=lambda x: x[2], reverse=cli.sort_reverse)
+    for row in mbody:
+        sym = row[0]
+        search_upper = pin.search.upper()
+        if search_upper and search_upper not in sym: continue
+        row[0] = put_button(
+            row[0],
+            onclick=lambda cli=cli,
+            s=sym: on_event.set_symbol(cli,s),
+            color='success' if cli.symbol == sym else 'secondary',
+            small=True
+            )
+        mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
+    put_table(mdata)
 
 @use_scope('rank', clear=True)
 def redraw_rank(cli):
@@ -136,7 +309,7 @@ def redraw_market_kline(cli: client):
     if key in cli.kline_cache:
         html = cli.kline_cache[key]
     else:
-        html = draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
+        html = klines.draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
         cli.kline_cache[key] = html
     put_html(html)
 
@@ -224,7 +397,7 @@ def redraw_trade_options(cli: client):
             size = f"30% auto 30%",
         )
         print('trade_confirm_button')
-        put_button('确认', onclick=lambda clsi=cli:trade_confirm_click(cli), small=True)
+        put_button('确认', onclick=lambda clsi=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '卖出':
         put_row(
             [
@@ -274,7 +447,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做多':
         put_row(
             [
@@ -324,7 +497,7 @@ def redraw_trade_options(cli: client):
             ],
             size = f"30% auto 30%",
         )
-        put_button('确认', onclick=lambda cli=cli:trade_confirm_click(cli), small=True)
+        put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做空':
         put_row(
             [
