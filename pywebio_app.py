@@ -47,6 +47,7 @@ class client:
         self.user_name = ''
         self.user_elo = 1500
         self.trade_type = None
+        self.buy_amount_percs = None
 
 def pywebio_run():
     client_id = ramdom_str(32)
@@ -191,6 +192,7 @@ def pin_changed(cli):
         if cli.symbol != pin.symbol:
             changed.add('symbol')
         #buy_amount_perc
+        print('buy_amount_percs:', cli.buy_amount_percs, pin.buy_amount_percs)
         if cli.buy_amount_percs and pin.buy_amount_percs and cli.buy_amount_perc != pin.buy_amount_perc:
             changed.add('buy_amount_perc')
     return changed
