@@ -174,8 +174,8 @@ def redraw_rank(cli):
 
 def pin_changed(cli):
     changed = set()
-    print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
-    print('cli vars:', cli.switch_tab, cli.search, cli.selectBase, cli.selectInterval, cli.selectPeriod, cli.symbol)
+    #print('pin vars:', pin.switch_tab, pin.search, pin.selectBase, pin.selectInterval, pin.selectPeriod, pin.symbol)
+    #print('cli vars:', cli.switch_tab, cli.search, cli.selectBase, cli.selectInterval, cli.selectPeriod, cli.symbol)
     if cli.switch_tab != pin.switch_tab:
         changed.add('switch_tab')
         return changed
@@ -191,7 +191,7 @@ def pin_changed(cli):
         if cli.symbol != pin.symbol:
             changed.add('symbol')
         #buy_amount_perc
-        if cli.buy_amount_perc != pin.buy_amount_perc:
+        if cli.buy_amount_percs and pin.buy_amount_percs and cli.buy_amount_perc != pin.buy_amount_perc:
             changed.add('buy_amount_perc')
     return changed
 
@@ -893,7 +893,6 @@ def trade_confirm_click(cli):
             redraw_trade_options_msg(cli, '请填写每单数量或整体杠杆率！', True)
         else:
             redraw_trade_options_msg(cli, '成功网格交易。', False)
-    
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
