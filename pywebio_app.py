@@ -227,8 +227,8 @@ def pin_changed(cli):
         if cli.symbol != pin.symbol:
             changed.add('symbol')
         #buy_amount_perc
-        print('buy_amount_percs:', cli.buy_amount_percs, pin.buy_amount_percs)
-        if cli.buy_amount_percs and pin.buy_amount_percs and cli.buy_amount_perc != pin.buy_amount_perc:
+        print('buy_amount_perc:', cli.buy_amount_perc, pin.buy_amount_perc)
+        if cli.buy_amount_perc and pin.buy_amount_perc and cli.buy_amount_perc != pin.buy_amount_perc:
             changed.add('buy_amount_perc')
     return changed
 
