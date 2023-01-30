@@ -79,6 +79,8 @@ def redraw_content(cli):
                     cli.selectPeriod = temp_selectPeriod
                     cli.search = temp_search
                     cli.selectBase = temp_selectBase
+                
+                redraw_trade_options_buy_amount(cli)
         elif pin.switch_tab == '模拟交易':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
@@ -117,6 +119,68 @@ def redraw_content(cli):
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
             break
+
+def redraw_trade_options_buy_amount(cli: client):
+    user_account = cli.user_account
+    symbol = cli.symbol
+    quote,base = commons.split_quote_base(symbol)
+    base_asset = user_account.get(base,0)
+    quote_price = commons.get_quote_price(quote)
+    base_price = commons.get_base_price(base)
+    #基准货币可用资产价值
+    base_asset_value = base_asset * base_price
+    #最大能买入的数量
+    quote_can_buy = base_asset_value / quote_price
+    #改变买入数量占总资产百分比，重绘买入数量
+    if cli.buy_amount_perc != pin.buy_amount_perc \
+        or cli.buy_base_amount != pin.buy_base_amount \
+        or cli.buy_quote_amount != pin.buy_quote_amount:
+        #分情况讨论
+        #1. 百分比修改，无论数量是否修改，都按照百分比计算
+        if cli.buy_amount_perc != pin.buy_amount_perc:
+            #调整到0~100之间
+            pin.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
+            cli.buy_amount_perc = pin.buy_amount_perc
+            #按照百分比计算base_amount数量
+            cli.buy_base_amount = base_asset * pin.buy_amount_perc / 100
+            buy_value = cli.buy_base_amount * base_price
+            #计算quote_amount数量
+            cli.buy_quote_amount = buy_value / quote_price
+            #调整到正确的范围
+            cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
+            cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
+        #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
+        elif cli.buy_quote_amount != pin.buy_quote_amount:
+            #调整到0~最大能买入的数量之间
+            pin.buy_quote_amount = max(0, min(quote_can_buy, pin.buy_quote_amount))
+            cli.buy_quote_amount = pin.buy_quote_amount
+            #计算买入总价值
+            buy_value = cli.buy_quote_amount * quote_price
+            #计算买入的base_amount数量
+            cli.buy_base_amount = buy_value / base_price
+            #计算买入的百分比
+            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
+            #调整到正确范围
+            cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
+            cli.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
+        #3. 百分比未修改，quote_amount数量也未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
+        elif cli.buy_base_amount != pin.buy_base_amount:
+            #调整到0~最大能买入的数量之间
+            pin.buy_base_amount = max(0, min(base_asset, pin.buy_base_amount))
+            cli.buy_base_amount = pin.buy_base_amount
+            #计算买入的百分比
+            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
+            #计算买入总价值
+            buy_value = cli.buy_base_amount * base_price
+            #计算买入的quote_amount数量
+            cli.buy_quote_amount = buy_value / quote_price
+            #调整到正确范围
+            cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
+            cli.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
+        #4. 更新界面pin值
+        pin.buy_amount_perc = cli.buy_amount_perc
+        pin.buy_base_amount = cli.buy_base_amount
+        pin.buy_quote_amount = cli.buy_quote_amount
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
@@ -341,12 +405,7 @@ def redraw_trade_options(cli: client):
         second_button('网格交易') if cli.trade_type != '网格交易' else success_button('网格交易'),
         ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
     symbol = cli.symbol
-    if symbol[-4:] == 'USDT':
-        base = symbol[-4:]
-        quote = symbol[:-4]
-    else:
-        base = symbol[-3:]
-        quote = symbol[:-3]
+    base,quote = commons.split_quote_base(symbol)
     if cli.trade_type == '买入':
         put_row(
             [
