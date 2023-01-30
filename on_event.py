@@ -14,6 +14,7 @@ import binanceAPI
 def login(cli: client, btn):
     if btn == '登陆':
         key = pin.key
+        print("key:",key)
         if key == '':
             with use_scope('login_info', clear=True):
                 put_error('请输入密钥')
