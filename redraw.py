@@ -7,6 +7,7 @@ import on_event
 import time
 import commons
 import klines
+import UI
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -343,257 +344,167 @@ def redraw_trade_options(cli: client):
         second_button('网格交易') if cli.trade_type != '网格交易' else success_button('网格交易'),
         ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
     symbol = cli.symbol
-    base,quote = commons.split_quote_base(symbol)
+    quote,base = commons.split_quote_base(symbol)
     if cli.trade_type == '买入':
-        put_row(
-            [
-                put_text('低于市场价'),
-                put_input('buy_price_perc',type=FLOAT,placeholder='-99999~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
-        ),
-        put_row(
-            [
-                put_text('使用'),
-                put_input('buy_base_amount',type=FLOAT,placeholder='0~'+str(account.get('USDT',0))),
-                put_text(base),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('低于市场价'),
+            put_input('buy_price_perc',type=FLOAT,placeholder='-99999~100'),
+            put_text('%')
         )
-        put_row(
-            [
-                put_text('消耗'),
-                put_input('buy_amount_perc',type=FLOAT,placeholder='0~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('使用'),
+            put_input('buy_base_amount',type=FLOAT,placeholder='0~'+str(account.get('USDT',0))),
+            put_text(base)
         )
-        put_row(
-            [
-                put_text('买入'),
-                put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(quote),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('消耗'),
+            put_input('buy_amount_perc',type=FLOAT,placeholder='0~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('相对于'),
-                put_select('buy_stop_loss_type', ['成交时','最大盈利']),
-                None
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('买入'),
+            put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(quote),
         )
-        put_row(
-            [
-                put_text('亏损占比资产'),
-                put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('%时止损'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('相对于'),
+            put_select('buy_stop_loss_type', ['成交时','最大盈利']),
+            None
+        )
+        UI.trade_options_row(
+            put_text('亏损占比资产'),
+            put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+            put_text('%时止损'),
         )
         print('trade_confirm_button')
         put_button('确认', onclick=lambda clsi=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '卖出':
-        put_row(
-            [
-                put_text('高于市场价'),
-                put_input('sell_price_perc',type=FLOAT,placeholder='-100~99999'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('高于市场价'),
+            put_input('sell_price_perc',type=FLOAT,placeholder='-100~99999'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('卖出'),
-                put_input('sell_quote_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(quote),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('卖出'),
+            put_input('sell_quote_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(quote),
         )
-        put_row(
-            [
-                put_text('消耗'),
-                put_input('sell_amount_perc',type=FLOAT,placeholder='0~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('消耗'),
+            put_input('sell_amount_perc',type=FLOAT,placeholder='0~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('价值'),
-                put_input('sell_base_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(base),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('价值'),
+            put_input('sell_base_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(base),
         )
-        put_row(
-            [
-                put_text('相对于'),
-                put_select('sell_stop_loss_type', ['成交时','最大盈利']),
-                None
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('相对于'),
+            put_select('sell_stop_loss_type', ['成交时','最大盈利']),
+            None
         )
-        put_row(
-            [
-                put_text('亏损占比资产'),
-                put_input('sell_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('%时止损'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('亏损占比资产'),
+            put_input('sell_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+            put_text('%时止损'),
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做多':
-        put_row(
-            [
-                put_text('低于市场价'),
-                put_input('long_price_perc',type=FLOAT,placeholder='-99999~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('低于市场价'),
+            put_input('long_price_perc',type=FLOAT,placeholder='-99999~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('使用'),
-                put_input('long_base_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(base),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('使用'),
+            put_input('long_base_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(base),
         )
-        put_row(
-            [
-                put_text('杠杆率'),
-                put_input('long_leverage',type=FLOAT,placeholder='0~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('杠杆率'),
+            put_input('long_leverage',type=FLOAT,placeholder='0~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('做多'),
-                put_input('long_quote_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(quote),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('做多'),
+            put_input('long_quote_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(quote),
         )
-        put_row(
-            [
-                put_text('相对于'),
-                put_select('long_stop_loss_type', ['成交时','最大盈利']),
-                None
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('相对于'),
+            put_select('long_stop_loss_type', ['成交时','最大盈利']),
+            None
         )
-        put_row(
-            [
-                put_text('亏损占比资产'),
-                put_input('long_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('%时止损'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('亏损占比资产'),
+            put_input('long_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+            put_text('%时止损'),
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做空':
-        put_row(
-            [
-                put_text('高于市场价'),
-                put_input('short_price_perc',type=FLOAT,placeholder='-100~99999'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('高于市场价'),
+            put_input('short_price_perc',type=FLOAT,placeholder='-100~99999'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('做空'),
-                put_input('short_quote_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(quote),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('做空'),
+            put_input('short_quote_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(quote),
         )
-        put_row(
-            [
-                put_text('杠杆率'),
-                put_input('short_leverage',type=FLOAT,placeholder='0~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('杠杆率'),
+            put_input('short_leverage',type=FLOAT,placeholder='0~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('价值'),
-                put_input('short_base_amount',type=FLOAT,placeholder='0~9999999'),
-                put_text(base),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('价值'),
+            put_input('short_base_amount',type=FLOAT,placeholder='0~9999999'),
+            put_text(base),
         )
-        put_row(
-            [
-                put_text('相对于'),
-                put_select('short_stop_loss_type', ['成交时','最大盈利']),
-                None
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('相对于'),
+            put_select('short_stop_loss_type', ['成交时','最大盈利']),
+            None
         )
-        put_row(
-            [
-                put_text('亏损占比资产'),
-                put_input('short_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('%时止损'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('亏损占比资产'),
+            put_input('short_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+            put_text('%时止损'),
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '网格交易':
         #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
-        put_row(
-            [
-                put_text('首单位置'),
-                put_input('grid_first_price_perc',type=FLOAT,placeholder='0~50'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('首单位置'),
+            put_input('grid_first_price_perc',type=FLOAT,placeholder='0~50'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('每单间隔'),
-                put_input('grid_interval_perc',type=FLOAT,placeholder='0~50'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('每单间隔'),
+            put_input('grid_interval_perc',type=FLOAT,placeholder='0~50'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('单侧订单数量'),
-                put_input('grid_order_num',type=NUMBER,placeholder='1~999'),
-                put_text('个'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('单侧订单数量'),
+            put_input('grid_order_num',type=NUMBER,placeholder='1~999'),
+            put_text('个'),
         )
-        put_row(
-            [
-                put_text('每单数量'),
-                put_input('grid_order_amount',type=FLOAT,placeholder='0~9999999'),
-                put_select('grid_order_amount_type', [quote,base]),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('每单数量'),
+            put_input('grid_order_amount',type=FLOAT,placeholder='0~9999999'),
+            put_select('grid_order_amount_type', [quote,base]),
         )
-        put_row(
-            [
-                put_text('整体杠杆率'),
-                put_input('grid_leverage',type=FLOAT,placeholder='0~100'),
-                put_text('%'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('整体杠杆率'),
+            put_input('grid_leverage',type=FLOAT,placeholder='0~100'),
+            put_text('%'),
         )
-        put_row(
-            [
-                put_text('亏损占比资产'),
-                put_input('grid_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-                put_text('%时止损'),
-            ],
-            size = f"30% auto 30%",
+        UI.trade_options_row(
+            put_text('亏损占比资产'),
+            put_input('grid_stop_loss_perc',type=FLOAT,placeholder='0~99'),
+            put_text('%时止损'),
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
 
