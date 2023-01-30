@@ -14,6 +14,9 @@ local_url = 'https://aitrad.in/'
 #最大杠杆倍数
 max_leverage_ratio = 20
 
+#交易手续费
+fees_ratio = 0.001
+
 #获取时间戳（十秒）
 def get_ts10():
     return int(time.time() / 10)

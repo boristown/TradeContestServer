@@ -339,17 +339,17 @@ def redraw_trade_options(cli: client):
         )
         UI.trade_options_row(
             put_text('使用'),
-            put_input('buy_base_amount',type=FLOAT,placeholder='0~'+str(account.get('USDT',0))),
+            put_input('buy_base_amount',type=FLOAT,value=0.0,placeholder='0.0'),
             put_text(base)
         )
         UI.trade_options_row(
             put_text('消耗'),
-            put_input('buy_amount_perc',type=FLOAT,placeholder='0~100'),
+            put_input('buy_amount_perc',type=FLOAT,value=0.0,placeholder='0.0'),
             put_text('%'),
         )
         UI.trade_options_row(
             put_text('买入'),
-            put_input('buy_quote_amount',type=FLOAT,placeholder='0~9999999'),
+            put_input('buy_quote_amount',type=FLOAT,value=0.0,placeholder='0.0'),
             put_text(quote),
         )
         UI.trade_options_row(
@@ -361,6 +361,11 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'),
             put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
             put_text('%时止损'),
+        )
+        UI.trade_options_row(
+            put_text('手续费'),
+            put_input('buy_fee',type=FLOAT,readonly=True,value=0),
+            put_text(base)
         )
         print('trade_confirm_button')
         put_button('确认', onclick=lambda clsi=cli:on_event.trade_confirm_click(cli), small=True)

@@ -196,7 +196,7 @@ def update_buy_options(cli: client):
     print('quote_price',quote_price)
     base_price = commons.get_base_price(base, ts10)
     #基准货币可用资产价值
-    base_asset_value = base_asset * base_price
+    base_asset_value = base_asset * base_price * (1 - commons.fees_ratio)
     #最大能买入的数量
     quote_can_buy = base_asset_value / quote_price
     print('quote_can_buy',quote_can_buy)
@@ -259,6 +259,8 @@ def update_buy_options(cli: client):
         pin.buy_amount_perc = cli.buy_amount_perc
         pin.buy_base_amount = cli.buy_base_amount
         pin.buy_quote_amount = cli.buy_quote_amount
+        #5. 更新交易手续费
+        pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件
