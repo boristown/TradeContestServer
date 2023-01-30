@@ -51,7 +51,7 @@ async def ticker_u(interval):
     t = int(time.time() * 1000)
     if t - cache_ticker_u_time[interval] <= cache_time:
         return cache_ticker_u[interval]
-    top_symbols = json.dumps(SYM_USDT[:100]).replace(" ", "")
+    top_symbols = json.dumps(SYM_USDT[:100]).replace(" ", "").replace("/", "")
     url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
     #print(url)
     url = "https://www.binance.com/" + url
@@ -65,7 +65,7 @@ async def ticker_b(interval):
     t = int(time.time() * 1000)
     if t - cache_ticker_b_time[interval] <= cache_time:
         return cache_ticker_b[interval]
-    top_symbols = json.dumps(SYM_BTC[:100]).replace(" ", "")
+    top_symbols = json.dumps(SYM_BTC[:100]).replace(" ", "").replace("/", "")
     url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
     #print(url)
     url = "https://www.binance.com/" + url
@@ -150,7 +150,6 @@ async def acme(s):
 def pywebio_task():
     myapp.pywebio_run()
     
-
 # `pywebio_task` is PyWebIO task function
 app.mount("/", FastAPI(routes=webio_routes(pywebio_task)))
 
