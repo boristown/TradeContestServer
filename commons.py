@@ -4,6 +4,7 @@ import time
 import functools
 from collections import *
 import copy
+import binanceAPI
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -160,12 +161,13 @@ def get_base_price(base, ts10):
 # BTCBUSD -> BTC, BUSD
 @functools.lru_cache
 def split_quote_base(symbol):
-    base4 = symbol[-4:]
-    base3 = symbol[-3:]
-    if base4 == 'USDT' or base4 == 'BUSD':
-        base = base4
-        quote = symbol[:-4]
-    else:
-        base = base3
-        quote = symbol[:-3]
-    return quote, base
+    return binanceAPI.SYM_DICT[symbol][1:]
+#     base4 = symbol[-4:]
+#     base3 = symbol[-3:]
+#     if base4 == 'USDT' or base4 == 'BUSD':
+#         base = base4
+#         quote = symbol[:-4]
+#     else:
+#         base = base3
+#         quote = symbol[:-3]
+#     return quote, base

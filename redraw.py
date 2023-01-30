@@ -8,6 +8,7 @@ import time
 import commons
 import klines
 import UI
+import binanceAPI
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -40,7 +41,7 @@ def redraw_market_header(cli):
     cli.selectBase = pin.selectBase
     cli.selectInterval = pin.selectInterval
     cli.selectPeriod = pin.selectPeriod
-    cli.symbol = pin.symbol
+    cli.symbol = binanceAPI.SYM_DICT2[pin.symbol][0]
 
 #内容重绘
 @use_scope('content', clear=True)
@@ -57,15 +58,12 @@ def redraw_content(cli):
             else: #没切换tab，局部重绘
                 print('redraw market part')
                 #切换市场或者切换k线周期或者切换时间窗口，重绘k线图
-                if cli.symbol != pin.symbol or \
-                    cli.selectInterval != pin.selectInterval or \
+                if cli.selectInterval != pin.selectInterval or \
                     cli.selectPeriod != pin.selectPeriod:
-                    temp_symbol = pin.symbol
                     temp_selectInterval = pin.selectInterval
                     temp_selectPeriod = pin.selectPeriod
                     print('redraw market kline',pin.selectInterval, pin.selectPeriod)
                     redraw_market_kline(cli)
-                    cli.symbol = temp_symbol
                     cli.selectInterval = temp_selectInterval
                     cli.selectPeriod = temp_selectPeriod
                 #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
@@ -246,10 +244,11 @@ def redraw_market_table(cli: client):
         mbody.sort(key=lambda x: x[2], reverse=cli.sort_reverse)
     for row in mbody:
         sym = row[0]
+        sym2 = binanceAPI.SYM_DICT[sym][0]
         search_upper = pin.search.upper()
-        if search_upper and search_upper not in sym: continue
+        if search_upper and search_upper not in sym and search_upper not in sym2: continue
         row[0] = put_button(
-            row[0],
+            sym2,
             onclick=lambda cli=cli,
             s=sym: on_event.set_symbol(cli,s),
             color='success' if cli.symbol == sym else 'secondary',

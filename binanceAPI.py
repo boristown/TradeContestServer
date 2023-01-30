@@ -191,11 +191,16 @@ SYM_BTC = [
 
 #去除斜杠并建立字典，映射到原始数据以及按斜杠分割后的数据
 #样例：{'BTCUSDT':['BTC/USDT', ''BTC', 'USDT']}
-SYM_DICT = {}
+SYM_DICT = {} #不带斜杠映射
+SYM_DICT2 = {} #带斜杠映射
 for sym in SYM_USDT:
-    sp = sym.split('/')
-    SYM_DICT[sym.replace('/', '')] = [sym, sp[0], sp[1]]
+    spl = sym.split('/')
+    rep = spl[0]+spl[1]
+    SYM_DICT[rep] = [sym, spl[0], spl[1]]
+    SYM_DICT2[sym] = [rep, spl[0], spl[1]]
 
 for sym in SYM_BTC:
-    sp = sym.split('/')
-    SYM_DICT[sym.replace('/', '')] = [sym, sp[0], sp[1]]
+    spl = sym.split('/')
+    rep = spl[0]+spl[1]
+    SYM_DICT[rep] = [sym, spl[0], spl[1]]
+    SYM_DICT2[sym] = [rep, spl[0], spl[1]]

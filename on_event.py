@@ -9,6 +9,7 @@ import random
 import redraw
 import commons
 import UI
+import binanceAPI
 
 def login(cli: client, btn):
     if btn == '登陆':
@@ -90,7 +91,7 @@ def pin_changed(cli):
         return pin_wait(changed)
     if pin.switch_tab == '市场':
         UI.chain_changed(cli,changed,[
-            'search', 'symbol',
+            'search',
             'selectBase', 'selectInterval', 'selectPeriod',
             'buy_price_perc', 'buy_base_amount', 'buy_amount_perc', 'buy_quote_amount', 'buy_stop_loss_type', 'buy_stop_loss_perc',
             'sell_price_perc', 'sell_base_amount', 'sell_amount_perc', 'sell_quote_amount', 'sell_stop_loss_type', 'sell_stop_loss_perc',
@@ -107,7 +108,7 @@ def pin_wait(changed):
         print('no change detected, waiting change...')
         changed = pin_wait_change(
             [
-                'switch_tab', 'search', 'symbol',
+                'switch_tab', 'search',
                 'selectBase', 'selectInterval', 'selectPeriod',
                 'buy_price_perc', 'buy_base_amount', 'buy_amount_perc', 'buy_quote_amount', 'buy_stop_loss_type', 'buy_stop_loss_perc',
                 'sell_price_perc', 'sell_base_amount', 'sell_amount_perc', 'sell_quote_amount', 'sell_stop_loss_type', 'sell_stop_loss_perc',
@@ -167,7 +168,7 @@ def trade_confirm_click(cli):
 
 def set_symbol(cli,name):
     cli.symbol = name
-    pin.symbol = cli.symbol
+    pin.symbol = binanceAPI.SYM_DICT[cli.symbol][0]
     redraw.redraw_market_kline(cli)
     redraw.redraw_market_table(cli)
     return cli.symbol
