@@ -103,20 +103,6 @@ def redraw_content(cli):
         print('global_redraw waiting change...')
         #change detection
         changed = on_event.pin_changed(cli)
-        if not changed:
-            print('no change detected, waiting change...')
-            changed = pin_wait_change(
-                [
-                    'switch_tab', 'search', 'symbol',
-                    'selectBase', 'selectInterval', 'selectPeriod',
-                    'buy_price_perc', 'buy_base_amount', 'buy_amount_perc', 'buy_quote_amount', 'buy_stop_loss_type', 'buy_stop_loss_perc',
-                    'sell_price_perc', 'sell_base_amount', 'sell_amount_perc', 'sell_quote_amount', 'sell_stop_loss_type', 'sell_stop_loss_perc',
-                    'long_price_perc', 'long_base_amount', 'long_leverage', 'long_quote_amount', 'long_stop_loss_type', 'long_stop_loss_perc',
-                    'short_price_perc', 'short_base_amount', 'short_leverage', 'short_quote_amount', 'short_stop_loss_type', 'short_stop_loss_perc',
-                    'grid_first_price_perc', 'grid_interval_perc', 'grid_order_num', 'grid_order_amount', 'grid_order_amount_type', 'grid_leverage', 'grid_stop_loss_perc',
-                ]
-            )
-        print('change detected')
         if cli.switch_tab != pin.switch_tab:
             print('change detected: switch_tab')
             break
