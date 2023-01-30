@@ -188,3 +188,14 @@ SYM_BTC = [
 'RVN/BTC',
 'LOOM/BTC'
 ]
+
+#去除斜杠并建立字典，映射到原始数据以及按斜杠分割后的数据
+#样例：{'BTCUSDT':['BTC/USDT', ''BTC', 'USDT']}
+SYM_DICT = {}
+for sym in SYM_USDT:
+    sp = sym.split('/')
+    SYM_DICT[sym.replace('/', '')] = [sym, sp[0], sp[1]]
+
+for sym in SYM_BTC:
+    sp = sym.split('/')
+    SYM_DICT[sym.replace('/', '')] = [sym, sp[0], sp[1]]
