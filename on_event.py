@@ -184,6 +184,7 @@ def set_sort(cli,label):
 
 def update_buy_options(cli: client):
     ts10 = commons.get_ts10()
+    if not cli.user_key: return
     print("def update_buy_options")
     user_account = cli.user_account
     symbol = cli.symbol

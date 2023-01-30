@@ -34,14 +34,15 @@ def redraw_market_header(cli):
             value='最近1天',
             )
     ])
+    print('cli.symbol',cli.symbol)
+    sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
     put_row([
-        put_input('symbol', value=cli.symbol, readonly=True),
+        put_input('symbol', value=sym2, readonly=True),
     ])
     cli.search = pin.search
     cli.selectBase = pin.selectBase
     cli.selectInterval = pin.selectInterval
     cli.selectPeriod = pin.selectPeriod
-    cli.symbol = binanceAPI.SYM_DICT2[pin.symbol][0]
 
 #内容重绘
 @use_scope('content', clear=True)
