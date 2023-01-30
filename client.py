@@ -1,3 +1,5 @@
+import commons
+
 class client:
     def __init__(self, client_id, interval, symbol, current_time, period, period_min):
         self.client_id = client_id
@@ -56,3 +58,11 @@ class client:
         self.grid_order_amount_type = None
         self.grid_leverage = None
         self.grid_stop_loss_perc = None
+        #初始化
+        self.interval = '1d'
+        self.symbol = 'BTCUSDT'
+        self.current_time = commons.get_tsms()
+        self.period = 30 * 24 * 60 * 60 * 1000
+        self.period_min = 60 * 1000
+        self.sort_key = '成交'
+        self.sort_reverse = True

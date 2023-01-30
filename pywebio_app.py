@@ -28,13 +28,10 @@ import on_event
 def pywebio_run():
     client_id = commons.ramdom_str(32)
     cli = client(client_id, '', '', 0, 0, 0)
-    cli.interval = '1d'
-    cli.symbol = 'BTCUSDT'
-    cli.current_time = int(time.time() * 1000)
-    cli.period = 30 * 24 * 60 * 60 * 1000
-    cli.period_min = 60 * 1000
-    cli.sort_key = '成交'
-    cli.sort_reverse = True
+    switch_redraw()
+    global_redraw(cli)
+
+def switch_redraw():
     #市场 / 模拟交易 / 比赛排行
     put_radio(
         'switch_tab', 
@@ -42,8 +39,6 @@ def pywebio_run():
         inline=True,
         value='模拟交易',
     )
-    pin.search = ''
-    global_redraw(cli)
 
 #全局重绘
 def global_redraw(cli):

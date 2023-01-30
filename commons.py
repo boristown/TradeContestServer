@@ -94,6 +94,9 @@ def get_price_symbol(symbol, ts10):
     price = float(r.json()['price'])
     return price
 
+def get_tsms():
+    return int(time.time() * 1000)
+    
 #获取随机字符串
 def ramdom_str(length):
     str = ''

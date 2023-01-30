@@ -8,6 +8,7 @@ import time
 import random
 import redraw
 import commons
+import UI
 
 def login(cli: client, btn):
     if btn == '登陆':
@@ -88,15 +89,20 @@ def pin_changed(cli):
         changed['switch_tab'] = pin.switch_tab
         return pin_wait(changed)
     if pin.switch_tab == '市场':
-        commons.chain_changed(cli,changed,[
+        UI.chain_changed(cli,changed,[
             'search', 'symbol',
             'selectBase', 'selectInterval', 'selectPeriod',
-            'buy_amount_perc',
+            'buy_price_perc', 'buy_base_amount', 'buy_amount_perc', 'buy_quote_amount', 'buy_stop_loss_type', 'buy_stop_loss_perc',
+            'sell_price_perc', 'sell_base_amount', 'sell_amount_perc', 'sell_quote_amount', 'sell_stop_loss_type', 'sell_stop_loss_perc',
+            'long_price_perc', 'long_base_amount', 'long_leverage', 'long_quote_amount', 'long_stop_loss_type', 'long_stop_loss_perc',
+            'short_price_perc', 'short_base_amount', 'short_leverage', 'short_quote_amount', 'short_stop_loss_type', 'short_stop_loss_perc',
+            'grid_first_price_perc', 'grid_interval_perc', 'grid_order_num', 'grid_order_amount', 'grid_order_amount_type', 'grid_leverage', 'grid_stop_loss_perc',
         ]
         )
     return pin_wait(changed)
 
 def pin_wait(changed):
+    print("pin wait begin")
     if not changed:
         print('no change detected, waiting change...')
         changed = pin_wait_change(
@@ -226,10 +232,10 @@ def update_buy_options(cli: client):
             #计算买入的base_amount数量
             cli.buy_base_amount = buy_value / base_price
             #计算买入的百分比
-            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
+            cli.buy_amount_perc = cli.buy_base_amount * 100 / base_asset 
             #调整到正确范围
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
-            cli.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
+            cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
         #3. 百分比未修改，quote_amount数量也未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
         elif cli.buy_base_amount != pin.buy_base_amount:
             #空置为0
@@ -246,7 +252,7 @@ def update_buy_options(cli: client):
             cli.buy_quote_amount = buy_value / quote_price
             #调整到正确范围
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
-            cli.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
+            cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
         #4. 更新界面pin值
         pin.buy_amount_perc = cli.buy_amount_perc
         pin.buy_base_amount = cli.buy_base_amount
