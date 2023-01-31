@@ -405,6 +405,11 @@ def redraw_trade_options(cli: client):
             put_input('sell_stop_loss_perc',type=FLOAT,placeholder='0~99'),
             put_text(" "+'%时止损'),
         )
+        UI.trade_options_row(
+            put_text('手续费(0.1%)'),
+            put_input('sell_fee',type=FLOAT,readonly=True,value=0),
+            put_text(" "+base)
+        )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做多':
         UI.trade_options_row(
@@ -437,6 +442,11 @@ def redraw_trade_options(cli: client):
             put_input('long_stop_loss_perc',type=FLOAT,placeholder='0~99'),
             put_text('%时止损'),
         )
+        UI.trade_options_row(
+            put_text('手续费(0.1%)'),
+            put_input('long_fee',type=FLOAT,readonly=True,value=0),
+            put_text(" "+base)
+        )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做空':
         UI.trade_options_row(
@@ -468,6 +478,11 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'),
             put_input('short_stop_loss_perc',type=FLOAT,placeholder='0~99'),
             put_text('%时止损'),
+        )
+        UI.trade_options_row(
+            put_text('手续费(0.1%)'),
+            put_input('short_fee',type=FLOAT,readonly=True,value=0),
+            put_text(" "+base)
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '网格交易':
