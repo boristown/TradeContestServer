@@ -171,8 +171,8 @@ def execute_sell(cli):
     users[cli.user_key]['account'] = user_account
     with open('db/user.json', 'w') as f:
         json.dump(users, f)
-    #输出信息：成功卖出sell_amount base，价格 pin.symbol_price base,收入quote_amount quote，手续费fee quote，当前账户余额为user_account
-    msg = f'成功卖出{sell_amount} {base}，价格{pin.symbol_price} {base}，收入{quote_amount} {quote}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
+    msg = f'成功卖出{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
@@ -341,7 +341,7 @@ def update_sell_options(cli):
     #改变卖出数量占总资产百分比，重绘卖出界面
     #1. 百分比修改，按照百分比计算base_amount数量和quote_amount数量
     if cli.sell_amount_perc != pin.sell_amount_perc:
-        print('百分比修改，按照百分比计算base_amount数量和quote_amount数量')
+        #print('百分比修改，按照百分比计算base_amount数量和quote_amount数量')
         #空置为0
         if not pin.sell_amount_perc:
             pin.sell_amount_perc = 0
@@ -361,7 +361,7 @@ def update_sell_options(cli):
         cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
     #2. 百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
     elif cli.sell_base_amount != pin.sell_base_amount:
-        print('百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量')
+        #print('百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量')
         #空置为0
         if not pin.sell_base_amount:
             pin.sell_base_amount = 0
@@ -382,7 +382,7 @@ def update_sell_options(cli):
         cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
     #3. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
     elif cli.sell_quote_amount != pin.sell_quote_amount:
-        print('百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量')
+        #print('百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量')
         #空置为0
         if not pin.sell_quote_amount:
             pin.sell_quote_amount = 0
