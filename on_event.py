@@ -126,10 +126,6 @@ def execute_buy(cli):
     #获取当前交易对
     symbol = cli.symbol
     quote, base = commons.split_quote_base(symbol)
-    # #获取当前价格
-    # base_price = commons.get_base_price(base)
-    # #获取当前报价
-    # quote_price = commons.get_quote_price(quote)
     #交易对价格
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     #手续费
@@ -152,6 +148,33 @@ def execute_buy(cli):
     msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)
 
+def execute_sell(cli):
+    ts10 = commons.get_ts10()
+    #获取当前交易对
+    symbol = cli.symbol
+    quote, base = commons.split_quote_base(symbol)
+    #交易对价格
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    #手续费
+    fee = float(pin.sell_fee)
+    #交易数量
+    quote_amount = float(cli.sell_quote_amount)
+    #卖出量
+    sell_amount = (quote_amount - fee) * pin.symbol_price
+    #修改账户余额
+    user_account = cli.user_account
+    user_account[base] += sell_amount
+    user_account[quote] -= quote_amount
+    #写入文件
+    with open('db/user.json', 'r') as f:
+        users = json.load(f)
+    users[cli.user_key]['account'] = user_account
+    with open('db/user.json', 'w') as f:
+        json.dump(users, f)
+    #输出信息：成功卖出sell_amount base，价格 pin.symbol_price base,收入quote_amount quote，手续费fee quote，当前账户余额为user_account
+    msg = f'成功卖出{sell_amount} {base}，价格{pin.symbol_price} {base}，收入{quote_amount} {quote}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    redraw.redraw_trade_options_msg(cli, msg, False)
+
 def trade_confirm_click(cli):
     account = cli.user_account
     lev_amt = commons.get_leverage_amount(account)
@@ -170,7 +193,7 @@ def trade_confirm_click(cli):
             and not pin.sell_base_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '成功卖出。', False)
+            execute_sell(cli)
     elif cli.trade_type == '做多':
         if not pin.long_base_amount \
             and not pin.long_leverage \
@@ -216,16 +239,11 @@ def set_sort(cli,label):
 def update_buy_options(cli: client):
     ts10 = commons.get_ts10()
     if not cli.user_key: return
-    print("def update_buy_options")
     user_account = cli.user_account
     symbol = cli.symbol
     print('cli.symbol',symbol)
     quote,base = commons.split_quote_base(symbol)
     base_asset = user_account.get(base,0)
-    # print('base_asset',base_asset,user_account,base)
-    # quote_price = commons.get_quote_price(quote, ts10)
-    # print('quote_price',quote_price)
-    # base_price = commons.get_base_price(base, ts10)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     #总手续费
     tot_fee = base_asset * commons.fees_ratio
@@ -301,6 +319,77 @@ def update_buy_options(cli: client):
         pin.buy_amount_perc = cli.buy_amount_perc
         pin.buy_base_amount = cli.buy_base_amount
         pin.buy_quote_amount = cli.buy_quote_amount
+
+def update_sell_options(pin, cli):
+    #更新卖出选项
+    #1. 获取当前账户的基准货币和交易货币数量
+    base_asset = pin.base_asset
+    quote_asset = pin.quote_asset
+    #2. 计算当前账户的基准货币和交易货币的可用数量
+    base_can_sell = pin.base_asset
+    quote_can_sell = pin.quote_asset
+    #3. 根据当前的pin值计算cli值
+    #1. 百分比修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
+    if cli.sell_amount_perc != pin.sell_amount_perc:
+        #空置为0
+        if not pin.sell_amount_perc:
+            pin.sell_amount_perc = 0
+        #调整到0~100之间
+        pin.sell_amount_perc = max(0, min(100, pin.sell_amount_perc))
+        cli.sell_amount_perc = pin.sell_amount_perc
+        #计算卖出的基准货币数量
+        cli.sell_base_amount = base_asset * pin.sell_amount_perc / 100
+        #手续费
+        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
+        #实际卖出的基准货币数量
+        real_base_amount = cli.sell_base_amount - pin.sell_fee
+        #计算quote_amount数量
+        cli.sell_quote_amount = real_base_amount / pin.symbol_price
+        #调整到正确范围
+        cli.sell_base_amount = max(0, min(base_asset, cli.sell_base_amount))
+        cli.sell_quote_amount = max(0, min(quote_can_sell, cli.sell_quote_amount))
+    #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
+    elif cli.sell_quote_amount != pin.sell_quote_amount:
+        #空置为0
+        if not pin.sell_quote_amount:
+            pin.sell_quote_amount = 0
+        #调整到0~最大能卖出的数量之间
+        pin.sell_quote_amount = max(0, min(quote_can_sell, pin.sell_quote_amount))
+        cli.sell_quote_amount = pin.sell_quote_amount
+        #计算卖出的百分比
+        cli.sell_amount_perc = cli.sell_quote_amount / quote_asset * 100
+        #计算卖出的基准货币数量
+        cli.sell_base_amount = cli.sell_quote_amount * pin.symbol_price
+        #手续费
+        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
+        #实际卖出的基准货币数量
+        real_base_amount = cli.sell_base_amount - pin.sell_fee
+        #调整到正确范围
+        cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
+        cli.sell_base_amount = max(0, min(base_can_sell, real_base_amount))
+    #3. 百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
+    elif cli.sell_base_amount != pin.sell_base_amount:
+        #空置为0
+        if not pin.sell_base_amount:
+            pin.sell_base_amount = 0
+        #调整到0~最大能卖出的数量之间
+        pin.sell_base_amount = max(0, min(base_can_sell, pin.sell_base_amount))
+        cli.sell_base_amount = pin.sell_base_amount
+        #计算卖出的百分比
+        cli.sell_amount_perc = cli.sell_base_amount / base_asset * 100
+        #手续费
+        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
+        #实际卖出的基准货币数量
+        real_base_amount = cli.sell_base_amount - pin.sell_fee
+        #计算quote_amount数量
+        cli.sell_quote_amount = real_base_amount / pin.symbol_price
+        #调整到正确范围
+        cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
+        cli.sell_quote_amount = max(0, min(quote_can_sell, cli.sell_quote_amount))
+    #4. 更新界面pin值
+    pin.sell_amount_perc = cli.sell_amount_perc
+    pin.sell_base_amount = cli.sell_base_amount
+    pin.sell_quote_amount = cli.sell_quote_amount
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件

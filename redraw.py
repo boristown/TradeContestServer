@@ -81,6 +81,7 @@ def redraw_content(cli):
                     cli.selectBase = temp_selectBase
                 
                 on_event.update_buy_options(cli)
+                on_event.update_sell_options(cli)
         elif pin.switch_tab == '模拟交易':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
@@ -138,17 +139,12 @@ def redraw_login(cli: client):
                 put_text('欢迎：' + cli.user_name)
                 res = '账户信息：\n'
                 res += 'ELO分：' + str(cli.user_elo) + '\n'
-                #格式：{'BTC':0,'USDT':1000}
                 price = commons.get_price_btc(ts10)
                 user_account = cli.user_account
-                #格式：{'BTC':10000,'USDT':1}
-                #res = get_contest_text() + '\n'
-                #res = '用户：' + cli.user_name + '\n'
                 res += 'BTC：' + str(user_account['BTC']) + '\n'
                 res += 'USDT：' + str(user_account['USDT']) + '\n'
                 res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
                 res += '杠杆率：' + str(commons.get_leverage(user_account))
-                #btc_price = get_price_btc(ts10)
                 put_text(res)
             put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
             put_scope('login_info')
@@ -380,22 +376,22 @@ def redraw_trade_options(cli: client):
         UI.trade_options_row(
             put_text('高于市场价'),
             put_input('sell_price_perc',type=FLOAT,placeholder='-100~99999'),
-            put_text('%'),
+            put_text(" "+'%'),
         )
         UI.trade_options_row(
             put_text('卖出'),
-            put_input('sell_quote_amount',type=FLOAT,placeholder='0~9999999'),
-            put_text(quote),
+            put_input('sell_quote_amount',type=FLOAT,value=0.0,placeholder='0.0'),
+            put_text(" "+quote),
         )
         UI.trade_options_row(
             put_text('消耗'),
-            put_input('sell_amount_perc',type=FLOAT,placeholder='0~100'),
-            put_text('%'),
+            put_input('sell_amount_perc',type=FLOAT,value=0.0,placeholder='0.0'),
+            put_text(" "+'%'),
         )
         UI.trade_options_row(
             put_text('价值'),
-            put_input('sell_base_amount',type=FLOAT,placeholder='0~9999999'),
-            put_text(base),
+            put_input('sell_base_amount',type=FLOAT,value=0.0,placeholder='0.0'),
+            put_text(" "+base),
         )
         UI.trade_options_row(
             put_text('相对于'),
@@ -405,7 +401,7 @@ def redraw_trade_options(cli: client):
         UI.trade_options_row(
             put_text('亏损占比资产'),
             put_input('sell_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-            put_text('%时止损'),
+            put_text(" "+'%时止损'),
         )
         put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
     elif cli.trade_type == '做多':
