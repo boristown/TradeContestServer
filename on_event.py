@@ -121,6 +121,36 @@ def pin_wait(changed):
     print('change detected')
     return changed
 
+def execute_buy(cli):
+    ts10 = commons.get_ts10()
+    #获取当前交易对
+    symbol = cli.symbol
+    quote, base = commons.split_quote_base(symbol)
+    # #获取当前价格
+    # base_price = commons.get_base_price(base)
+    # #获取当前报价
+    # quote_price = commons.get_quote_price(quote)
+    #交易对价格
+    symbol_price = commons.get_symbol_price(symbol)
+    #手续费
+    fee = float(pin.buy_fee)
+    #交易数量
+    base_amount = float(cli.buy_base_amount)
+    #买入量
+    buy_amount = (base_amount  - fee) / symbol_price
+    #修改账户余额
+    user_account = cli.user_account
+    user_account[base] -= base_amount
+    user_account[quote] += buy_amount
+    #写入文件
+    with open('db/user.json', 'r') as f:
+        users = json.load(f)
+    users[cli.user_key]['account'] = user_account
+    with open('db/user.json', 'w') as f:
+        json.dump(users, f)
+    #输出信息：成功买入buy_amount quote，花费base_amount base，手续费fee quote，当前账户余额为user_account
+    msg = f'成功买入{buy_amount} {quote}，花费{base_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
     account = cli.user_account
@@ -128,12 +158,12 @@ def trade_confirm_click(cli):
     tot_balance = commons.get_total_balance(account)
     # 点击确认按钮后，根据当前交易类型，判断输入是否合法，如果合法则发送交易请求，否则提示错误信息。
     if cli.trade_type == '买入':
-        if not pin.buy_base_amount \
-            and not pin.buy_amount_perc \
-            and not pin.buy_quote_amount:
+        if not cli.buy_base_amount \
+            and not cli.buy_amount_perc \
+            and not cli.buy_quote_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '成功买入。', False)
+            execute_buy(cli)
     elif cli.trade_type == '卖出':
         if not pin.sell_quote_amount \
             and not pin.sell_amount_perc \
