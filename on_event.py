@@ -252,9 +252,9 @@ def update_buy_options(cli: client):
             #手续费
             pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
             #实际买入的基准货币金额
-            act_base_amount = cli.buy_base_amount - pin.buy_fee
+            real_base_amount = cli.buy_base_amount - pin.buy_fee
             #计算quote_amount数量
-            cli.buy_quote_amount = act_base_amount / pin.symbol_price 
+            cli.buy_quote_amount = real_base_amount / pin.symbol_price 
             #调整到正确的范围
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))

@@ -334,9 +334,9 @@ def redraw_trade_options(cli: client):
     quote,base = commons.split_quote_base(symbol)
     symbol_price = commons.get_price_symbol(symbol, ts10)
     UI.trade_options_row(
-        '1 '+quote+' =', 
+        put_text('1 '+quote+' ='), 
         put_input('symbol_price',type=FLOAT,readonly=True,value=symbol_price),
-        base
+        put_text(base)
         )
     if cli.trade_type == '买入':
         UI.trade_options_row(
