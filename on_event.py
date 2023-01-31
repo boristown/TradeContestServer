@@ -148,8 +148,8 @@ def execute_buy(cli):
     users[cli.user_key]['account'] = user_account
     with open('db/user.json', 'w') as f:
         json.dump(users, f)
-    #输出信息：成功买入buy_amount quote，花费base_amount base，手续费fee quote，当前账户余额为user_account
-    msg = f'成功买入{buy_amount} {quote}，花费{base_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    #输出信息：成功买入buy_amount quote，价格 symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
+    msg = f'成功买入{buy_amount} {quote}，价格{symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
