@@ -222,14 +222,17 @@ def update_buy_options(cli: client):
     print('cli.symbol',symbol)
     quote,base = commons.split_quote_base(symbol)
     base_asset = user_account.get(base,0)
-    print('base_asset',base_asset,user_account,base)
-    quote_price = commons.get_quote_price(quote, ts10)
-    print('quote_price',quote_price)
-    base_price = commons.get_base_price(base, ts10)
-    #基准货币可用资产价值
-    base_asset_value = base_asset * base_price * (1 - commons.fees_ratio)
+    # print('base_asset',base_asset,user_account,base)
+    # quote_price = commons.get_quote_price(quote, ts10)
+    # print('quote_price',quote_price)
+    # base_price = commons.get_base_price(base, ts10)
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    #总手续费
+    tot_fee = base_asset * commons.fees_ratio
+    #实际可用基准货币资产余额
+    aval_base_asset = base_asset - tot_fee
     #最大能买入的数量
-    quote_can_buy = base_asset_value / quote_price
+    quote_can_buy = aval_base_asset / pin.symbol_price
     print('quote_can_buy',quote_can_buy)
     #改变买入数量占总资产百分比，重绘买入数量
     if cli.buy_amount_perc != pin.buy_amount_perc \
@@ -245,10 +248,13 @@ def update_buy_options(cli: client):
             pin.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
             cli.buy_amount_perc = pin.buy_amount_perc
             #按照百分比计算base_amount数量
-            cli.buy_base_amount = base_asset * pin.buy_amount_perc / 100
-            buy_value = cli.buy_base_amount * base_price
+            cli.buy_base_amount = base_asset * pin.buy_amount_perc / 100 
+            #手续费
+            pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
+            #实际买入的基准货币金额
+            act_base_amount = cli.buy_base_amount - pin.buy_fee
             #计算quote_amount数量
-            cli.buy_quote_amount = buy_value / quote_price
+            cli.buy_quote_amount = act_base_amount / pin.symbol_price 
             #调整到正确的范围
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
@@ -260,12 +266,15 @@ def update_buy_options(cli: client):
             #调整到0~最大能买入的数量之间
             pin.buy_quote_amount = max(0, min(quote_can_buy, pin.buy_quote_amount))
             cli.buy_quote_amount = pin.buy_quote_amount
-            #计算买入总价值
-            buy_value = cli.buy_quote_amount * quote_price
-            #计算买入的base_amount数量
-            cli.buy_base_amount = buy_value / base_price
-            #计算买入的百分比
-            cli.buy_amount_perc = cli.buy_base_amount * 100 / base_asset 
+            #按照quote_amount数量计算base_amount数量
+            cli.buy_base_amount = pin.buy_quote_amount * pin.symbol_price
+            #含手续费的base_amount数量
+            real_base_amount = cli.buy_base_amount / (1 - commons.fees_ratio)
+            #手续费
+            pin.buy_fee = real_base_amount - cli.buy_base_amount
+            cli.buy_base_amount = real_base_amount
+            #计算百分比
+            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
             #调整到正确范围
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
@@ -279,10 +288,12 @@ def update_buy_options(cli: client):
             cli.buy_base_amount = pin.buy_base_amount
             #计算买入的百分比
             cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
-            #计算买入总价值
-            buy_value = cli.buy_base_amount * base_price
-            #计算买入的quote_amount数量
-            cli.buy_quote_amount = buy_value / quote_price
+            #手续费
+            pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
+            #实际买入的基准货币金额
+            real_base_amount = cli.buy_base_amount - pin.buy_fee
+            #计算quote_amount数量
+            cli.buy_quote_amount = real_base_amount / pin.symbol_price
             #调整到正确范围
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
             cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
@@ -290,8 +301,6 @@ def update_buy_options(cli: client):
         pin.buy_amount_perc = cli.buy_amount_perc
         pin.buy_base_amount = cli.buy_base_amount
         pin.buy_quote_amount = cli.buy_quote_amount
-        #5. 更新交易手续费
-        pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
 
 def trade_price_change(x,cli):
     #价格输入框内容改变事件

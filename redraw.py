@@ -317,6 +317,7 @@ def redraw_trade_options_msg(cli: client, msg, is_error):
 
 @use_scope('trade_options', clear=True)
 def redraw_trade_options(cli: client):
+    ts10 = commons.get_ts10()
     print("account")
     account = cli.user_account
     #显示一行小字，内容是：*交易手续费0.1%。
@@ -331,6 +332,12 @@ def redraw_trade_options(cli: client):
         ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
     symbol = cli.symbol
     quote,base = commons.split_quote_base(symbol)
+    symbol_price = commons.get_price_symbol(symbol, ts10)
+    UI.trade_options_row(
+        '1 '+quote+' =', 
+        put_input('symbol_price',type=FLOAT,readonly=True,value=symbol_price),
+        base
+        )
     if cli.trade_type == '买入':
         UI.trade_options_row(
             put_text('低于市场价'),
