@@ -131,7 +131,7 @@ def execute_buy(cli):
     # #获取当前报价
     # quote_price = commons.get_quote_price(quote)
     #交易对价格
-    symbol_price = commons.get_symbol_price(symbol)
+    symbol_price = commons.get_price_symbol(symbol, ts10)
     #手续费
     fee = float(pin.buy_fee)
     #交易数量
