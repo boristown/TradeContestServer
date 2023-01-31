@@ -320,10 +320,9 @@ def update_buy_options(cli: client):
         pin.buy_base_amount = cli.buy_base_amount
         pin.buy_quote_amount = cli.buy_quote_amount
 
-def update_sell_options(pin, cli):
+def update_sell_options(cli):
     #更新卖出选项
     #1. 获取当前账户的基准货币和交易货币数量
-    print('def update_sell_options(pin, cli)')
     base_asset = pin.base_asset
     quote_asset = pin.quote_asset
     #2. 计算当前账户的基准货币和交易货币的可用数量
