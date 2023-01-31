@@ -79,9 +79,10 @@ def redraw_content(cli):
                     cli.selectPeriod = temp_selectPeriod
                     cli.search = temp_search
                     cli.selectBase = temp_selectBase
-                
-                on_event.update_buy_options(cli)
-                on_event.update_sell_options(cli)
+                if cli.trade_type == '买入':
+                    on_event.update_buy_options(cli)
+                elif cli.trade_type == '卖出':
+                    on_event.update_sell_options(cli)
         elif pin.switch_tab == '模拟交易':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
