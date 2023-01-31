@@ -321,8 +321,16 @@ def redraw_trade_options(cli: client):
     print("account")
     account = cli.user_account
     #显示一行小字，内容是：*交易手续费0.1%。
-    put_text('*交易手续费0.1%。')
+    #put_text('*交易手续费0.1%。')
     #买入、卖出、做多、做空、网格交易，趋势追踪
+    symbol = cli.symbol
+    quote,base = commons.split_quote_base(symbol)
+    symbol_price = commons.get_price_symbol(symbol, ts10)
+    UI.trade_options_row(
+        put_text('1 '+quote+' ='), 
+        put_input('symbol_price',type=FLOAT,readonly=True,value=symbol_price),
+        put_text(" "+base)
+        )
     put_buttons([
         second_button('买入') if cli.trade_type != '买入' else success_button('买入'),
         second_button('卖出') if cli.trade_type != '卖出' else success_button('卖出'),
@@ -330,34 +338,26 @@ def redraw_trade_options(cli: client):
         second_button('做空') if cli.trade_type != '做空' else success_button('做空'),
         second_button('网格交易') if cli.trade_type != '网格交易' else success_button('网格交易'),
         ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
-    symbol = cli.symbol
-    quote,base = commons.split_quote_base(symbol)
-    symbol_price = commons.get_price_symbol(symbol, ts10)
-    UI.trade_options_row(
-        put_text('1 '+quote+' ='), 
-        put_input('symbol_price',type=FLOAT,readonly=True,value=symbol_price),
-        put_text(base)
-        )
     if cli.trade_type == '买入':
         UI.trade_options_row(
             put_text('低于市场价'),
             put_input('buy_price_perc',type=FLOAT,placeholder='-99999~100'),
-            put_text('%')
+            put_text(" "+'%')
         )
         UI.trade_options_row(
             put_text('使用'),
             put_input('buy_base_amount',type=FLOAT,value=0.0,placeholder='0.0'),
-            put_text(base)
+            put_text(" "+base)
         )
         UI.trade_options_row(
             put_text('消耗'),
             put_input('buy_amount_perc',type=FLOAT,value=0.0,placeholder='0.0'),
-            put_text('%'),
+            put_text(" "+'%'),
         )
         UI.trade_options_row(
             put_text('买入'),
             put_input('buy_quote_amount',type=FLOAT,value=0.0,placeholder='0.0'),
-            put_text(quote),
+            put_text(" "+quote),
         )
         UI.trade_options_row(
             put_text('相对于'),
@@ -367,12 +367,12 @@ def redraw_trade_options(cli: client):
         UI.trade_options_row(
             put_text('亏损占比资产'),
             put_input('buy_stop_loss_perc',type=FLOAT,placeholder='0~99'),
-            put_text('%时止损'),
+            put_text(" "+'%时止损'),
         )
         UI.trade_options_row(
-            put_text('手续费'),
+            put_text('手续费(0.1%)'),
             put_input('buy_fee',type=FLOAT,readonly=True,value=0),
-            put_text(base)
+            put_text(" "+base)
         )
         print('trade_confirm_button')
         put_button('确认', onclick=lambda clsi=cli:on_event.trade_confirm_click(cli), small=True)
