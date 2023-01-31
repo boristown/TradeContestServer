@@ -321,15 +321,25 @@ def update_buy_options(cli: client):
         pin.buy_quote_amount = cli.buy_quote_amount
 
 def update_sell_options(cli):
-    #更新卖出选项
-    #1. 获取当前账户的基准货币和交易货币数量
-    base_asset = pin.base_asset
-    quote_asset = pin.quote_asset
-    #2. 计算当前账户的基准货币和交易货币的可用数量
-    base_can_sell = pin.base_asset
-    quote_can_sell = pin.quote_asset
-    #3. 根据当前的pin值计算cli值
-    #1. 百分比修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
+    #参考方法：update_buy_options实现该方法
+    ts10 = commons.get_ts10()
+    if not cli.user_key: return
+    user_account = cli.user_account
+    symbol = cli.symbol
+    print('cli.symbol',symbol)
+    quote,base = commons.split_quote_base(symbol)
+    print('quote,base',quote,base)
+    quote_asset = user_account.get(quote, 0)
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    #总手续费
+    tot_fee = quote_asset * commons.fees_ratio
+    #实际卖出的quote数量
+    real_quote_asset = quote_asset - tot_fee
+    #最大能卖出的金额
+    base_can_sell = real_quote_asset * pin.symbol_price
+    print('base_can_sell',base_can_sell)
+    #改变卖出数量占总资产百分比，重绘卖出界面
+    #1. 百分比修改，按照百分比计算base_amount数量和quote_amount数量
     if cli.sell_amount_perc != pin.sell_amount_perc:
         #空置为0
         if not pin.sell_amount_perc:
@@ -337,37 +347,18 @@ def update_sell_options(cli):
         #调整到0~100之间
         pin.sell_amount_perc = max(0, min(100, pin.sell_amount_perc))
         cli.sell_amount_perc = pin.sell_amount_perc
-        #计算卖出的基准货币数量
-        cli.sell_base_amount = base_asset * pin.sell_amount_perc / 100
+        #计算卖出的资产数量
+        cli.sell_quote_amount = quote_asset * cli.sell_amount_perc / 100
         #手续费
-        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
-        #实际卖出的基准货币数量
-        real_base_amount = cli.sell_base_amount - pin.sell_fee
-        #计算quote_amount数量
-        cli.sell_quote_amount = real_base_amount / pin.symbol_price
+        pin.sell_fee = cli.sell_quote_amount * commons.fees_ratio
+        #实际卖出的quote数量
+        real_quote_asset = cli.sell_quote_amount - pin.sell_fee
+        #计算base_amount数量
+        cli.sell_base_amount = real_quote_asset * pin.symbol_price
         #调整到正确范围
-        cli.sell_base_amount = max(0, min(base_asset, cli.sell_base_amount))
-        cli.sell_quote_amount = max(0, min(quote_can_sell, cli.sell_quote_amount))
-    #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
-    elif cli.sell_quote_amount != pin.sell_quote_amount:
-        #空置为0
-        if not pin.sell_quote_amount:
-            pin.sell_quote_amount = 0
-        #调整到0~最大能卖出的数量之间
-        pin.sell_quote_amount = max(0, min(quote_can_sell, pin.sell_quote_amount))
-        cli.sell_quote_amount = pin.sell_quote_amount
-        #计算卖出的百分比
-        cli.sell_amount_perc = cli.sell_quote_amount / quote_asset * 100
-        #计算卖出的基准货币数量
-        cli.sell_base_amount = cli.sell_quote_amount * pin.symbol_price
-        #手续费
-        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
-        #实际卖出的基准货币数量
-        real_base_amount = cli.sell_base_amount - pin.sell_fee
-        #调整到正确范围
-        cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
-        cli.sell_base_amount = max(0, min(base_can_sell, real_base_amount))
-    #3. 百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
+        cli.sell_quote_amount = max(0, min(quote_asset, cli.sell_quote_amount))
+        cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
+    #2. 百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
     elif cli.sell_base_amount != pin.sell_base_amount:
         #空置为0
         if not pin.sell_base_amount:
@@ -375,18 +366,41 @@ def update_sell_options(cli):
         #调整到0~最大能卖出的数量之间
         pin.sell_base_amount = max(0, min(base_can_sell, pin.sell_base_amount))
         cli.sell_base_amount = pin.sell_base_amount
-        #计算卖出的百分比
-        cli.sell_amount_perc = cli.sell_base_amount / base_asset * 100
+        #计算卖出的quote数量
+        cli.sell_quote_amount = cli.sell_base_amount / pin.symbol_price
+        #含手续费的quote数量
+        real_quote_asset = cli.sell_quote_amount / (1 - commons.fees_ratio)
         #手续费
-        pin.sell_fee = cli.sell_base_amount * commons.fees_ratio
-        #实际卖出的基准货币数量
-        real_base_amount = cli.sell_base_amount - pin.sell_fee
-        #计算quote_amount数量
-        cli.sell_quote_amount = real_base_amount / pin.symbol_price
+        pin.sell_fee = real_quote_asset - cli.sell_quote_amount
+        cli.sell_quote_amount = real_quote_asset
+        #计算百分比
+        cli.sell_amount_perc = cli.sell_quote_amount / quote_asset * 100
         #调整到正确范围
+        cli.sell_quote_amount = max(0, min(quote_asset, cli.sell_quote_amount))
         cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
-        cli.sell_quote_amount = max(0, min(quote_can_sell, cli.sell_quote_amount))
-    #4. 更新界面pin值
+    #3. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
+    elif cli.sell_quote_amount != pin.sell_quote_amount:
+        #空置为0
+        if not pin.sell_quote_amount:
+            pin.sell_quote_amount = 0
+        #调整到0~最大能卖出的数量之间
+        pin.sell_quote_amount = max(0, min(quote_asset, pin.sell_quote_amount))
+        cli.sell_quote_amount = pin.sell_quote_amount
+        #计算卖出百分比
+        cli.sell_amount_perc = cli.sell_quote_amount / quote_asset * 100
+        #手续费
+        pin.sell_fee = cli.sell_quote_amount * commons.fees_ratio
+        #实际卖出的quote数量
+        real_quote_asset = cli.sell_quote_amount - pin.sell_fee
+        #计算base_amount数量
+        cli.sell_base_amount = real_quote_asset * pin.symbol_price
+        #调整到正确范围
+        cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
+        cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
+    #4. 三个都未修改，不做处理
+    else:
+        pass
+    #重绘卖出界面
     pin.sell_amount_perc = cli.sell_amount_perc
     pin.sell_base_amount = cli.sell_base_amount
     pin.sell_quote_amount = cli.sell_quote_amount
