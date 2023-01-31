@@ -131,13 +131,13 @@ def execute_buy(cli):
     # #获取当前报价
     # quote_price = commons.get_quote_price(quote)
     #交易对价格
-    symbol_price = commons.get_price_symbol(symbol, ts10)
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     #手续费
     fee = float(pin.buy_fee)
     #交易数量
     base_amount = float(cli.buy_base_amount)
     #买入量
-    buy_amount = (base_amount  - fee) / symbol_price
+    buy_amount = (base_amount  - fee) / pin.symbol_price
     #修改账户余额
     user_account = cli.user_account
     user_account[base] -= base_amount
@@ -148,8 +148,8 @@ def execute_buy(cli):
     users[cli.user_key]['account'] = user_account
     with open('db/user.json', 'w') as f:
         json.dump(users, f)
-    #输出信息：成功买入buy_amount quote，价格 symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
-    msg = f'成功买入{buy_amount} {quote}，价格{symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+    #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
+    msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
