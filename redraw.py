@@ -160,6 +160,8 @@ def redraw_login_welcome(cli: client):
     #put_text(res)
     put_markdown('### 估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
     put_markdown('### 杠杆率：' + str(commons.get_leverage(user_account)))
+    pie_chart_html = commons.get_pie_chart_html(user_account)
+    put_html(pie_chart_html)
     #交易历史记录
     put_markdown('## 交易历史记录')
     history = db.history(cli.user_key)
@@ -307,11 +309,11 @@ def redraw_rank(cli):
     rank_list, my_rank, my_days = commons.get_rank_list(cli)
 
     if cli.user_key:
-        put_text('用户名：' + cli.user_name)
-        put_text('余额：' + str(commons.get_total_balance(cli.user_account)) + " USDT")
-        put_text('排名：第' + str(my_rank) + '名')
-        put_text('交易次数：' + str(cli.trade_cnt) + '次')
-        put_text('注册天数：' + str(my_days) + '天')
+        put_markdown('## ' + cli.user_name)
+        put_markdown('### 余额：' + str(round(commons.get_total_balance(cli.user_account),2)) + " USDT")
+        put_markdown('### 排名：第' + str(my_rank) + '名')
+        put_markdown('### 交易次数：' + str(cli.trade_cnt) + '次')
+        put_markdown('### 注册天数：' + str(my_days) + '天')
 
     data = [
         ['排名', '用户名', '余额', '交易次数', '注册天数'],

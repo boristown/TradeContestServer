@@ -8,6 +8,7 @@ import binanceAPI
 import client
 import json
 import db
+import pyecharts
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -70,6 +71,37 @@ def get_leverage_amount(user_account):
         if delta < 0:
             leverage -= delta
     return leverage
+
+def get_account_percent(user_account):
+    #获取账户各币种的百分比
+    attr = []
+    val = []
+    tot_amount = 0
+    ts10 = get_ts10()
+    price_btc = get_price_btc(ts10)
+    price_eth = get_price_eth(ts10)
+    #price_symbol = get_price_symbol(curr_usdt)
+    leverage = 0
+    for symbol in user_account:
+        if symbol == 'USDT':
+            delta = user_account[symbol]
+        elif symbol == 'BTC':
+            delta = user_account[symbol] * price_btc
+        elif symbol == 'ETH':
+            delta = user_account[symbol] * price_eth
+        else:
+            curr_usdt = symbol + 'USDT'
+            price_symbol = get_price_symbol(curr_usdt, ts10)
+            delta = user_account[symbol] * price_symbol
+        abs_delta = abs(delta)
+        tot_amount += abs_delta
+        if delta > 0:
+            sign = '+'
+        else:
+            sign = '-'
+        attr.append(sign + symbol)
+        val.append(abs_delta)
+    return attr, val
 
 def get_leverage(user_account):
     #杠杆率
@@ -215,3 +247,18 @@ def get_rank_list(cli):
                 my_days = user_list[i][3]
                 break
     return user_list, my_rank, my_days
+
+def get_pie_chart_html(user_account):
+    attr,val = get_account_percent(user_account)
+    chart = pyecharts.Pie("账户资产比例", title_pos='center', width=350)
+    chart.add("", attr, val, 
+    label_text_color=None,
+    is_more_utils=True,
+    is_random=True,
+    is_label_show=True,
+    rosetype='radius',
+    radius=[30, 75],
+    legend_orient="vertical",
+    legend_pos="left"
+    )
+    return chart.render_notebook()
