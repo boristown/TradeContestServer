@@ -264,15 +264,15 @@ def redraw_rank(cli):
     rank_list, my_rank, my_days = commons.get_rank_list(cli)
 
     if cli.user_key:
-        put_text('ID：' + cli.user_key)
-        put_text('余额：' + str(commons.get_total_balance(cli)) + " USDT")
+        put_text('用户名：' + cli.user_name)
+        put_text('余额：' + str(commons.get_total_balance(cli.user_account)) + " USDT")
         put_text('排名：第' + str(my_rank) + '名')
         put_text('注册天数：' + str(my_days) + '天')
 
     data = [
         ['排名', '用户名', '余额', '交易次数', '注册天数'],
     ]
-    
+
     for i in range(len(rank_list)):
         row = rank_list[i]
         data.append([row[4], row[0], row[1], row[2], row[3]])
