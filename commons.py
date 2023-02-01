@@ -169,7 +169,7 @@ def split_quote_base(symbol):
     return binanceAPI.SYM_DICT[symbol][1:]
 
 #读取users.json,计算每个人的账户价值（USDT单位），注册时间，交易次数，排序，计算出排行榜
-def get_rank_list(cli: client.client):
+def get_rank_list(cli):
     #读取users.json
     with open('users.json', 'r') as f:
         users = json.load(f)
