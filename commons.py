@@ -187,11 +187,12 @@ def get_rank_list(cli):
         #保留两位小数
         days = round(days, 2)
         #交易次数
-        trade_count = int(u['trade_count'])
+        trade_cnt = int(u['trade_cnt'])
+        print(user, total_balance, days, trade_cnt)
         #用户名
         username = u['name']
         #用户清单
-        user_list.append([username, total_balance, trade_count, days, 0])
+        user_list.append([username, total_balance, trade_cnt, days, 0])
     #添加特殊用户：基准账户
     user_list.append(['基准账户', 1000000, 0, 0, 0])
     #将用户按账户价值倒序排序
@@ -206,7 +207,7 @@ def get_rank_list(cli):
     my_rank, my_days = 0, 0
     if cli.user_key:
         for i in range(len(user_list)):
-            if user_list[i][0] == cli.user_key:
+            if user_list[i][0] == cli.user_name:
                 my_rank = user_list[i][4]
                 my_days = user_list[i][3]
                 break
