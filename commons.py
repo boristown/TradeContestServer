@@ -181,6 +181,8 @@ def get_rank_list(cli):
         user_account = u['account']
         #计算每个人的账户价值（USDT单位）
         total_balance = get_total_balance(user_account)
+        #保留两位小数
+        total_balance = round(total_balance, 2)
         #注册时间(ms)
         register_time = u['reg_time']
         #天数
@@ -195,7 +197,7 @@ def get_rank_list(cli):
         #用户清单
         user_list.append([username, total_balance, trade_cnt, days, 0])
     #添加特殊用户：基准账户
-    user_list.append(['基准账户', 1000000, 0, 0, 0])
+    user_list.append(['基准账户', 1000000, 0, "∞", 0])
     #将用户按账户价值倒序排序
     user_list.sort(key=lambda x: x[1], reverse=True)
     #计算排名:user_list[i][4]
