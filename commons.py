@@ -173,7 +173,7 @@ def split_quote_base(symbol):
 def get_rank_list(cli):
     print("get_rank_list")
     #读取users.json
-    users = db.read_users()
+    users = db.users().read()
     cur_tsms = get_tsms()
     user_list = []
     for user in users:

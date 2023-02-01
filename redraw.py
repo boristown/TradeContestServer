@@ -261,13 +261,13 @@ def redraw_market_table(cli: client):
 
 @use_scope('rank', clear=True)
 def redraw_rank(cli):
-
     rank_list, my_rank, my_days = commons.get_rank_list(cli)
 
     if cli.user_key:
         put_text('用户名：' + cli.user_name)
         put_text('余额：' + str(commons.get_total_balance(cli.user_account)) + " USDT")
         put_text('排名：第' + str(my_rank) + '名')
+        put_text('交易次数：' + str(cli.trade_cnt) + '次')
         put_text('注册天数：' + str(my_days) + '天')
 
     data = [

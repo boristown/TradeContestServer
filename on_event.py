@@ -23,14 +23,14 @@ def login(cli: client, btn):
             #验证key是否存在
             #如果存在，更新last_login_time
             #如果不存在，提示用户：密钥不存在，请重新输入
-            users = db.read_users()
+            users = db.users().read()
             # with open('db/user.json', 'r') as f:
             #     users = json.load(f)
             if key in users:
                 users[key]['last_login_time'] = int(time.time() * 1000)
                 # with open('db/user.json', 'w') as f:
                 #     json.dump(users, f)
-                db.write_users(users)
+                db.users().write(users)
                 cli.reg_key = ''
                 cli.user_key = key
                 cli.user_name = users[key]['name']
@@ -46,11 +46,7 @@ def login(cli: client, btn):
     elif btn == '注册':
         #输出一个32为随机在字符串
         key = commons.ramdom_str(32)
-        #存储key到服务端 db/user.json
-        #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
-        # with open('db/user.json', 'r') as f:
-        #     users = json.load(f)
-        users = db.read_users()
+        users = db.users().read()
         users[key] = {
             'name': '', 
             'ELO': 1500.0,
@@ -63,9 +59,8 @@ def login(cli: client, btn):
             'orders': [],
             'trade_cnt': 0,
             }
-        # with open('db/user.json', 'w') as f:
-        #     json.dump(users, f)
-        db.write_users(users)
+        db.users().write(users)
+        db.history(key).create()
         cli.reg_key = key
         redraw.redraw_login(cli)
 
@@ -81,7 +76,7 @@ def conf_name(cli, btn):
             #如果不存在，更新用户名
             # with open('db/user.json', 'r') as f:
             #     users = json.load(f)
-            users = db.read_users()
+            users = db.users().read()
             for key in users:
                 if users[key]['name'] == name:
                     with use_scope('login_info', clear=True):
@@ -91,7 +86,7 @@ def conf_name(cli, btn):
             cli.user_name = name
             # with open('db/user.json', 'w') as f:
             #     json.dump(users, f)
-            db.write_users(users)
+            db.users().write(users)
         redraw.redraw_login(cli)
 
 def pin_changed(cli):
@@ -132,6 +127,7 @@ def pin_wait(changed):
 
 def execute_buy(cli):
     ts10 = commons.get_ts10()
+    tsms = commons.get_tsms()
     #获取当前交易对
     symbol = cli.symbol
     quote, base = commons.split_quote_base(symbol)
@@ -149,20 +145,41 @@ def execute_buy(cli):
     user_account[quote] += buy_amount
     cli.trade_cnt += 1
     #写入文件
-    users = db.read_users()
+    users = db.users().read()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    db.write_users(users)
+    db.users().write(users)
+    #写入历史记录
+    history = db.history(cli.user_key)
+    history_list = history.read()
+    history_list.append([
+        #交易类型
+        #交易时间（ms）
+        #交易币种
+        #交易base
+        #交易quote
+        #交易数量(base)
+        #交易数量(quote)
+        #手续费
+        #手续费单位
+        #交易价格
+        #交易后账户余额
+        '买入', tsms, symbol, base, quote, base_amount, buy_amount, fee, base, pin.symbol_price, user_account
+    ])
+    history.write(history_list)
+
     #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
     msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     #清除输入的数量/百分比字段
     pin.buy_base_amount = cli.buy_base_amount = 0
     pin.buy_amount_perc = cli.buy_amount_perc = 0
     pin.buy_quote_amount = cli.buy_quote_amount = 0
+    pin.buy_fee = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def execute_sell(cli):
     ts10 = commons.get_ts10()
+    tsms = commons.get_tsms()
     #获取当前交易对
     symbol = cli.symbol
     quote, base = commons.split_quote_base(symbol)
@@ -180,16 +197,35 @@ def execute_sell(cli):
     user_account[quote] -= quote_amount
     cli.trade_cnt += 1
     #写入文件
-    users = db.read_users()
+    users = db.users().read()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    db.write_users(users)
+    db.users().write(users)
+    #写入历史记录
+    history = db.history(cli.user_key)
+    history_list = history.read()
+    history_list.append([
+        #交易类型
+        #交易时间（ms）
+        #交易币种
+        #交易base
+        #交易quote
+        #交易数量(base)
+        #交易数量(quote)
+        #手续费
+        #手续费单位
+        #交易价格
+        #交易后账户余额
+        '卖出', tsms, symbol, base, quote, sell_amount, quote_amount, fee, quote, pin.symbol_price, user_account
+    ])
+    history.write(history_list)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
     msg = f'成功卖出{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
     #清除输入的数量/百分比字段
     pin.sell_base_amount = cli.sell_base_amount = 0
     pin.sell_amount_perc = cli.sell_amount_perc = 0
     pin.sell_quote_amount = cli.sell_quote_amount = 0
+    pin.sell_fee = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
@@ -212,19 +248,20 @@ def trade_confirm_click(cli):
         else:
             execute_sell(cli)
     elif cli.trade_type == '做多':
+        redraw.redraw_trade_options_msg(cli, '很抱歉，做多功能暂未开放', True)
         if not pin.long_base_amount \
             and not pin.long_leverage \
             and not pin.long_quote_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '成功做多。', False)
+            redraw.redraw_trade_options_msg(cli, '很抱歉，"做多"暂未开放，敬请期待！', False)
     elif cli.trade_type == '做空':
         if not pin.short_quote_amount \
             and not pin.short_leverage \
             and not pin.short_base_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '成功做空。', False)
+            redraw.redraw_trade_options_msg(cli, '很抱歉，"做空"暂未开放，敬请期待！', False)
     elif cli.trade_type == '网格交易':
         if not pin.grid_first_price_perc \
             and not pin.grid_interval_perc:
@@ -235,7 +272,7 @@ def trade_confirm_click(cli):
             and not pin.grid_leverage:
             redraw.redraw_trade_options_msg(cli, '请填写每单数量或整体杠杆率！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '成功网格交易。', False)
+            redraw.redraw_trade_options_msg(cli, '很抱歉，"网格交易"暂未开放，敬请期待！', False)
 
 def set_symbol(cli,name):
     cli.symbol = name
@@ -424,66 +461,3 @@ def update_sell_options(cli):
     pin.sell_amount_perc = cli.sell_amount_perc
     pin.sell_base_amount = cli.sell_base_amount
     pin.sell_quote_amount = cli.sell_quote_amount
-
-def trade_price_change(x,cli):
-    #价格输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_amount_change(x,cli):
-    #数量输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_cost_change(x,cli):
-    #金额输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_leverage_change(x,cli):
-    #杠杆率输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_stop_mode_change(x,cli):
-    #止损方式下拉框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_stop_ratio_change(x,cli):
-    #止损比例输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_stop_mode_change(x,cli):
-    #止损方式下拉框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_stop_price_change(x,cli):
-    #止损价格输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
-
-def trade_interval_change(x,cli):
-    #间隔输入框内容改变事件
-    #获取输入框内容
-    #调用交易接口
-    #显示交易结果
-    pass
