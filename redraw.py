@@ -139,26 +139,63 @@ def redraw_login(cli: client):
             put_buttons(['确认用户名'], onclick=lambda btn: on_event.conf_name(cli, btn))
             #put_scope('login_info')
         else:
-            #欢迎：用户名
-            with use_scope('login_welcome', clear=True):
-                put_text('欢迎：' + cli.user_name)
-                res = '账户信息：\n'
-                user_account = cli.user_account
-                for curr in user_account:
-                    res += curr + '：' + str(user_account[curr]) + '\n'
-                put_text(res)
-                put_text('估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
-                put_text('杠杆率：' + str(commons.get_leverage(user_account)))
-                #res += 'ELO分：' + str(cli.user_elo) + '\n'
-                # price = commons.get_price_btc(ts10)
-                # user_account = cli.user_account
-                # res += 'BTC：' + str(user_account['BTC']) + '\n'
-                # res += 'USDT：' + str(user_account['USDT']) + '\n'
-                # res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
-                # res += '杠杆率：' + str(commons.get_leverage(user_account))
-                #put_text(res)
+            redraw_login_welcome(cli)
+            # #欢迎：用户名
+            # with use_scope('login_welcome', clear=True):
+            #     put_text('欢迎：' + cli.user_name)
+            #     res = '账户信息：\n'
+            #     user_account = cli.user_account
+            #     for curr in user_account:
+            #         res += curr + '：' + str(user_account[curr]) + '\n'
+            #     put_text(res)
+            #     put_text('估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
+            #     put_text('杠杆率：' + str(commons.get_leverage(user_account)))
             put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
-            #put_scope('login_info')
+
+@use_scope('login_welcome', clear=True)
+def redraw_login_welcome(cli: client):
+    put_markdown('# ' + cli.user_name)
+    put_markdown('## 账户信息：')
+    user_account = cli.user_account
+    for curr in user_account:
+        put_markdown("### " + curr + '：' + str(user_account[curr]))
+    #put_text(res)
+    put_markdown('### 估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
+    put_markdown('### 杠杆率：' + str(commons.get_leverage(user_account)))
+    #交易历史记录
+    put_markdown('## 交易历史记录')
+    history = db.history(cli.user_key)
+    history_list = history.read()
+    if history_list == None:
+        history_list = []
+    history_list.append(
+        [
+        #交易类型
+        #交易时间（ms）
+        #交易对
+        #交易数量(quote)
+        #交易quote
+        #交易数量(base)
+        #交易base
+        #手续费
+        #手续费单位
+        #交易价格
+        #交易后账户余额
+        '交易类型',
+        '交易时间戳',
+        '交易对',
+        '交易数量(quote)',
+        '交易quote',
+        '交易数量(base)',
+        '交易base',
+        '手续费',
+        '手续费单位',
+        '交易价格',
+        '交易后账户余额'
+        ]
+    )
+    history_list.reverse()
+    put_table(history_list)
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):

@@ -35,7 +35,7 @@ def login(cli: client, btn):
                 cli.user_key = key
                 cli.user_name = users[key]['name']
                 cli.user_account = users[key]['account']
-                cli.user_elo = users[key]['ELO']
+                #cli.user_elo = users[key]['ELO']
                 cli.user_orders = users[key]['orders']
                 cli.trade_cnt = users[key].get('trade_cnt',0)
                 redraw.redraw_login(cli)
@@ -49,7 +49,7 @@ def login(cli: client, btn):
         users = db.users().read()
         users[key] = {
             'name': '', 
-            'ELO': 1500.0,
+            #'ELO': 1500.0,
             'reg_time': int(time.time() * 1000), 
             'last_login_time': int(time.time() * 1000),
             'account': {
@@ -156,15 +156,15 @@ def execute_buy(cli):
         #交易类型
         #交易时间（ms）
         #交易币种
-        #交易base
+        #交易数量(quote)
         #交易quote
         #交易数量(base)
-        #交易数量(quote)
+        #交易base
         #手续费
         #手续费单位
         #交易价格
         #交易后账户余额
-        '买入', tsms, symbol, base, quote, base_amount, buy_amount, fee, base, pin.symbol_price, user_account
+        '买入', tsms, symbol, buy_amount, quote, base_amount, base, fee, base, pin.symbol_price, user_account
     ])
     history.write(history_list)
 
@@ -208,15 +208,15 @@ def execute_sell(cli):
         #交易类型
         #交易时间（ms）
         #交易币种
-        #交易base
+        #交易数量(quote)
         #交易quote
         #交易数量(base)
-        #交易数量(quote)
+        #交易base
         #手续费
         #手续费单位
         #交易价格
         #交易后账户余额
-        '卖出', tsms, symbol, base, quote, sell_amount, quote_amount, fee, quote, pin.symbol_price, user_account
+        '卖出', tsms, symbol, quote_amount, quote, sell_amount, base, fee, quote, pin.symbol_price, user_account
     ])
     history.write(history_list)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
