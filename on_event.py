@@ -149,16 +149,16 @@ def execute_buy(cli):
     user_account[quote] += buy_amount
     cli.trade_cnt += 1
     #写入文件
-    # with open('db/user.json', 'r') as f:
-    #     users = json.load(f)
     users = db.read_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    # with open('db/user.json', 'w') as f:
-    #     json.dump(users, f)
     db.write_users(users)
     #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
     msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+    #清除输入的数量/百分比字段
+    pin.buy_base_amount = cli.buy_base_amount = 0
+    pin.buy_amount_perc = cli.buy_amount_perc = 0
+    pin.buy_quote_amount = cli.buy_quote_amount = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def execute_sell(cli):
@@ -180,16 +180,16 @@ def execute_sell(cli):
     user_account[quote] -= quote_amount
     cli.trade_cnt += 1
     #写入文件
-    # with open('db/user.json', 'r') as f:
-    #     users = json.load(f)
     users = db.read_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    # with open('db/user.json', 'w') as f:
-    #     json.dump(users, f)
     db.write_users(users)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
     msg = f'成功卖出{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    #清除输入的数量/百分比字段
+    pin.sell_base_amount = cli.sell_base_amount = 0
+    pin.sell_amount_perc = cli.sell_amount_perc = 0
+    pin.sell_quote_amount = cli.sell_quote_amount = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
