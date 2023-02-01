@@ -9,6 +9,8 @@ import client
 import json
 import db
 from pyecharts.charts import Pie
+from pyecharts import options as opts
+from pyecharts.globals import ThemeType
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -252,7 +254,8 @@ def get_pie_chart_html(user_account):
     print("def get_pie_chart_html")
     attr,val = get_account_percent(user_account)
     print(attr,val)
-    chart = Pie("账户资产比例", title_pos='center', width=350)
+    # chart = Pie("账户资产比例", title_pos='center', width=350)
+    chart = Pie(init_opts=opts.InitOpts(theme=ThemeType.LIGHT))
     print(chart)
     chart.add("", attr, val, 
     label_text_color=None,
