@@ -112,7 +112,9 @@ def redraw_content(cli):
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
+    put_scope('login_input')
     put_scope('login_welcome')
+    put_scope('login_button')
     put_scope('login_info')
     #当前时间戳（10秒）
     ts10 = int(time.time() / 10)
@@ -122,12 +124,17 @@ def redraw_login(cli: client):
     #提示用户：该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回
     #请将该密钥复制到上方输入框中，点击登陆
     if cli.user_key == '': #未登录
-        put_input('key', placeholder='输入密钥')
+
+        with use_scope('login_input', clear=True):
+            put_input('key', placeholder='输入密钥')
+            
         if cli.reg_key == '':
-            put_buttons(['登陆', '注册'], onclick=lambda btn: on_event.login(cli, btn))
+            with use_scope('login_button', clear=True):
+                put_buttons(['登陆', '注册'], onclick=lambda btn: on_event.login(cli, btn))
             #put_scope('login_info')
         else:
-            put_buttons(['登陆'], onclick=lambda btn: on_event.login(cli, btn))
+            with use_scope('login_button', clear=True):
+                put_buttons(['登陆'], onclick=lambda btn: on_event.login(cli, btn))
             with use_scope('login_info', clear=True):
                 put_success('该密钥是您的唯一登陆凭证，请妥善保管，如果遗失，将无法找回')
                 put_success('请将该密钥复制到上方输入框中，点击登陆')
@@ -150,7 +157,8 @@ def redraw_login(cli: client):
             #     put_text(res)
             #     put_text('估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
             #     put_text('杠杆率：' + str(commons.get_leverage(user_account)))
-            put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
+            with use_scope('login_button', clear=True):
+                put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
 
 @use_scope('login_welcome', clear=True)
 def redraw_login_welcome(cli: client):
