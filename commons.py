@@ -274,37 +274,37 @@ def get_pie_chart_html(user_account):
     center=["35%", "50%"],# 位置设置
     # legend_orient="horizontal",
     # legend_pos="bottom",
-    label_opts=opts.LabelOpts(
-            position="outside",
-            formatter="{a|{a}}{abg|}\n{hr|}\n {b|{b}: }{c}  {per|{d}%}  ",
-            background_color="#eee",
-            border_color="#aaa",
-            border_width=1,
-            border_radius=4,
-            rich={
-                "a": {"color": "#999", "lineHeight": 22, "align": "center"},
-                "abg": {
-                    "backgroundColor": "#e3e3e3", #上面的背景设置
-                    "width": "100%",
-                    "align": "right",
-                    "height": 22,
-                    "borderRadius": [4, 4, 0, 0],
-                },
-                "hr": { #相当于中间的分割线样式设置
-                    "borderColor": "#aaa",
-                    "width": "100%",
-                    "borderWidth": 0.5,
-                    "height": 0,
-                },
-                "b": {"fontSize": 16, "lineHeight": 33},#名称文字样式
-                "per": { # 百分数的字体样式设置
-                    "color": "#eee",
-                    "backgroundColor": "#334455",
-                    "padding": [2, 4], #[高，宽]设置，那个背景矩形
-                    "borderRadius": 2, #圆角设置
-                },
-            },
-    ),
+    # label_opts=opts.LabelOpts(
+    #         position="outside",
+    #         formatter="{a|{a}}{abg|}\n{hr|}\n {b|{b}: }{c}  {per|{d}%}  ",
+    #         background_color="#eee",
+    #         border_color="#aaa",
+    #         border_width=1,
+    #         border_radius=4,
+    #         rich={
+    #             "a": {"color": "#999", "lineHeight": 22, "align": "center"},
+    #             "abg": {
+    #                 "backgroundColor": "#e3e3e3", #上面的背景设置
+    #                 "width": "100%",
+    #                 "align": "right",
+    #                 "height": 22,
+    #                 "borderRadius": [4, 4, 0, 0],
+    #             },
+    #             "hr": { #相当于中间的分割线样式设置
+    #                 "borderColor": "#aaa",
+    #                 "width": "100%",
+    #                 "borderWidth": 0.5,
+    #                 "height": 0,
+    #             },
+    #             "b": {"fontSize": 16, "lineHeight": 33},#名称文字样式
+    #             "per": { # 百分数的字体样式设置
+    #                 "color": "#eee",
+    #                 "backgroundColor": "#334455",
+    #                 "padding": [2, 4], #[高，宽]设置，那个背景矩形
+    #                 "borderRadius": 2, #圆角设置
+    #             },
+    #         },
+    # ),
     )
     print("chart",chart)
     chart.set_global_opts(
