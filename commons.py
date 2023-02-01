@@ -8,7 +8,7 @@ import binanceAPI
 import client
 import json
 import db
-import pyecharts
+from pyecharts import Pie
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -252,7 +252,7 @@ def get_pie_chart_html(user_account):
     print("def get_pie_chart_html")
     attr,val = get_account_percent(user_account)
     print(attr,val)
-    chart = pyecharts.Pie("账户资产比例", title_pos='center', width=350)
+    chart = Pie("账户资产比例", title_pos='center', width=350)
     print(chart)
     chart.add("", attr, val, 
     label_text_color=None,
@@ -261,7 +261,7 @@ def get_pie_chart_html(user_account):
     is_label_show=True,
     rosetype='radius',
     radius=[30, 75],
-    legend_orient="vertical",
-    legend_pos="left"
+    legend_orient="horizontal",
+    legend_pos="bottom",
     )
     return chart.render_notebook()
