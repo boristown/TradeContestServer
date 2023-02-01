@@ -146,8 +146,9 @@ def redraw_login(cli: client):
                 user_account = cli.user_account
                 for curr in user_account:
                     res += curr + '：' + str(user_account[curr]) + '\n'
-                res += '估值：' + str(commons.get_total_balance(user_account)) + ' USDT' + '\n'
-                res += '杠杆率：' + str(commons.get_leverage(user_account)) + '\n'
+                put_text(res)
+                put_text('估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
+                put_text('杠杆率：' + str(commons.get_leverage(user_account)))
                 #res += 'ELO分：' + str(cli.user_elo) + '\n'
                 # price = commons.get_price_btc(ts10)
                 # user_account = cli.user_account
@@ -155,7 +156,7 @@ def redraw_login(cli: client):
                 # res += 'USDT：' + str(user_account['USDT']) + '\n'
                 # res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
                 # res += '杠杆率：' + str(commons.get_leverage(user_account))
-                put_text(res)
+                #put_text(res)
             put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
             #put_scope('login_info')
 
