@@ -23,7 +23,7 @@ def login(cli: client, btn):
             #验证key是否存在
             #如果存在，更新last_login_time
             #如果不存在，提示用户：密钥不存在，请重新输入
-            users = db.get_users()
+            users = db.read_users()
             # with open('db/user.json', 'r') as f:
             #     users = json.load(f)
             if key in users:
@@ -50,7 +50,7 @@ def login(cli: client, btn):
         #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
         # with open('db/user.json', 'r') as f:
         #     users = json.load(f)
-        users = db.get_users()
+        users = db.read_users()
         users[key] = {
             'name': '', 
             'ELO': 1500.0,
@@ -81,7 +81,7 @@ def conf_name(cli, btn):
             #如果不存在，更新用户名
             # with open('db/user.json', 'r') as f:
             #     users = json.load(f)
-            users = db.get_users()
+            users = db.read_users()
             for key in users:
                 if users[key]['name'] == name:
                     with use_scope('login_info', clear=True):
@@ -151,7 +151,7 @@ def execute_buy(cli):
     #写入文件
     # with open('db/user.json', 'r') as f:
     #     users = json.load(f)
-    users = db.get_users()
+    users = db.read_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
     # with open('db/user.json', 'w') as f:
@@ -182,7 +182,7 @@ def execute_sell(cli):
     #写入文件
     # with open('db/user.json', 'r') as f:
     #     users = json.load(f)
-    users = db.get_users()
+    users = db.read_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
     # with open('db/user.json', 'w') as f:
