@@ -251,6 +251,7 @@ def get_rank_list(cli):
     return user_list, my_rank, my_days
 
 def get_pie_chart_html(user_account):
+    #参考：https://blog.csdn.net/vv_eve/article/details/107991704
     print("def get_pie_chart_html")
     attr,val = get_account_percent(user_account)
     print(attr,val)
@@ -268,10 +269,14 @@ def get_pie_chart_html(user_account):
     # is_random=True,
     # is_label_show=True,
     rosetype='radius',
-    radius=[30, 75],
+    radius=["40%", "55%"],
+    center=["35%", "50%"],# 位置设置
     # legend_orient="horizontal",
     # legend_pos="bottom",
     )
-    print()
-    chart.set_global_opts(title_opts=opts.TitleOpts(title="账户资产比例"))
+    print("chart",chart)
+    chart.set_global_opts(
+        title_opts=opts.TitleOpts(title="账户资产比例"),
+        legend_opts=opts.LegendOpts(pos_left="65%", orient="vertical"),
+        )
     return chart.render_notebook()
