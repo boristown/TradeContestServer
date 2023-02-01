@@ -111,6 +111,8 @@ def redraw_content(cli):
 
 @use_scope('login', clear=True)
 def redraw_login(cli: client):
+    put_scope('login_welcome')
+    put_scope('login_info')
     #当前时间戳（10秒）
     ts10 = int(time.time() / 10)
     #输入密钥点击登陆
@@ -122,7 +124,7 @@ def redraw_login(cli: client):
         put_input('key', placeholder='输入密钥')
         if cli.reg_key == '':
             put_buttons(['登陆', '注册'], onclick=lambda btn: on_event.login(cli, btn))
-            put_scope('login_info')
+            #put_scope('login_info')
         else:
             put_buttons(['登陆'], onclick=lambda btn: on_event.login(cli, btn))
             with use_scope('login_info', clear=True):
@@ -134,7 +136,7 @@ def redraw_login(cli: client):
         if cli.user_name == '':
             put_input('user_name', placeholder='输入用户名')
             put_buttons(['确认用户名'], onclick=lambda btn: on_event.conf_name(cli, btn))
-            put_scope('login_info')
+            #put_scope('login_info')
         else:
             #欢迎：用户名
             with use_scope('login_welcome', clear=True):
@@ -149,7 +151,7 @@ def redraw_login(cli: client):
                 res += '杠杆率：' + str(commons.get_leverage(user_account))
                 put_text(res)
             put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
-            put_scope('login_info')
+            #put_scope('login_info')
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
