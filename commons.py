@@ -8,7 +8,7 @@ import binanceAPI
 import client
 import json
 import db
-from pyecharts import Pie
+from pyecharts.charts import Pie
 
 up_triangle = '▲'
 down_triangle = '▼'
