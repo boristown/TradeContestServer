@@ -256,15 +256,22 @@ def get_pie_chart_html(user_account):
     print(attr,val)
     # chart = Pie("账户资产比例", title_pos='center', width=350)
     chart = Pie(init_opts=opts.InitOpts(theme=ThemeType.LIGHT))
+    pair = [(k,v) for k,v in zip(attr,val)]
     print(chart)
-    chart.add("", attr, val, 
-    label_text_color=None,
-    is_more_utils=True,
-    is_random=True,
-    is_label_show=True,
+    chart.add(
+        "", 
+        # attr, 
+        # val, 
+        data_pair=pair,
+    # label_text_color=None,
+    # is_more_utils=True,
+    # is_random=True,
+    # is_label_show=True,
     rosetype='radius',
     radius=[30, 75],
-    legend_orient="horizontal",
-    legend_pos="bottom",
+    # legend_orient="horizontal",
+    # legend_pos="bottom",
     )
+    print()
+    chart.set_global_opts(title_opts=opts.TitleOpts(title="账户资产比例"))
     return chart.render_notebook()
