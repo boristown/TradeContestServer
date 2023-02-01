@@ -147,16 +147,6 @@ def redraw_login(cli: client):
             #put_scope('login_info')
         else:
             redraw_login_welcome(cli)
-            # #欢迎：用户名
-            # with use_scope('login_welcome', clear=True):
-            #     put_text('欢迎：' + cli.user_name)
-            #     res = '账户信息：\n'
-            #     user_account = cli.user_account
-            #     for curr in user_account:
-            #         res += curr + '：' + str(user_account[curr]) + '\n'
-            #     put_text(res)
-            #     put_text('估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
-            #     put_text('杠杆率：' + str(commons.get_leverage(user_account)))
             with use_scope('login_button', clear=True):
                 put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
 
@@ -214,6 +204,7 @@ def redraw_market(cli: client):
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
+    print("redraw_sponsor")
     #输出赞助人（并输出感谢的话）：
     #淘淘
     #熊*添
@@ -226,21 +217,22 @@ def redraw_sponsor(cli: client):
     #徐坚
     #于*万
     #居中显示
-    put_text('By AI纪元')
-    put_text('感谢以下赞助人的支持！')
-    put_text('淘淘')
-    put_text('熊*添')
-    put_text('刘*超')
-    put_text('小点点')
-    put_text('秦汉')
-    put_text('张*勇')
-    put_text('赵磊')
-    put_text('冯*俊')
-    put_text('徐坚')
-    put_text('于*万')
-    put_text('如果您也想成为赞助人，请联系：tbziy@foxmail.com')
+    put_markdown('## 感谢以下赞助人的支持:')
+    put_markdown('### 淘淘')
+    put_markdown('### 熊*添')
+    put_markdown('### 刘*超')
+    put_markdown('### 小点点')
+    put_markdown('### 秦汉')
+    put_markdown('### 张*勇')
+    put_markdown('### 赵磊')
+    put_markdown('### 冯*俊')
+    put_markdown('### 徐坚')    
+    put_markdown('### 于*万')
+    put_markdown('#### 如果您也想成为赞助人，请联系：tbziy@foxmail.com')
     #超链接：
-    put_link('项目地址','https://github.com/boristown/TradeContestServer')
+    put_markdown('[![github](https://www.iconpacks.net/icons/3/free-github-logo-icon-6531.png)](https://github.com/boristown/TradeContestServer)')
+    #put_markdown('#### [项目地址](https://github.com/boristown/TradeContestServer)')
+    put_markdown('#### by AI纪元')
 
 def second_button(label):
     return {
@@ -332,6 +324,7 @@ def redraw_rank(cli):
 
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
+    print("def redraw_market_kline")
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
     cli.interval = selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
@@ -342,13 +335,16 @@ def redraw_market_kline(cli: client):
     cli.period = cli.period.replace('d', ' * 24 * 60 * 60 * 1000')
     cli.period = cli.period.replace('h', ' * 60 * 60 * 1000')
     cli.period = cli.period.replace('m', ' * 60 * 1000')
+    print("cli.period",cli.period)
     cli.period = eval(cli.period)
     key = (cli.symbol, cli.interval, cli.period)
     if key in cli.kline_cache:
         html = cli.kline_cache[key]
     else:
+        print("get kline data begin")
         html = klines.draw_klines(cli.symbol, cli.interval, cli.current_time - cli.period, cli.current_time, [], 1)
         cli.kline_cache[key] = html
+    print(html)
     put_html(html)
 
     if cli.user_key != '':
