@@ -260,27 +260,21 @@ def redraw_market_table(cli: client):
 
 @use_scope('rank', clear=True)
 def redraw_rank(cli):
-    #比赛实时排行
-    # 第0轮模拟交易竞赛
-    # 我的排名：第1名
-    # 我的余额：1000000
-    # 我的收益：0%
-    #
-    # 排名 用户名   余额    ELO分 分数变化
-    # 1    基准账户 1000000 1500  +0
-    # 2    ak-bot  1000000 1500  +0
     if cli.user_key:
-        put_text('第0轮模拟交易竞赛')
-        put_text('我的排名：第2名')
-        put_text('我的余额：1000000')
-        put_text('我的收益：0%')
+        put_text('ID：' + cli.user_key)
+        put_text('余额：1000000')
+        put_text('排名：第1名')
+        put_text('注册天数：0')
+    
+    rank_list = commons.get_rank_list(cli)
 
     data = [
-        ['排名', '用户名', '余额', 'ELO分', '分数变化'],
-        ['1', '基准账户', '1000000', '1500', '+0'],
-        ['2', 'ak-bot', '1000000', '1500', '+0']
+        ['排名', '用户名', '余额', '交易次数', '注册天数'],
+        ['1', '基准账户', '1000000', '0', '0'],
+        ['1', 'ak-bot', '1000000', '0', '0']
     ]
     put_table(data)
+
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
     selinterval = pin.selectInterval

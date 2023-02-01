@@ -66,3 +66,4 @@ class client:
         self.period_min = 60 * 1000
         self.sort_key = '成交'
         self.sort_reverse = True
+        self.trade_cnt = 0

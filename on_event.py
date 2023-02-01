@@ -34,6 +34,7 @@ def login(cli: client, btn):
                 cli.user_account = users[key]['account']
                 cli.user_elo = users[key]['ELO']
                 cli.user_orders = users[key]['orders']
+                cli.trade_cnt = users[key].get('trade_cnt',0)
                 redraw.redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):
@@ -56,6 +57,7 @@ def login(cli: client, btn):
                 "BTC":0.0,
                 },
             'orders': [],
+            'trade_cnt': 0,
             }
         with open('db/user.json', 'w') as f:
             json.dump(users, f)
@@ -138,10 +140,12 @@ def execute_buy(cli):
     user_account = cli.user_account
     user_account[base] -= base_amount
     user_account[quote] += buy_amount
+    cli.trade_cnt += 1
     #写入文件
     with open('db/user.json', 'r') as f:
         users = json.load(f)
     users[cli.user_key]['account'] = user_account
+    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
     with open('db/user.json', 'w') as f:
         json.dump(users, f)
     #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
@@ -165,10 +169,12 @@ def execute_sell(cli):
     user_account = cli.user_account
     user_account[base] += sell_amount
     user_account[quote] -= quote_amount
+    cli.trade_cnt += 1
     #写入文件
     with open('db/user.json', 'r') as f:
         users = json.load(f)
     users[cli.user_key]['account'] = user_account
+    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
     with open('db/user.json', 'w') as f:
         json.dump(users, f)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
