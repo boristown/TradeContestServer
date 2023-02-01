@@ -144,6 +144,8 @@ def execute_buy(cli):
     user_account[base] -= base_amount
     user_account[quote] += buy_amount
     cli.trade_cnt += 1
+    #账户估值
+    user_account_value = commons.get_total_balance(user_account)
     #写入文件
     users = db.users().read()
     users[cli.user_key]['account'] = user_account
@@ -164,7 +166,9 @@ def execute_buy(cli):
         #手续费单位
         #交易价格
         #交易后账户余额
-        '买入', tsms, symbol, buy_amount, quote, base_amount, base, fee, base, pin.symbol_price, user_account
+        '买入', tsms, symbol, buy_amount, 
+        quote, base_amount, base, fee, 
+        base, pin.symbol_price, user_account, user_account_value
     ])
     history.write(history_list)
 
@@ -196,6 +200,8 @@ def execute_sell(cli):
     user_account[base] += sell_amount
     user_account[quote] -= quote_amount
     cli.trade_cnt += 1
+    #账户市值
+    user_account_value = commons.get_total_balance(user_account)
     #写入文件
     users = db.users().read()
     users[cli.user_key]['account'] = user_account
@@ -216,7 +222,9 @@ def execute_sell(cli):
         #手续费单位
         #交易价格
         #交易后账户余额
-        '卖出', tsms, symbol, quote_amount, quote, sell_amount, base, fee, quote, pin.symbol_price, user_account
+        '卖出', tsms, symbol, quote_amount, 
+        quote, sell_amount, base, fee, 
+        quote, pin.symbol_price, user_account, user_account_value
     ])
     history.write(history_list)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account

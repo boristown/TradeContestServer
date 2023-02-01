@@ -191,7 +191,8 @@ def redraw_login_welcome(cli: client):
         '手续费',
         '手续费单位',
         '交易价格',
-        '交易后账户余额'
+        '交易后账户余额',
+        '账户估值(USDT)'
         ]
     )
     history_list.reverse()
