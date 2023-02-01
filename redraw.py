@@ -147,7 +147,7 @@ def redraw_login(cli: client):
                 for curr in user_account:
                     res += curr + '：' + str(user_account[curr]) + '\n'
                 res += '估值：' + str(commons.get_total_balance(user_account)) + ' USDT' + '\n'
-                res += '杠杆率：' + str(commons.get_leverage()) + '\n'
+                res += '杠杆率：' + str(commons.get_leverage(user_account)) + '\n'
                 #res += 'ELO分：' + str(cli.user_elo) + '\n'
                 # price = commons.get_price_btc(ts10)
                 # user_account = cli.user_account
