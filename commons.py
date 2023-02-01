@@ -6,6 +6,7 @@ from collections import *
 import copy
 import binanceAPI
 import client
+import json
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -166,16 +167,47 @@ def get_base_price(base, ts10):
 @functools.lru_cache
 def split_quote_base(symbol):
     return binanceAPI.SYM_DICT[symbol][1:]
-#     base4 = symbol[-4:]
-#     base3 = symbol[-3:]
-#     if base4 == 'USDT' or base4 == 'BUSD':
-#         base = base4
-#         quote = symbol[:-4]
-#     else:
-#         base = base3
-#         quote = symbol[:-3]
-#     return quote, base
 
 #读取users.json,计算每个人的账户价值（USDT单位），注册时间，交易次数，排序，计算出排行榜
 def get_rank_list(cli: client.client):
-    return []
+    #读取users.json
+    with open('users.json', 'r') as f:
+        users = json.load(f)
+    cur_tsms = get_tsms()
+    user_list = []
+    for user in users:
+        u = users[user]
+        user_account = u['account']
+        #计算每个人的账户价值（USDT单位）
+        total_balance = get_total_balance(user_account)
+        #注册时间(ms)
+        register_time = u['reg_time']
+        #天数
+        days = (cur_tsms - register_time) / 1000 / 60 / 60 / 24
+        #保留两位小数
+        days = round(days, 2)
+        #交易次数
+        trade_count = int(u['trade_count'])
+        #用户名
+        username = u['name']
+        #用户清单
+        user_list.append([username, total_balance, trade_count, days, 0])
+    #添加特殊用户：基准账户
+    user_list.append(['基准账户', 1000000, 0, 0, 0])
+    #将用户按账户价值倒序排序
+    user_list.sort(key=lambda x: x[1], reverse=True)
+    #计算排名:user_list[i][4]
+    #相同余额，排名相同
+    rank = 1
+    for i in range(len(user_list)):
+        if i > 0 and user_list[i][1] < user_list[i - 1][1]:
+            rank = i + 1
+        user_list[i][4] = rank
+    my_rank, my_days = 0, 0
+    if cli.user_key:
+        for i in range(len(user_list)):
+            if user_list[i][0] == cli.user_key:
+                my_rank = user_list[i][4]
+                my_days = user_list[i][3]
+                break
+    return user_list, my_rank, my_days
