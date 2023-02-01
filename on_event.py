@@ -10,6 +10,7 @@ import redraw
 import commons
 import UI
 import binanceAPI
+import db
 
 def login(cli: client, btn):
     if btn == '登陆':
@@ -22,12 +23,14 @@ def login(cli: client, btn):
             #验证key是否存在
             #如果存在，更新last_login_time
             #如果不存在，提示用户：密钥不存在，请重新输入
-            with open('db/user.json', 'r') as f:
-                users = json.load(f)
+            users = db.get_users()
+            # with open('db/user.json', 'r') as f:
+            #     users = json.load(f)
             if key in users:
                 users[key]['last_login_time'] = int(time.time() * 1000)
-                with open('db/user.json', 'w') as f:
-                    json.dump(users, f)
+                # with open('db/user.json', 'w') as f:
+                #     json.dump(users, f)
+                db.write_users(users)
                 cli.reg_key = ''
                 cli.user_key = key
                 cli.user_name = users[key]['name']
@@ -45,8 +48,9 @@ def login(cli: client, btn):
         key = commons.ramdom_str(32)
         #存储key到服务端 db/user.json
         #存储格式：{key: '', name: '', reg_time: '',  last_login_time: ''}
-        with open('db/user.json', 'r') as f:
-            users = json.load(f)
+        # with open('db/user.json', 'r') as f:
+        #     users = json.load(f)
+        users = db.get_users()
         users[key] = {
             'name': '', 
             'ELO': 1500.0,
@@ -59,8 +63,9 @@ def login(cli: client, btn):
             'orders': [],
             'trade_cnt': 0,
             }
-        with open('db/user.json', 'w') as f:
-            json.dump(users, f)
+        # with open('db/user.json', 'w') as f:
+        #     json.dump(users, f)
+        db.write_users(users)
         cli.reg_key = key
         redraw.redraw_login(cli)
 
@@ -74,8 +79,9 @@ def conf_name(cli, btn):
             #验证用户名是否存在
             #如果存在，提示用户：用户名已存在，请重新输入
             #如果不存在，更新用户名
-            with open('db/user.json', 'r') as f:
-                users = json.load(f)
+            # with open('db/user.json', 'r') as f:
+            #     users = json.load(f)
+            users = db.get_users()
             for key in users:
                 if users[key]['name'] == name:
                     with use_scope('login_info', clear=True):
@@ -83,8 +89,9 @@ def conf_name(cli, btn):
                     return
             users[cli.user_key]['name'] = name
             cli.user_name = name
-            with open('db/user.json', 'w') as f:
-                json.dump(users, f)
+            # with open('db/user.json', 'w') as f:
+            #     json.dump(users, f)
+            db.write_users(users)
         redraw.redraw_login(cli)
 
 def pin_changed(cli):
@@ -142,12 +149,14 @@ def execute_buy(cli):
     user_account[quote] += buy_amount
     cli.trade_cnt += 1
     #写入文件
-    with open('db/user.json', 'r') as f:
-        users = json.load(f)
+    # with open('db/user.json', 'r') as f:
+    #     users = json.load(f)
+    users = db.get_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    with open('db/user.json', 'w') as f:
-        json.dump(users, f)
+    # with open('db/user.json', 'w') as f:
+    #     json.dump(users, f)
+    db.write_users(users)
     #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
     msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)
@@ -171,12 +180,14 @@ def execute_sell(cli):
     user_account[quote] -= quote_amount
     cli.trade_cnt += 1
     #写入文件
-    with open('db/user.json', 'r') as f:
-        users = json.load(f)
+    # with open('db/user.json', 'r') as f:
+    #     users = json.load(f)
+    users = db.get_users()
     users[cli.user_key]['account'] = user_account
     users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    with open('db/user.json', 'w') as f:
-        json.dump(users, f)
+    # with open('db/user.json', 'w') as f:
+    #     json.dump(users, f)
+    db.write_users(users)
     #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
     msg = f'成功卖出{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
     redraw.redraw_trade_options_msg(cli, msg, False)

@@ -7,6 +7,7 @@ import copy
 import binanceAPI
 import client
 import json
+import db
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -172,8 +173,7 @@ def split_quote_base(symbol):
 def get_rank_list(cli):
     print("get_rank_list")
     #读取users.json
-    with open('users.json', 'r') as f:
-        users = json.load(f)
+    users = db.read_users()
     cur_tsms = get_tsms()
     user_list = []
     for user in users:

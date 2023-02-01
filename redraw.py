@@ -9,6 +9,7 @@ import commons
 import klines
 import UI
 import binanceAPI
+import db
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
