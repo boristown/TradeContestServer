@@ -253,6 +253,7 @@ def get_pie_chart_html(user_account):
     attr,val = get_account_percent(user_account)
     print(attr,val)
     chart = pyecharts.Pie("账户资产比例", title_pos='center', width=350)
+    print(chart)
     chart.add("", attr, val, 
     label_text_color=None,
     is_more_utils=True,
