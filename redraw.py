@@ -143,13 +143,18 @@ def redraw_login(cli: client):
             with use_scope('login_welcome', clear=True):
                 put_text('欢迎：' + cli.user_name)
                 res = '账户信息：\n'
-                res += 'ELO分：' + str(cli.user_elo) + '\n'
-                price = commons.get_price_btc(ts10)
                 user_account = cli.user_account
-                res += 'BTC：' + str(user_account['BTC']) + '\n'
-                res += 'USDT：' + str(user_account['USDT']) + '\n'
-                res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
-                res += '杠杆率：' + str(commons.get_leverage(user_account))
+                for curr in user_account:
+                    res += curr + '：' + str(user_account[curr]) + '\n'
+                res += '估值：' + str(commons.get_total_balance(user_account)) + ' USDT' + '\n'
+                res += '杠杆率：' + str(commons.get_leverage()) + '\n'
+                #res += 'ELO分：' + str(cli.user_elo) + '\n'
+                # price = commons.get_price_btc(ts10)
+                # user_account = cli.user_account
+                # res += 'BTC：' + str(user_account['BTC']) + '\n'
+                # res += 'USDT：' + str(user_account['USDT']) + '\n'
+                # res += '估值：' + str(user_account['BTC']*price + user_account['USDT']) + '\n'
+                # res += '杠杆率：' + str(commons.get_leverage(user_account))
                 put_text(res)
             put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
             #put_scope('login_info')
