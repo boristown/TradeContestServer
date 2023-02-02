@@ -15,6 +15,8 @@ from pyecharts.globals import ThemeType
 up_triangle = '▲'
 down_triangle = '▼'
 
+cookie_key = 'aitrad.in.key'
+
 local_url = 'https://aitrad.in/'
 
 #最大杠杆倍数
@@ -312,3 +314,4 @@ def get_pie_chart_html(user_account):
         legend_opts=opts.LegendOpts(pos_left="65%", orient="vertical"),
         )
     return chart.render_notebook()
+

@@ -16,6 +16,7 @@ from client import client
 import redraw
 import commons
 import on_event
+import pywebio_battery
 
 #实现初始画面：
 #首先显示币种名称
@@ -28,6 +29,10 @@ import on_event
 def pywebio_run():
     client_id = commons.ramdom_str(32)
     cli = client(client_id, '', '', 0, 0, 0)
+    cval = pywebio_battery.get_cookie('cli.user_key')
+    if cval:
+        cli.user_key = cval
+        on_event.login(cli,'登陆',True)
     switch_redraw()
     global_redraw(cli)
 

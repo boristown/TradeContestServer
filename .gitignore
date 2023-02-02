@@ -4,3 +4,4 @@ html/*.html
 *.pyc
 db/*
 *.pyc
+secret.py

@@ -11,6 +11,7 @@ import time
 from collections import defaultdict
 from pywebio.platform.fastapi import webio_routes
 import pywebio_app as myapp
+import pywebio.session
 
 app = FastAPI()
 
@@ -148,6 +149,7 @@ async def acme(s):
         return s
 
 def pywebio_task():
+    pywebio.session.run_js('WebIO._state.CurrentSession.on_session_close(()=>{setTimeout(()=>location.reload(), 4000})')
     myapp.pywebio_run()
     
 # `pywebio_task` is PyWebIO task function

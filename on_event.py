@@ -11,10 +11,14 @@ import commons
 import UI
 import binanceAPI
 import db
+import pywebio_battery
 
-def login(cli: client, btn):
+def login(cli: client, btn, auto = False):
     if btn == '登陆':
-        key = pin.key
+        if auto:
+            key = cli.user_key
+        else:
+            key = pin.key
         print("key:",key)
         if key == '':
             with use_scope('login_info', clear=True):
@@ -38,6 +42,7 @@ def login(cli: client, btn):
                 #cli.user_elo = users[key]['ELO']
                 cli.user_orders = users[key]['orders']
                 cli.trade_cnt = users[key].get('trade_cnt',0)
+                pywebio_battery.set_cookie('cli.user_key', cli.user_key)
                 redraw.redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):

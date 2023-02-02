@@ -1,3 +1,4 @@
 fastapi[all]
 pyecharts
 pywebio
+pywebio-battery
