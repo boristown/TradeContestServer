@@ -30,9 +30,8 @@ def pywebio_run():
     client_id = commons.ramdom_str(32)
     cli = client(client_id, '', '', 0, 0, 0)
     switch_redraw()
-    cval = pywebio_battery.get_cookie('cli.user_key')
-    if cval:
-        cli.user_key = cval
+    cli.user_key = pywebio_battery.get_cookie('cli.user_key')
+    if cli.user_key:
         on_event.login(cli,'登陆',True)
     global_redraw(cli)
 
