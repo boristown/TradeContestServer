@@ -29,11 +29,11 @@ import pywebio_battery
 def pywebio_run():
     client_id = commons.ramdom_str(32)
     cli = client(client_id, '', '', 0, 0, 0)
+    switch_redraw()
     cval = pywebio_battery.get_cookie('cli.user_key')
     if cval:
         cli.user_key = cval
         on_event.login(cli,'登陆',True)
-    switch_redraw()
     global_redraw(cli)
 
 def switch_redraw():
