@@ -31,13 +31,14 @@ def run_task():
         resp = requests.get(url).json()
         db.ticker('u', interval).write(resp)
         print('u_', interval, resp)
+        time.sleep(5)
         top_symbols = json.dumps(binanceAPI.SYM_BTC[:100]).replace(" ", "").replace("/", "")
         url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
         url = "https://www.binance.com/" + url
         resp = requests.get(url).json()
         db.ticker('b', interval).write(resp)
         print('b_', interval, resp)
-        time.sleep(10)
+        time.sleep(5)
 
 if __name__ == "__main__":
     while True:
