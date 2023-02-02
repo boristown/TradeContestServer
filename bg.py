@@ -23,7 +23,7 @@ h = [str(i)+'h' for i in range(1, 24)]
 d = [str(i)+'d' for i in range(1, 8)]
 
 def run_task():
-    for interval in m + h + d:
+    for interval in h + d:
         #url = 'https://aitrad.in/ticker_u/' + interval
         top_symbols = json.dumps(binanceAPI.SYM_USDT[:100]).replace(" ", "").replace("/", "")
         url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
