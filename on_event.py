@@ -13,6 +13,17 @@ import binanceAPI
 import db
 import pywebio_battery
 
+def logout(cli):
+    cli.user_key = ''
+    cli.user_name = ''
+    cli.user_account = {}
+    cli.user_orders = []
+    cli.trade_cnt = 0
+    cli.reg_key = ''
+    cli.symbol = ''
+    pywebio_battery.set_cookie('cli.user_key', '')
+    redraw.redraw_login(cli)
+
 def login(cli: client, btn, auto = False):
     if btn == '登陆':
         if auto:

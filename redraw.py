@@ -148,7 +148,7 @@ def redraw_login(cli: client):
         else:
             redraw_login_welcome(cli)
             with use_scope('login_button', clear=True):
-                put_buttons(['登出'], onclick=lambda btn: on_event.login(cli, btn))
+                put_buttons(['登出'], onclick=lambda btn: on_event.logout(cli))
 
 @use_scope('login_welcome', clear=True)
 def redraw_login_welcome(cli: client):
