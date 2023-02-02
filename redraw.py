@@ -203,23 +203,11 @@ def redraw_market(cli: client):
     if pin.switch_tab == '市场': redraw_market_header(cli)
     if pin.switch_tab == '市场': redraw_market_kline(cli)
     if pin.switch_tab == '市场': redraw_market_table(cli)
-    if pin.switch_tab == '市场': redraw_sponsor(cli)
+    #if pin.switch_tab == '市场': redraw_sponsor(cli)
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
     print("redraw_sponsor")
-    #输出赞助人（并输出感谢的话）：
-    #淘淘
-    #熊*添
-    #刘*超
-    #小点点
-    #秦汉
-    #张*勇
-    #赵磊
-    #冯*俊
-    #徐坚
-    #于*万
-    #居中显示
     put_markdown('## 感谢以下赞助人的支持:')
     put_markdown('### 淘淘')
     put_markdown('### 熊*添')
@@ -324,6 +312,7 @@ def redraw_rank(cli):
         row = rank_list[i]
         data.append([row[4], row[0], row[1], row[2], row[3]])
     put_table(data)
+    redraw_sponsor(cli)
 
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
