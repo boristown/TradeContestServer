@@ -31,3 +31,20 @@ class history:
     def write(self, history):
         with open(self.path, 'w') as f:
             json.dump(history, f)
+
+#市场价格清单
+class ticker:
+    def __init__(self, base, interval):
+        if base == 'b':
+            self.path = 'db/ticker_b/' + interval + '.json'
+        elif base == 'u':
+            self.path = 'db/ticker_u/' + interval + '.json'
+    
+    def read(self):
+        with open(self.path, 'r') as f:
+            ticker = json.load(f)
+        return ticker
+    
+    def write(self, ticker):
+        with open(self.path, 'w') as f:
+            json.dump(ticker, f)

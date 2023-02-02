@@ -169,12 +169,19 @@ def get_binance_ticker(cli,usdt_on,interval):
         return cli.ticker_cache[key]
     if 'M' in interval or 'y' in interval:
         interval = '7d'
+    # if usdt_on:
+    #     url = local_url + "ticker_u/" + interval
+    # else:
+    #     url = local_url + "ticker_b/" + interval
+    # print(url)
+    # data = requests.get(url).json()
     if usdt_on:
-        url = local_url + "ticker_u/" + interval
+        ticker = db.ticker('u',interval)
+        # path = '/db/ticker_u/' + interval + '.json'
     else:
-        url = local_url + "ticker_b/" + interval
-    print(url)
-    data = requests.get(url).json()
+        ticker = db.ticker('b',interval)
+        # path = '/db/ticker_b/' + interval + '.json'
+    data = ticker.read()
     cli.ticker_cache[key] = copy.deepcopy(data)
     return data
 

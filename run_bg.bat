@@ -1,0 +1,2 @@
+python bg.py
+pause
