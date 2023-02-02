@@ -231,7 +231,7 @@ def get_rank_list(cli):
         #用户清单
         user_list.append([username, total_balance, trade_cnt, days, 0])
     #添加特殊用户：基准账户
-    user_list.append(['基准账户', 1000000, 0, "∞", 0])
+    user_list.append(['基准账户', 1000000.0, 0, "∞", 0])
     #将用户按账户价值倒序排序
     user_list.sort(key=lambda x: x[1], reverse=True)
     #计算排名:user_list[i][4]
