@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import db
+import binanceAPI
 
 #这是一个后台作业
 
@@ -23,14 +24,20 @@ d = [str(i)+'d' for i in range(1, 8)]
 
 def run_task():
     for interval in m + h + d:
-        url = 'https://aitrad.in/ticker_u/' + interval
+        #url = 'https://aitrad.in/ticker_u/' + interval
+        top_symbols = json.dumps(binanceAPI.SYM_USDT[:100]).replace(" ", "").replace("/", "")
+        url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
+        url = "https://www.binance.com/" + url
         resp = requests.get(url).json()
         db.ticker('u', interval).write(resp)
-        url = 'https://aitrad.in/ticker_b/' + interval
+        print('u_', interval, resp)
+        top_symbols = json.dumps(binanceAPI.SYM_BTC[:100]).replace(" ", "").replace("/", "")
+        url = 'api/v3/ticker?symbols=' + top_symbols + '&windowSize='+interval
+        url = "https://www.binance.com/" + url
         resp = requests.get(url).json()
         db.ticker('b', interval).write(resp)
-        print(interval, ' done')
-        time.sleep(1)
+        print('b_', interval, resp)
+        time.sleep(10)
 
 if __name__ == "__main__":
     while True:
