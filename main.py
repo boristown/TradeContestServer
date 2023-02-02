@@ -151,7 +151,7 @@ def pywebio_task():
     myapp.pywebio_run()
     
 # `pywebio_task` is PyWebIO task function
-app.mount("/", FastAPI(routes=webio_routes(pywebio_task)))
+app.mount("/", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
 
 # 运行指令：
