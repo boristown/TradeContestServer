@@ -43,7 +43,8 @@ def login(cli: client, btn, auto = False):
                 cli.user_orders = users[key]['orders']
                 cli.trade_cnt = users[key].get('trade_cnt',0)
                 pywebio_battery.set_cookie('cli.user_key', cli.user_key)
-                redraw.redraw_login(cli)
+                if not auto:
+                    redraw.redraw_login(cli)
             else:
                 with use_scope('login_info', clear=True):
                     put_error('密钥不存在，请重新输入')
