@@ -37,16 +37,22 @@ def pywebio_run():
 
 def switch_redraw():
     #市场 / 模拟交易 / 比赛排行
+    val_pos=pywebio_battery.get_cookie('pin.switch_tab')
+    if not val_pos:
+        val_pos=1
+    print('val_pos', val_pos)
+    print('commons.tabs', commons.tabs)
+    val_pos=int(val_pos)
     put_radio(
         'switch_tab', 
         options=commons.tabs,
         inline=True,
-        value='模拟交易',
+        value=commons.tabs[val_pos-1],
     )
-    cookie_switch_tab = pywebio_battery.get_cookie('pin.switch_tab')
-    print('cookie_switch_tab', cookie_switch_tab)
-    if cookie_switch_tab:
-        pin.switch_tab = commons.tabs[cookie_switch_tab]
+    # cookie_switch_tab = pywebio_battery.get_cookie('pin.switch_tab')
+    # print('cookie_switch_tab', cookie_switch_tab)
+    # if cookie_switch_tab:
+    #     pin.switch_tab = commons.tabs[cookie_switch_tab]
 
 #全局重绘
 def global_redraw(cli):

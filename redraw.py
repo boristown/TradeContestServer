@@ -54,6 +54,10 @@ def redraw_content(cli):
         commons.tab_pos[pin.switch_tab]
         )
     while True:
+        pywebio_battery.set_cookie(
+            'pin.switch_tab', 
+            commons.tab_pos[pin.switch_tab]
+            )
         if pin.switch_tab == '市场':
             print('redraw market')
             if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘

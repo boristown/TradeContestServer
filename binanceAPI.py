@@ -1,6 +1,5 @@
 SYM_USDT = [
 'BTC/USDT',
-'BUSD/USDT',
 'ETH/USDT',
 'XRP/USDT',
 'SOL/USDT',
