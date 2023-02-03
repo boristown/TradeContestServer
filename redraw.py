@@ -10,6 +10,7 @@ import klines
 import UI
 import binanceAPI
 import db
+import pywebio_battery
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -48,6 +49,7 @@ def redraw_market_header(cli):
 #内容重绘
 @use_scope('content', clear=True)
 def redraw_content(cli):
+    pywebio_battery.set_cookie('pin.switch_tab', pin.switch_tab)
     while True:
         if pin.switch_tab == '市场':
             print('redraw market')
