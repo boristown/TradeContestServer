@@ -158,6 +158,10 @@ def execute_buy(cli):
     buy_amount = (base_amount  - fee) / pin.symbol_price
     #修改账户余额
     user_account = cli.user_account
+    if base not in user_account:
+        user_account[base] = 0
+    if quote not in user_account:
+        user_account[quote] = 0
     user_account[base] -= base_amount
     user_account[quote] += buy_amount
     cli.trade_cnt += 1
@@ -214,6 +218,10 @@ def execute_sell(cli):
     sell_amount = (quote_amount - fee) * pin.symbol_price
     #修改账户余额
     user_account = cli.user_account
+    if base not in user_account:
+        user_account[base] = 0
+    if quote not in user_account:
+        user_account[quote] = 0
     user_account[base] += sell_amount
     user_account[quote] -= quote_amount
     cli.trade_cnt += 1
