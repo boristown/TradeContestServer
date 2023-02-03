@@ -237,6 +237,8 @@ def get_rank_list(cli):
         print(user, total_balance, days, trade_cnt)
         #用户名
         username = u['name']
+        if username == "":
+            continue
         #用户清单
         user_list.append([username, total_balance, trade_cnt, days, 0])
     #添加特殊用户：基准账户
