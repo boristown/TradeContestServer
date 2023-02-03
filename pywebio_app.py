@@ -31,9 +31,6 @@ def pywebio_run():
     cli = client(client_id, '', '', 0, 0, 0)
     switch_redraw()
     cli.user_key = pywebio_battery.get_cookie('cli.user_key')
-    cookie_switch_tab = pywebio_battery.get_cookie('pin.switch_tab')
-    if cookie_switch_tab:
-        pin.switch_tab = cookie_switch_tab
     if cli.user_key:
         on_event.login(cli,'登陆',True)
     global_redraw(cli)
@@ -46,6 +43,10 @@ def switch_redraw():
         inline=True,
         value='模拟交易',
     )
+    # cookie_switch_tab = pywebio_battery.get_cookie('pin.switch_tab')
+    # print('cookie_switch_tab', cookie_switch_tab)
+    # if cookie_switch_tab:
+    #     pin.switch_tab = cookie_switch_tab
 
 #全局重绘
 def global_redraw(cli):
