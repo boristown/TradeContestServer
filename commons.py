@@ -29,6 +29,9 @@ fees_ratio = 0.001
 def get_ts10():
     return int(time.time() / 10)
 
+tabs = ['市场', '模拟交易', '比赛排行']
+tab_pos = {v: i for i, v in enumerate(tabs)}
+
 def get_total_balance(user_account):
     #总资产
     #本金 = USDT余额 + BTC数量*当前价格
