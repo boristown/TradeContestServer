@@ -20,7 +20,7 @@ cookie_key = 'aitrad.in.key'
 local_url = 'https://aitrad.in/'
 
 #最大杠杆倍数
-max_leverage_ratio = 20
+max_leverage_ratio = 200.0
 
 #交易手续费
 fees_ratio = 0.001
