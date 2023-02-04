@@ -94,6 +94,10 @@ def redraw_content(cli):
                     on_event.update_buy_options(cli)
                 elif cli.trade_type == '卖出':
                     on_event.update_sell_options(cli)
+                elif cli.trade_type == '做多':
+                    on_event.update_long_options(cli)
+                elif cli.trade_type == '做空':
+                    on_event.update_short_options(cli)
         elif pin.switch_tab == '模拟交易':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
