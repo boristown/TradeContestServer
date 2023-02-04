@@ -176,23 +176,11 @@ def execute_buy(cli):
     history = db.history(cli.user_key)
     history_list = history.read()
     history_list.append([
-        #交易类型
-        #交易时间（ms）
-        #交易币种
-        #交易数量(quote)
-        #交易quote
-        #交易数量(base)
-        #交易base
-        #手续费
-        #手续费单位
-        #交易价格
-        #交易后账户余额
         '买入', tsms, symbol, buy_amount, 
         quote, base_amount, base, fee, 
         base, pin.symbol_price, user_account, user_account_value
     ])
     history.write(history_list)
-
     #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
     msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     #清除输入的数量/百分比字段
@@ -236,17 +224,6 @@ def execute_sell(cli):
     history = db.history(cli.user_key)
     history_list = history.read()
     history_list.append([
-        #交易类型
-        #交易时间（ms）
-        #交易币种
-        #交易数量(quote)
-        #交易quote
-        #交易数量(base)
-        #交易base
-        #手续费
-        #手续费单位
-        #交易价格
-        #交易后账户余额
         '卖出', tsms, symbol, quote_amount, 
         quote, sell_amount, base, fee, 
         quote, pin.symbol_price, user_account, user_account_value
@@ -259,6 +236,102 @@ def execute_sell(cli):
     pin.sell_amount_perc = cli.sell_amount_perc = 0
     pin.sell_quote_amount = cli.sell_quote_amount = 0
     pin.sell_fee = 0
+    redraw.redraw_trade_options_msg(cli, msg, False)
+
+def execute_long(cli):
+    ts10 = commons.get_ts10()
+    tsms = commons.get_tsms()
+    #获取当前交易对
+    symbol = cli.symbol
+    quote, base = commons.split_quote_base(symbol)
+    #交易对价格
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    #手续费
+    fee = float(pin.long_fee)
+    #交易数量
+    base_amount = float(cli.long_base_amount)
+    #买入量
+    long_amount = (base_amount  - fee) / pin.symbol_price
+    #修改账户余额
+    user_account = cli.user_account
+    if base not in user_account:
+        user_account[base] = 0
+    if quote not in user_account:
+        user_account[quote] = 0
+    user_account[base] -= base_amount
+    user_account[quote] += long_amount
+    cli.trade_cnt += 1
+    #账户估值
+    user_account_value = commons.get_total_balance(user_account)
+    #写入文件
+    users = db.users().read()
+    users[cli.user_key]['account'] = user_account
+    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
+    db.users().write(users)
+    #写入历史记录
+    history = db.history(cli.user_key)
+    history_list = history.read()
+    history_list.append([
+        '做多', tsms, symbol, long_amount, 
+        quote, base_amount, base, fee, 
+        base, pin.symbol_price, user_account, user_account_value
+    ])
+    history.write(history_list)
+    #输出信息：成功买入long_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
+    msg = f'成功做多{long_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+    #清除输入的数量/百分比字段
+    pin.long_base_amount = cli.long_base_amount = 0
+    pin.long_leverage = cli.long_leverage = 0
+    pin.long_quote_amount = cli.long_quote_amount = 0
+    pin.long_fee = 0
+    redraw.redraw_trade_options_msg(cli, msg, False)
+
+def execute_short(cli):
+    ts10 = commons.get_ts10()
+    tsms = commons.get_tsms()
+    #获取当前交易对
+    symbol = cli.symbol
+    quote, base = commons.split_quote_base(symbol)
+    #交易对价格
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    #手续费
+    fee = float(pin.short_fee)
+    #交易数量
+    quote_amount = float(cli.short_quote_amount)
+    #卖出量
+    short_amount = (quote_amount - fee) * pin.symbol_price
+    #修改账户余额
+    user_account = cli.user_account
+    if base not in user_account:
+        user_account[base] = 0
+    if quote not in user_account:
+        user_account[quote] = 0
+    user_account[base] += short_amount
+    user_account[quote] -= quote_amount
+    cli.trade_cnt += 1
+    #账户市值
+    user_account_value = commons.get_total_balance(user_account)
+    #写入文件
+    users = db.users().read()
+    users[cli.user_key]['account'] = user_account
+    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
+    db.users().write(users)
+    #写入历史记录
+    history = db.history(cli.user_key)
+    history_list = history.read()
+    history_list.append([
+        '做空', tsms, symbol, quote_amount, 
+        quote, short_amount, base, fee, 
+        quote, pin.symbol_price, user_account, user_account_value
+    ])
+    history.write(history_list)
+    #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入short_amount base，手续费fee quote，当前账户余额为user_account
+    msg = f'成功做空{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{short_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    #清除输入的数量/百分比字段
+    pin.short_base_amount = cli.short_base_amount = 0
+    pin.short_leverage = cli.short_leverage = 0
+    pin.short_quote_amount = cli.short_quote_amount = 0
+    pin.short_fee = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def trade_confirm_click(cli):
@@ -287,14 +360,14 @@ def trade_confirm_click(cli):
             and not pin.long_quote_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '很抱歉，"做多"暂未开放，敬请期待！', False)
+            execute_long(cli)
     elif cli.trade_type == '做空':
         if not pin.short_quote_amount \
             and not pin.short_leverage \
             and not pin.short_base_amount:
             redraw.redraw_trade_options_msg(cli, '交易数量不能为空！', True)
         else:
-            redraw.redraw_trade_options_msg(cli, '很抱歉，"做空"暂未开放，敬请期待！', False)
+            execute_short(cli)
     elif cli.trade_type == '网格交易':
         if not pin.grid_first_price_perc \
             and not pin.grid_interval_perc:
