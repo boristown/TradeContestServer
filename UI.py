@@ -31,4 +31,4 @@ def float_input(id,readonly=False):
     return pywebio.pin.put_input(id,type=pywebio.input.FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
 
 def trade_conf_button(cli):
-    pywebio.pin.put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
+    pywebio.output.put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
