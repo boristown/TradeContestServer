@@ -427,7 +427,7 @@ def redraw_trade_options(cli: client):
         UI.trade_options_row(
             put_text('使用'),UI.float_input('long_base_amount'),put_text(" "+base))
         UI.trade_options_row(
-            put_text('杠杆率'),UI.float_input('long_leverage'),put_text(' %'))
+            put_text('杠杆率'),UI.float_input('long_leverage'),put_text(' 倍'))
         UI.trade_options_row(
             put_text('做多'),UI.float_input('long_quote_amount'),put_text(" "+quote))
         UI.trade_options_row(
@@ -444,7 +444,7 @@ def redraw_trade_options(cli: client):
         UI.trade_options_row(
             put_text('做空'),UI.float_input('short_quote_amount'),put_text(" "+quote))
         UI.trade_options_row(
-            put_text('杠杆率'),UI.float_input('short_leverage'),put_text(' %'))
+            put_text('杠杆率'),UI.float_input('short_leverage'),put_text(' 倍'))
         UI.trade_options_row(
             put_text('价值'),UI.float_input('short_base_amount'),put_text(" "+base))
         UI.trade_options_row(
