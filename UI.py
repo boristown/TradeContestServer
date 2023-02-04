@@ -22,7 +22,7 @@ def chain_changed(cli,changed,chain):
 
 #默认零值的浮点数输入框
 def float_input(id,readonly=False):
-    pywebio.pin.put_input(id,type=FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
+    return pywebio.pin.put_input(id,type=FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
 
 def trade_conf_button(cli):
     pywebio.pin.put_button('确认', onclick=lambda cli=cli:on_event.trade_confirm_click(cli), small=True)
