@@ -496,90 +496,6 @@ def update_sell_options(cli):
     pin.sell_quote_amount = cli.sell_quote_amount
 
 
-def update_buy_options(cli: client):
-    ts10 = commons.get_ts10()
-    if not cli.user_key: return
-    user_account = cli.user_account
-    symbol = cli.symbol
-    print('cli.symbol',symbol)
-    quote,base = commons.split_quote_base(symbol)
-    base_asset = user_account.get(base,0)
-    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
-    #总手续费
-    tot_fee = base_asset * commons.fees_ratio
-    #实际可用基准货币资产余额
-    aval_base_asset = base_asset - tot_fee
-    #最大能买入的数量
-    quote_can_buy = aval_base_asset / pin.symbol_price
-    print('quote_can_buy',quote_can_buy)
-    #改变买入数量占总资产百分比，重绘买入数量
-    if cli.buy_amount_perc != pin.buy_amount_perc \
-        or cli.buy_base_amount != pin.buy_base_amount \
-        or cli.buy_quote_amount != pin.buy_quote_amount:
-        #分情况讨论
-        #1. 百分比修改，无论数量是否修改，都按照百分比计算
-        if cli.buy_amount_perc != pin.buy_amount_perc:
-            #空置为0
-            if not pin.buy_amount_perc:
-                pin.buy_amount_perc = 0
-            #调整到0~100之间
-            pin.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
-            cli.buy_amount_perc = pin.buy_amount_perc
-            #按照百分比计算base_amount数量
-            cli.buy_base_amount = base_asset * pin.buy_amount_perc / 100 
-            #手续费
-            pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
-            #实际买入的基准货币金额
-            real_base_amount = cli.buy_base_amount - pin.buy_fee
-            #计算quote_amount数量
-            cli.buy_quote_amount = real_base_amount / pin.symbol_price 
-            #调整到正确的范围
-            cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
-            cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
-        #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
-        elif cli.buy_quote_amount != pin.buy_quote_amount:
-            #空置为0
-            if not pin.buy_quote_amount:
-                pin.buy_quote_amount = 0
-            #调整到0~最大能买入的数量之间
-            pin.buy_quote_amount = max(0, min(quote_can_buy, pin.buy_quote_amount))
-            cli.buy_quote_amount = pin.buy_quote_amount
-            #按照quote_amount数量计算base_amount数量
-            cli.buy_base_amount = pin.buy_quote_amount * pin.symbol_price
-            #含手续费的base_amount数量
-            real_base_amount = cli.buy_base_amount / (1 - commons.fees_ratio)
-            #手续费
-            pin.buy_fee = real_base_amount - cli.buy_base_amount
-            cli.buy_base_amount = real_base_amount
-            #计算百分比
-            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
-            #调整到正确范围
-            cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
-            cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
-        #3. 百分比未修改，quote_amount数量也未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
-        elif cli.buy_base_amount != pin.buy_base_amount:
-            #空置为0
-            if not pin.buy_base_amount:
-                pin.buy_base_amount = 0
-            #调整到0~最大能买入的数量之间
-            pin.buy_base_amount = max(0, min(base_asset, pin.buy_base_amount))
-            cli.buy_base_amount = pin.buy_base_amount
-            #计算买入的百分比
-            cli.buy_amount_perc = cli.buy_base_amount / base_asset * 100
-            #手续费
-            pin.buy_fee = cli.buy_base_amount * commons.fees_ratio
-            #实际买入的基准货币金额
-            real_base_amount = cli.buy_base_amount - pin.buy_fee
-            #计算quote_amount数量
-            cli.buy_quote_amount = real_base_amount / pin.symbol_price
-            #调整到正确范围
-            cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
-            cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
-        #4. 更新界面pin值
-        pin.buy_amount_perc = cli.buy_amount_perc
-        pin.buy_base_amount = cli.buy_base_amount
-        pin.buy_quote_amount = cli.buy_quote_amount
-
 def update_long_options(cli: client):
     ts10 = commons.get_ts10()
     if not cli.user_key: return
@@ -690,3 +606,101 @@ def update_long_options(cli: client):
         pin.long_leverage = cli.long_leverage
         pin.long_base_amount = cli.long_base_amount
         pin.long_quote_amount = cli.long_quote_amount
+
+def update_short_options(cli: client):
+    ts10 = commons.get_ts10()
+    if not cli.user_key: return
+    user_account = cli.user_account
+    symbol = cli.symbol
+    quote,base = commons.split_quote_base(symbol)
+
+    base_asset = user_account.get(base,0)
+
+    quote_asset = user_account.get(quote,0)
+
+    total_balance = commons.get_total_balance(user_account)
+
+    #最大可用资金
+    usdt_can_short = total_balance * commons.max_leverage_ratio
+    
+    #base价格
+    base_price = commons.get_base_price(base, ts10)
+    
+    #quote价格
+    quote_price = commons.get_quote_price(quote, ts10)
+    
+    pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+
+    #最大可动用base
+    base_can_short = usdt_can_short / base_price + base_asset
+
+    #排除手续费的base
+    real_base_can_short = base_can_short * (1.0 - commons.fees_ratio)
+
+    #最大可交易quote
+    real_quote_can_exchange = real_base_can_short / pin.symbol_price
+    
+    #最大可动用quote
+    quote_can_short = usdt_can_short / quote_price + quote_asset
+
+    #排除手续费的quote
+    real_quote_can_short = quote_can_short * (1.0 - commons.fees_ratio)
+
+    #最大可交易base
+    real_base_can_exchange = real_quote_can_short * pin.symbol_price
+
+    if cli.short_leverage != pin.short_leverage:
+        if not pin.short_leverage:
+            pin.short_leverage = 0
+        pin.short_leverage = max(0, min(commons.max_leverage_ratio,pin.short_leverage))
+        cli.short_leverage = pin.short_leverage
+        #计算卖出的资产数量
+        cli.short_quote_amount = quote_can_short * cli.short_leverage / commons.max_leverage_ratio
+        #手续费
+        pin.short_fee = cli.short_quote_amount * commons.fees_ratio
+        #实际卖出的quote数量
+        real_quote_asset = cli.short_quote_amount - pin.sell_fee
+        #计算base_amount数量
+        cli.short_base_amount = real_quote_asset * pin.symbol_price
+        #调整到正确范围
+        cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
+        cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
+
+    elif cli.short_base_amount != pin.short_base_amount:
+        if not pin.short_base_amount:
+            pin.short_base_amount = 0
+        pin.short_base_amount = max(0, min(base_can_short, pin.short_base_amount))
+        cli.short_base_amount = pin.short_base_amount
+        #计算卖出的百分比
+        cli.short_leverage = cli.short_base_amount / base_can_short * commons.max_leverage_ratio
+        #手续费
+        pin.short_fee = cli.short_base_amount * commons.fees_ratio
+        #实际卖出的基准货币金额
+        real_base_amount = cli.short_base_amount - pin.short_fee
+        #计算quote_amount数量
+        cli.short_quote_amount = real_base_amount / pin.symbol_price
+        #调整到正确范围
+        cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
+        cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
+    elif cli.short_quote_amount != pin.short_quote_amount:
+        if not pin.short_quote_amount:
+            pin.short_quote_amount = 0
+        pin.short_quote_amount = max(0, min(quote_can_short, pin.short_quote_amount))
+        cli.short_quote_amount = pin.short_quote_amount
+        #计算卖出的百分比
+        cli.short_leverage = cli.short_quote_amount / quote_can_short * commons.max_leverage_ratio
+        #手续费
+        pin.short_fee = cli.short_quote_amount * commons.fees_ratio
+        #实际卖出的quote数量
+        real_quote_amount = cli.short_quote_amount - pin.short_fee
+        #计算base_amount数量
+        cli.short_base_amount = real_quote_amount * pin.symbol_price
+        #调整到正确范围
+        cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
+        cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
+    else:
+        return
+    #4. 更新界面pin值
+    pin.short_leverage = cli.short_leverage
+    pin.short_base_amount = cli.short_base_amount
+    pin.short_quote_amount = cli.short_quote_amount
