@@ -1,5 +1,6 @@
 import pywebio.pin
 import pywebio.output
+import pywebio.input
 import pywebio
 import on_event
 
@@ -25,7 +26,9 @@ def chain_changed(cli,changed,chain):
 def float_input(id,readonly=False):
     print(dir(pywebio.pin))
     print(dir(pywebio))
-    return pywebio.pin.put_input(id,type=pywebio.FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
+    print(dir(pywebio.input))
+    print(dir(pywebio.output))
+    return pywebio.pin.put_input(id,type=pywebio.input.FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
 
 def trade_conf_button(cli):
     print(dir(pywebio.pin))
