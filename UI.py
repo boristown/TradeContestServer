@@ -1,5 +1,6 @@
 import pywebio.pin
 import pywebio.output
+import pywebio
 import on_event
 
 #交易选项行
@@ -23,7 +24,8 @@ def chain_changed(cli,changed,chain):
 #默认零值的浮点数输入框
 def float_input(id,readonly=False):
     print(dir(pywebio.pin))
-    return pywebio.pin.put_input(id,type=FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
+    print(dir(pywebio))
+    return pywebio.pin.put_input(id,type=pywebio.FLOAT,value=0.0,placeholder='0.0',readonly=readonly)
 
 def trade_conf_button(cli):
     print(dir(pywebio.pin))
