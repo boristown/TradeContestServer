@@ -1,8 +1,15 @@
-class order:
-    def __init__(self, order_type, ts, symbol, side, price, qty):
-        self.order_type = order_type
-        self.ts = ts
-        self.symbol = symbol
-        self.side = side
-        self.price = price
-        self.qty = qty
+
+def make_order(ts, symbol, side, type, price, amount, currency,target_amount, target_currency, fee, status):
+    return {
+            'ts': ts,
+            'symbol': symbol,
+            'side': side,
+            'type': type,
+            'price': price,
+            'amount': amount,
+            'currency': currency,
+            'target_amount': target_amount,
+            'target_currency': target_currency,
+            'fee': fee,
+            'status': status,
+            }

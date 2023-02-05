@@ -12,6 +12,7 @@ import UI
 import binanceAPI
 import db
 import pywebio_battery
+import order
 
 def logout(cli):
     cli.user_key = ''
@@ -150,12 +151,13 @@ def execute_buy(cli):
     quote, base = commons.split_quote_base(symbol)
     #交易对价格
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    pin.buy_price = pin.symbol_price * (1 - pin.buy_price_perc / 100)
     #手续费
     fee = float(pin.buy_fee)
     #交易数量
     base_amount = float(cli.buy_base_amount)
     #买入量
-    buy_amount = (base_amount  - fee) / pin.symbol_price
+    buy_amount = (base_amount  - fee) / pin.buy_price
     #修改账户余额
     user_account = cli.user_account
     if base not in user_account:
@@ -164,26 +166,26 @@ def execute_buy(cli):
         user_account[quote] = 0
     if cli.buy_price_perc > 0:
         #order
-        order = {
-            'ts': tsms,
-            'symbol': symbol,
-            'side': 'buy',
-            'type': 'limit',
-            'price': pin.symbol_price,
-            'amount': base_amount,
-            'currency': base,
-            'target_amount': buy_amount,
-            'target_currency': quote,
-            'fee': fee,
-            'status': 'open',
-            }
+        od = order.make_order(
+            tsms,
+            symbol,
+            'buy',
+            'limit',
+            pin.buy_price,
+            base_amount,
+            base,
+            buy_amount,
+            quote,
+            fee,
+            'open'
+        )
         #写入文件
         users = db.users().read()
-        users[cli.user_key].orders.append(order)
+        users[cli.user_key].orders.append(od)
         db.users().write(users)
         #订单创建成功
         msg = '订单创建成功: '
-        msg += f'买入{buy_amount} {base}，价格{pin.symbol_price} {quote}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+        msg += f'买入{buy_amount} {base}，价格{pin.buy_price} {quote}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
     else:
         #立即成交
         user_account[base] -= base_amount
@@ -202,16 +204,16 @@ def execute_buy(cli):
         history_list.append([
             '买入', tsms, symbol, buy_amount, 
             quote, base_amount, base, fee, 
-            base, pin.symbol_price, user_account, user_account_value
+            base, pin.buy_price, user_account, user_account_value
         ])
         history.write(history_list)
         #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
-        msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
-        #清除输入的数量/百分比字段
-        pin.buy_base_amount = cli.buy_base_amount = 0
-        pin.buy_amount_perc = cli.buy_amount_perc = 0
-        pin.buy_quote_amount = cli.buy_quote_amount = 0
-        pin.buy_fee = 0
+        msg = f'成功买入{buy_amount} {quote}，价格{pin.buy_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+    #清除输入的数量/百分比字段
+    pin.buy_base_amount = cli.buy_base_amount = 0
+    pin.buy_amount_perc = cli.buy_amount_perc = 0
+    pin.buy_quote_amount = cli.buy_quote_amount = 0
+    pin.buy_fee = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def execute_sell(cli):
@@ -222,39 +224,63 @@ def execute_sell(cli):
     quote, base = commons.split_quote_base(symbol)
     #交易对价格
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    pin.sell_price = pin.symbol_price * (1 + pin.sell_price_perc / 100)
     #手续费
     fee = float(pin.sell_fee)
     #交易数量
     quote_amount = float(cli.sell_quote_amount)
     #卖出量
-    sell_amount = (quote_amount - fee) * pin.symbol_price
+    sell_amount = (quote_amount - fee) * pin.sell_price
     #修改账户余额
     user_account = cli.user_account
     if base not in user_account:
         user_account[base] = 0
     if quote not in user_account:
         user_account[quote] = 0
-    user_account[base] += sell_amount
-    user_account[quote] -= quote_amount
-    cli.trade_cnt += 1
-    #账户市值
-    user_account_value = commons.get_total_balance(user_account)
-    #写入文件
-    users = db.users().read()
-    users[cli.user_key]['account'] = user_account
-    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    db.users().write(users)
-    #写入历史记录
-    history = db.history(cli.user_key)
-    history_list = history.read()
-    history_list.append([
-        '卖出', tsms, symbol, quote_amount, 
-        quote, sell_amount, base, fee, 
-        quote, pin.symbol_price, user_account, user_account_value
-    ])
-    history.write(history_list)
-    #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
-    msg = f'成功卖出{quote_amount} {quote}，价格{pin.symbol_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    if cli.sell_price_perc > 0:
+        #order
+        od = order.make_order(
+            tsms,
+            symbol,
+            'sell',
+            'limit',
+            pin.sell_price,
+            quote_amount,
+            quote,
+            sell_amount,
+            base,
+            fee,
+            'open'
+        )
+        #写入文件
+        users = db.users().read()
+        users[cli.user_key].orders.append(od)
+        db.users().write(users)
+        #订单创建成功
+        msg = '订单创建成功: '
+        msg += f'卖出{sell_amount} {base}，价格{pin.sell_price} {quote}，花费{quote_amount} {quote}，手续费{fee} {quote}，当前账户余额为{user_account}'
+    else:
+        user_account[base] += sell_amount
+        user_account[quote] -= quote_amount
+        cli.trade_cnt += 1
+        #账户市值
+        user_account_value = commons.get_total_balance(user_account)
+        #写入文件
+        users = db.users().read()
+        users[cli.user_key]['account'] = user_account
+        users[cli.user_key]['trade_cnt'] = cli.trade_cnt
+        db.users().write(users)
+        #写入历史记录
+        history = db.history(cli.user_key)
+        history_list = history.read()
+        history_list.append([
+            '卖出', tsms, symbol, quote_amount, 
+            quote, sell_amount, base, fee, 
+            quote, pin.symbol_price, user_account, user_account_value
+        ])
+        history.write(history_list)
+        #输出信息：成功卖出quote_amount quote，价格 pin.symbol_price base,收入sell_amount base，手续费fee quote，当前账户余额为user_account
+        msg = f'成功卖出{quote_amount} {quote}，价格{pin.sell_price} {base}，收入{sell_amount} {base}，手续费{fee} {quote}，当前账户余额为{user_account}'
     #清除输入的数量/百分比字段
     pin.sell_base_amount = cli.sell_base_amount = 0
     pin.sell_amount_perc = cli.sell_amount_perc = 0
@@ -429,12 +455,15 @@ def update_buy_options(cli: client):
     quote,base = commons.split_quote_base(symbol)
     base_asset = user_account.get(base,0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    if pin.buy_price == '':
+        pin.buy_price = 0
+    pin.buy_price = pin.symbol_price * (1 - cli.buy_price_perc / 100)
     #总手续费
     tot_fee = base_asset * commons.fees_ratio
     #实际可用基准货币资产余额
     aval_base_asset = base_asset - tot_fee
     #最大能买入的数量
-    quote_can_buy = aval_base_asset / pin.symbol_price
+    quote_can_buy = aval_base_asset / pin.buy_price
     print('quote_can_buy',quote_can_buy)
     if cli.buy_price_perc != pin.buy_price_perc:
         if not pin.buy_price_perc:
@@ -463,7 +492,7 @@ def update_buy_options(cli: client):
             #实际买入的基准货币金额
             real_base_amount = cli.buy_base_amount - pin.buy_fee
             #计算quote_amount数量
-            cli.buy_quote_amount = real_base_amount / pin.symbol_price 
+            cli.buy_quote_amount = real_base_amount / pin.buy_price 
             #调整到正确的范围
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
@@ -476,7 +505,7 @@ def update_buy_options(cli: client):
             pin.buy_quote_amount = max(0, min(quote_can_buy, pin.buy_quote_amount))
             cli.buy_quote_amount = pin.buy_quote_amount
             #按照quote_amount数量计算base_amount数量
-            cli.buy_base_amount = pin.buy_quote_amount * pin.symbol_price
+            cli.buy_base_amount = pin.buy_quote_amount * pin.buy_price
             #含手续费的base_amount数量
             real_base_amount = cli.buy_base_amount / (1 - commons.fees_ratio)
             #手续费
@@ -502,7 +531,7 @@ def update_buy_options(cli: client):
             #实际买入的基准货币金额
             real_base_amount = cli.buy_base_amount - pin.buy_fee
             #计算quote_amount数量
-            cli.buy_quote_amount = real_base_amount / pin.symbol_price
+            cli.buy_quote_amount = real_base_amount / pin.buy_price
             #调整到正确范围
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
             cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
@@ -522,12 +551,13 @@ def update_sell_options(cli):
     print('quote,base',quote,base)
     quote_asset = user_account.get(quote, 0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    pin.sell_price = pin.symbol_price * (1 + pin.sell_price_perc / 100)
     #总手续费
     tot_fee = quote_asset * commons.fees_ratio
     #实际卖出的quote数量
     real_quote_asset = quote_asset - tot_fee
     #最大能卖出的金额
-    base_can_sell = real_quote_asset * pin.symbol_price
+    base_can_sell = real_quote_asset * pin.sell_price
     print('base_can_sell',base_can_sell)
     if cli.sell_price_perc != pin.sell_price_perc:
         if not pin.sell_price_perc:
@@ -553,7 +583,7 @@ def update_sell_options(cli):
         #实际卖出的quote数量
         real_quote_asset = cli.sell_quote_amount - pin.sell_fee
         #计算base_amount数量
-        cli.sell_base_amount = real_quote_asset * pin.symbol_price
+        cli.sell_base_amount = real_quote_asset * pin.sell_price
         #调整到正确范围
         cli.sell_quote_amount = max(0, min(quote_asset, cli.sell_quote_amount))
         cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
@@ -567,7 +597,7 @@ def update_sell_options(cli):
         pin.sell_base_amount = max(0, min(base_can_sell, pin.sell_base_amount))
         cli.sell_base_amount = pin.sell_base_amount
         #计算卖出的quote数量
-        cli.sell_quote_amount = cli.sell_base_amount / pin.symbol_price
+        cli.sell_quote_amount = cli.sell_base_amount / pin.sell_price
         #含手续费的quote数量
         real_quote_asset = cli.sell_quote_amount / (1 - commons.fees_ratio)
         #手续费
@@ -594,7 +624,7 @@ def update_sell_options(cli):
         #实际卖出的quote数量
         real_quote_asset = cli.sell_quote_amount - pin.sell_fee
         #计算base_amount数量
-        cli.sell_base_amount = real_quote_asset * pin.symbol_price
+        cli.sell_base_amount = real_quote_asset * pin.sell_price
         #调整到正确范围
         cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
         cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))

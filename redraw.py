@@ -404,6 +404,8 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'), UI.float_input('buy_stop_loss_perc'),put_text(" "+'%时止损'),)
         UI.trade_options_row(
             put_text('手续费(0.1%)'), UI.float_input('buy_fee',True), put_text(" "+base))
+        UI.trade_options_row(
+            put_text('交易价格'), UI.float_input('buy_price',True), put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '卖出':
         UI.trade_options_row(
@@ -420,6 +422,8 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'),UI.float_input('sell_stop_loss_perc'),put_text(" "+'%时止损'))
         UI.trade_options_row(
             put_text('手续费(0.1%)'), UI.float_input('sell_fee',True),put_text(" "+base))
+        UI.trade_options_row(
+            put_text('交易价格'), UI.float_input('sell_price',True), put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '做多':
         UI.trade_options_row(
@@ -437,6 +441,8 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'),UI.float_input('long_stop_loss_perc'),put_text(' %时止损'))
         UI.trade_options_row(
             put_text('手续费(0.1%)'),UI.float_input('long_fee',True),put_text(" "+base))
+        UI.trade_options_row(
+            put_text('交易价格'), UI.float_input('long_price',True), put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '做空':
         UI.trade_options_row(
@@ -454,6 +460,8 @@ def redraw_trade_options(cli: client):
             put_text('亏损占比资产'),UI.float_input('short_stop_loss_perc'),put_text(' %时止损'))
         UI.trade_options_row(
             put_text('手续费(0.1%)'),UI.float_input('short_fee',True),put_text(" "+quote))
+        UI.trade_options_row(
+            put_text('交易价格'), UI.float_input('short_price',True), put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '网格交易':
         #网格交易：首单位置___%，每单间隔___%，单侧订单数量___（下拉：[quote]/[base]），每单数量___，整体杠杆率___%，亏损占比总资产___%时止损。确认按钮。
