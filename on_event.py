@@ -144,6 +144,7 @@ def pin_wait(changed):
     return changed
 
 def execute_buy(cli):
+    print("execute_buy")
     ts10 = commons.get_ts10()
     tsms = commons.get_tsms()
     #获取当前交易对
@@ -152,6 +153,7 @@ def execute_buy(cli):
     #交易对价格
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     pin.buy_price = pin.symbol_price * (1 - pin.buy_price_perc / 100)
+    print("pin.buy_price",pin.buy_price)
     #手续费
     fee = float(pin.buy_fee)
     #交易数量
@@ -164,6 +166,7 @@ def execute_buy(cli):
         user_account[base] = 0
     if quote not in user_account:
         user_account[quote] = 0
+    print("cli.buy_price_perc",cli.buy_price_perc)
     if cli.buy_price_perc > 0:
         #order
         od = order.make_order(
