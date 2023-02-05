@@ -162,32 +162,56 @@ def execute_buy(cli):
         user_account[base] = 0
     if quote not in user_account:
         user_account[quote] = 0
-    user_account[base] -= base_amount
-    user_account[quote] += buy_amount
-    cli.trade_cnt += 1
-    #账户估值
-    user_account_value = commons.get_total_balance(user_account)
-    #写入文件
-    users = db.users().read()
-    users[cli.user_key]['account'] = user_account
-    users[cli.user_key]['trade_cnt'] = cli.trade_cnt
-    db.users().write(users)
-    #写入历史记录
-    history = db.history(cli.user_key)
-    history_list = history.read()
-    history_list.append([
-        '买入', tsms, symbol, buy_amount, 
-        quote, base_amount, base, fee, 
-        base, pin.symbol_price, user_account, user_account_value
-    ])
-    history.write(history_list)
-    #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
-    msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
-    #清除输入的数量/百分比字段
-    pin.buy_base_amount = cli.buy_base_amount = 0
-    pin.buy_amount_perc = cli.buy_amount_perc = 0
-    pin.buy_quote_amount = cli.buy_quote_amount = 0
-    pin.buy_fee = 0
+    if cli.buy_price_perc > 0:
+        #order
+        order = {
+            'ts': tsms,
+            'symbol': symbol,
+            'side': 'buy',
+            'type': 'limit',
+            'price': pin.symbol_price,
+            'amount': base_amount,
+            'currency': base,
+            'target_amount': buy_amount,
+            'target_currency': quote,
+            'fee': fee,
+            'status': 'open',
+            }
+        #写入文件
+        users = db.users().read()
+        users[cli.user_key].orders.append(order)
+        db.users().write(users)
+        #订单创建成功
+        msg = '订单创建成功: '
+        msg += f'买入{buy_amount} {base}，价格{pin.symbol_price} {quote}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+    else:
+        #立即成交
+        user_account[base] -= base_amount
+        user_account[quote] += buy_amount
+        cli.trade_cnt += 1
+        #账户估值
+        user_account_value = commons.get_total_balance(user_account)
+        #写入文件
+        users = db.users().read()
+        users[cli.user_key]['account'] = user_account
+        users[cli.user_key]['trade_cnt'] = cli.trade_cnt
+        db.users().write(users)
+        #写入历史记录
+        history = db.history(cli.user_key)
+        history_list = history.read()
+        history_list.append([
+            '买入', tsms, symbol, buy_amount, 
+            quote, base_amount, base, fee, 
+            base, pin.symbol_price, user_account, user_account_value
+        ])
+        history.write(history_list)
+        #输出信息：成功买入buy_amount quote，价格 pin.symbol_price base,花费base_amount base，手续费fee base，当前账户余额为user_account
+        msg = f'成功买入{buy_amount} {quote}，价格{pin.symbol_price} {base}，花费{base_amount} {base}，手续费{fee} {base}，当前账户余额为{user_account}'
+        #清除输入的数量/百分比字段
+        pin.buy_base_amount = cli.buy_base_amount = 0
+        pin.buy_amount_perc = cli.buy_amount_perc = 0
+        pin.buy_quote_amount = cli.buy_quote_amount = 0
+        pin.buy_fee = 0
     redraw.redraw_trade_options_msg(cli, msg, False)
 
 def execute_sell(cli):
