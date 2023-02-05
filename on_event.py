@@ -184,7 +184,8 @@ def execute_buy(cli):
         )
         #写入文件
         users = db.users().read()
-        users[cli.user_key].orders.append(od)
+        print(users[cli.user_key])
+        users[cli.user_key]["orders"].append(od)
         db.users().write(users)
         #订单创建成功
         msg = '订单创建成功: '
