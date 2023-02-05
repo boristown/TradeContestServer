@@ -412,6 +412,13 @@ def update_buy_options(cli: client):
     #最大能买入的数量
     quote_can_buy = aval_base_asset / pin.symbol_price
     print('quote_can_buy',quote_can_buy)
+    if cli.buy_price_perc != pin.buy_price_perc:
+        if not pin.buy_price_perc:
+            pin.buy_price_perc = 0
+        #调整到100以内
+        if pin.buy_price_perc > 100:
+            pin.buy_price_perc = 100
+        cli.buy_price_perc = pin.buy_price_perc
     #改变买入数量占总资产百分比，重绘买入数量
     if cli.buy_amount_perc != pin.buy_amount_perc \
         or cli.buy_base_amount != pin.buy_base_amount \
