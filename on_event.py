@@ -505,6 +505,13 @@ def update_sell_options(cli):
     #最大能卖出的金额
     base_can_sell = real_quote_asset * pin.symbol_price
     print('base_can_sell',base_can_sell)
+    if cli.sell_price_perc != pin.sell_price_perc:
+        if not pin.sell_price_perc:
+            pin.sell_price_perc = 0
+        #调整到100以内
+        if pin.sell_price_perc < -100.0:
+            pin.sell_price_perc = -100.0
+        cli.sell_price_perc = pin.sell_price_perc
     #改变卖出数量占总资产百分比，重绘卖出界面
     #1. 百分比修改，按照百分比计算base_amount数量和quote_amount数量
     if cli.sell_amount_perc != pin.sell_amount_perc:
@@ -619,6 +626,14 @@ def update_long_options(cli: client):
     #最大可交易base
     real_base_can_exchange = real_quote_can_long * pin.symbol_price
 
+    if cli.long_price_perc != pin.long_price_perc:
+        if not pin.long_price_perc:
+            pin.long_price_perc = 0
+        #调整到100以内
+        if pin.long_price_perc > 100:
+            pin.long_price_perc = 100
+        cli.long_price_perc = pin.long_price_perc
+
     #改变买入数量占总资产百分比，重绘买入数量
     if cli.long_leverage != pin.long_leverage \
         or cli.long_base_amount != pin.long_base_amount \
@@ -728,6 +743,14 @@ def update_short_options(cli: client):
 
     #最大可交易base
     real_base_can_exchange = real_quote_can_short * pin.symbol_price
+
+    if cli.short_price_perc != pin.short_price_perc:
+        if not pin.short_price_perc:
+            pin.short_price_perc = 0
+        #调整到100以内
+        if pin.short_price_perc < -100.0:
+            pin.short_price_perc = -100.0
+        cli.short_price_perc = pin.short_price_perc
 
     if cli.short_leverage != pin.short_leverage:
         if not pin.short_leverage:
