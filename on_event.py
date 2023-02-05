@@ -144,7 +144,7 @@ def pin_wait(changed):
     return changed
 
 def execute_buy(cli):
-    print("execute_buy")
+    #print("execute_buy")
     ts10 = commons.get_ts10()
     tsms = commons.get_tsms()
     #获取当前交易对
@@ -153,7 +153,7 @@ def execute_buy(cli):
     #交易对价格
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     pin.buy_price = pin.symbol_price * (1 - pin.buy_price_perc / 100)
-    print("pin.buy_price",pin.buy_price)
+    #print("pin.buy_price",pin.buy_price)
     #手续费
     fee = float(pin.buy_fee)
     #交易数量
@@ -184,7 +184,7 @@ def execute_buy(cli):
         )
         #写入文件
         users = db.users().read()
-        print(users[cli.user_key])
+        #print(users[cli.user_key])
         users[cli.user_key]["orders"].append(od)
         db.users().write(users)
         #订单创建成功
@@ -258,7 +258,7 @@ def execute_sell(cli):
         )
         #写入文件
         users = db.users().read()
-        users[cli.user_key].orders.append(od)
+        users[cli.user_key]["orders"].append(od)
         db.users().write(users)
         #订单创建成功
         msg = '订单创建成功: '
@@ -462,12 +462,12 @@ def update_buy_options(cli: client):
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     if not pin.buy_price:
         pin.buy_price = 0
-    print('pin.buy_price',pin.buy_price)
+    #print('pin.buy_price',pin.buy_price)
     #总手续费
     tot_fee = base_asset * commons.fees_ratio
     #实际可用基准货币资产余额
     aval_base_asset = base_asset - tot_fee
-    print('cli.buy_price_perc',pin.buy_price)
+    #print('cli.buy_price_perc',pin.buy_price)
     if cli.buy_price_perc != pin.buy_price_perc:
         if not pin.buy_price_perc:
             pin.buy_price_perc = 0
@@ -558,14 +558,15 @@ def update_sell_options(cli):
     print('quote,base',quote,base)
     quote_asset = user_account.get(quote, 0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
-    pin.sell_price = pin.symbol_price * (1 + pin.sell_price_perc / 100)
+    if not pin.sell_price:
+        pin.sell_price = 0
     #总手续费
     tot_fee = quote_asset * commons.fees_ratio
     #实际卖出的quote数量
     real_quote_asset = quote_asset - tot_fee
     #最大能卖出的金额
     base_can_sell = real_quote_asset * pin.sell_price
-    print('base_can_sell',base_can_sell)
+    #print('base_can_sell',base_can_sell)
     if cli.sell_price_perc != pin.sell_price_perc:
         if not pin.sell_price_perc:
             pin.sell_price_perc = 0
@@ -573,6 +574,7 @@ def update_sell_options(cli):
         if pin.sell_price_perc < -100.0:
             pin.sell_price_perc = -100.0
         cli.sell_price_perc = pin.sell_price_perc
+    pin.sell_price = pin.symbol_price * (1 + pin.sell_price_perc / 100)
     #改变卖出数量占总资产百分比，重绘卖出界面
     #1. 百分比修改，按照百分比计算base_amount数量和quote_amount数量
     if cli.sell_amount_perc != pin.sell_amount_perc:
