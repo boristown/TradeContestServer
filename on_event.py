@@ -456,17 +456,14 @@ def update_buy_options(cli: client):
     print('quote,base',quote,base)
     base_asset = user_account.get(base,0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
-    print('pin.buy_price',pin.buy_price)
-    if pin.buy_price == '':
+    if not pin.buy_price:
         pin.buy_price = 0
-    pin.buy_price = pin.symbol_price * (1 - cli.buy_price_perc / 100)
+    print('pin.buy_price',pin.buy_price)
     #总手续费
     tot_fee = base_asset * commons.fees_ratio
     #实际可用基准货币资产余额
     aval_base_asset = base_asset - tot_fee
-    #最大能买入的数量
-    quote_can_buy = aval_base_asset / pin.buy_price
-    print('quote_can_buy',quote_can_buy)
+    print('cli.buy_price_perc',pin.buy_price)
     if cli.buy_price_perc != pin.buy_price_perc:
         if not pin.buy_price_perc:
             pin.buy_price_perc = 0
@@ -474,6 +471,10 @@ def update_buy_options(cli: client):
         if pin.buy_price_perc > 100:
             pin.buy_price_perc = 100
         cli.buy_price_perc = pin.buy_price_perc
+    pin.buy_price = pin.symbol_price * (1 - cli.buy_price_perc / 100)
+    #最大能买入的数量
+    quote_can_buy = aval_base_asset / pin.buy_price
+    print('quote_can_buy',quote_can_buy)
     #改变买入数量占总资产百分比，重绘买入数量
     if cli.buy_amount_perc != pin.buy_amount_perc \
         or cli.buy_base_amount != pin.buy_base_amount \
