@@ -453,8 +453,10 @@ def update_buy_options(cli: client):
     symbol = cli.symbol
     print('update_buy_options',symbol)
     quote,base = commons.split_quote_base(symbol)
+    print('quote,base',quote,base)
     base_asset = user_account.get(base,0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
+    print('pin.buy_price',pin.buy_price)
     if pin.buy_price == '':
         pin.buy_price = 0
     pin.buy_price = pin.symbol_price * (1 - cli.buy_price_perc / 100)
