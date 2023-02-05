@@ -451,7 +451,7 @@ def update_buy_options(cli: client):
     if not cli.user_key: return
     user_account = cli.user_account
     symbol = cli.symbol
-    print('cli.symbol',symbol)
+    print('update_buy_options',symbol)
     quote,base = commons.split_quote_base(symbol)
     base_asset = user_account.get(base,0)
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
