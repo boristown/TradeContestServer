@@ -25,6 +25,11 @@ def logout(cli):
     pywebio_battery.set_cookie('cli.user_key', '')
     redraw.redraw_login(cli)
 
+def switch_symbol(cli):
+    pin.symbol = str(pin.symbol).upper()
+    cli.symbol = binanceAPI.SYM_DICT2[pin.symbol][1]
+    set_symbol(cli,cli.symbol)
+
 def login(cli: client, btn, auto = False):
     if btn == '登陆':
         if auto:

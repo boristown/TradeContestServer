@@ -39,7 +39,8 @@ def redraw_market_header(cli):
     print('cli.symbol',cli.symbol)
     sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
     put_row([
-        put_input('symbol', value=sym2, readonly=True),
+        put_input('symbol', value=sym2, readonly=False),
+        put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
     ])
     cli.search = pin.search
     cli.selectBase = pin.selectBase
