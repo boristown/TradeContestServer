@@ -231,9 +231,9 @@ def redraw_login_welcome(cli: client):
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
-    if pin.switch_tab == '市场': redraw_market_header(cli)
+    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': redraw_market_header(cli)
     if pin.switch_tab == '市场': redraw_market_kline(cli)
-    if pin.switch_tab == '市场': redraw_market_table(cli)
+    if pin.switch_tab == '市场清单': redraw_market_table(cli)
     #if pin.switch_tab == '市场': redraw_sponsor(cli)
 
 @use_scope('sponsor', clear=True)
