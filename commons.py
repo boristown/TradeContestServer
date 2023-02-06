@@ -331,7 +331,7 @@ def get_orders_table(orders):
     ans = []
     ans.append(["类型", "交易对", "方向", "价格", "数量", "时间", "状态"])
     for od in orders:
-        ans.append(
+        ans.append([
             od["type"],
             od["symbol"],
             od["side"],
@@ -339,5 +339,5 @@ def get_orders_table(orders):
             od["amount"],
             od["ts"],
             od["status"]
-            )
+            ])
     return ans
