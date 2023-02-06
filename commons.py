@@ -327,3 +327,17 @@ def get_pie_chart_html(user_account):
         )
     return chart.render_notebook()
 
+def get_orders_table(orders):
+    ans = []
+    ans.append(["类型", "交易对", "方向", "价格", "数量", "时间", "状态"])
+    for od in orders:
+        ans.append(
+            od["type"],
+            od["symbol"],
+            od["side"],
+            od["price"],
+            od["amount"],
+            od["ts"],
+            od["status"]
+            )
+    return ans

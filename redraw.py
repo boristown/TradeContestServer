@@ -175,6 +175,15 @@ def redraw_login_welcome(cli: client):
     put_markdown('### 杠杆率：' + str(commons.get_leverage(user_account)))
     pie_chart_html = commons.get_pie_chart_html(user_account)
     put_html(pie_chart_html)
+    users = db.get_users()
+    user = users[cli.user_key]
+    print("user", user)
+    orders = user['orders']
+    print("orders", orders)
+    if len(orders) > 0:
+        #我的订单
+        put_markdown('## 我的订单：')
+        put_table(commons.get_orders_table(orders))
     #交易历史记录
     put_markdown('## 交易历史记录')
     history = db.history(cli.user_key)
