@@ -42,6 +42,7 @@ def redraw_market_header(cli):
         put_input('symbol', value=sym2, readonly=False),
         put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
     ])
+    put_scope('symbol_info')
     cli.search = pin.search
     cli.selectBase = pin.selectBase
     cli.selectInterval = pin.selectInterval

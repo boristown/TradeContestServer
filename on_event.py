@@ -27,7 +27,16 @@ def logout(cli):
 
 def switch_symbol(cli):
     pin.symbol = str(pin.symbol).upper()
-    cli.symbol = binanceAPI.SYM_DICT2[pin.symbol][1]
+    if pin.symbol not in binanceAPI.SYM_DICT2:
+        if pin.symbol in binanceAPI.SYM_DICT:
+            pin.symbol = binanceAPI.SYM_DICT[pin.symbol][0]
+        else:
+            with use_scope('symbol_info', clear=True):
+                put_error('不存在的交易对:'+pin.symbol)
+        return
+    with use_scope('symbol_info', clear=True):
+        clear()
+    cli.symbol = binanceAPI.SYM_DICT2[pin.symbol][0]
     set_symbol(cli,cli.symbol)
 
 def login(cli: client, btn, auto = False):
@@ -441,7 +450,8 @@ def trade_confirm_click(cli):
 
 def set_symbol(cli,name):
     cli.symbol = name
-    pin.symbol = binanceAPI.SYM_DICT[cli.symbol][0]
+    pin.symbol,_,pin.selectBase = binanceAPI.SYM_DICT[cli.symbol]
+    cli.selectBase = pin.selectBase
     redraw.redraw_market_kline(cli)
     redraw.redraw_market_table(cli)
     return cli.symbol
