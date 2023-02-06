@@ -201,17 +201,6 @@ def redraw_login_welcome(cli: client):
         history_list = []
     history_list.append(
         [
-        #交易类型
-        #交易时间（ms）
-        #交易对
-        #交易数量(quote)
-        #交易quote
-        #交易数量(base)
-        #交易base
-        #手续费
-        #手续费单位
-        #交易价格
-        #交易后账户余额
         '交易类型',
         '交易时间戳',
         '交易对',
@@ -232,8 +221,8 @@ def redraw_login_welcome(cli: client):
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
     if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': redraw_market_header(cli)
-    if pin.switch_tab == '市场': redraw_market_kline(cli)
-    if pin.switch_tab == '市场清单': redraw_market_table(cli)
+    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': redraw_market_kline(cli)
+    if pin.switch_tab == '市场清单' or pin.switch_tab == '市场清单': redraw_market_table(cli)
     #if pin.switch_tab == '市场': redraw_sponsor(cli)
 
 @use_scope('sponsor', clear=True)
@@ -290,6 +279,7 @@ def update_header(cli):
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
+    if pin.switch_tab != '市场清单': return
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
     cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
@@ -347,6 +337,8 @@ def redraw_rank(cli):
 
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
+    if pin.switch_tab != '市场': 
+        return
     print("def redraw_market_kline")
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
