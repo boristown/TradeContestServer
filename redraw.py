@@ -118,6 +118,13 @@ def redraw_content(cli):
                 cli.switch_tab = temp_switch_tab
             else:
                 pass
+        elif pin.switch_tab == '市场清单':
+            print('redraw list')
+            if cli.switch_tab != pin.switch_tab:
+                print('redraw list all')
+                temp_switch_tab = pin.switch_tab
+                #redraw_market_table(cli)
+                cli.switch_tab = temp_switch_tab
         print('global_redraw waiting change...')
         #change detection
         changed = on_event.pin_changed(cli)
