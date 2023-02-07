@@ -38,10 +38,11 @@ def redraw_market_header(cli):
     ])
     print('cli.symbol',cli.symbol)
     sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
-    put_row([
-        put_input('symbol', value=sym2, readonly=False),
-        put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
-    ])
+    if pin.switch_tab == '市场':
+        put_row([
+            put_input('symbol', value=sym2, readonly=False),
+            put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
+        ])
     put_scope('symbol_info')
     cli.search = pin.search
     cli.selectBase = pin.selectBase
@@ -337,8 +338,7 @@ def redraw_rank(cli):
 
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
-    if pin.switch_tab != '市场': 
-        return
+    if pin.switch_tab != '市场': return
     print("def redraw_market_kline")
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
