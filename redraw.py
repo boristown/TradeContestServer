@@ -16,27 +16,38 @@ import pywebio_battery
 def redraw_market_header(cli):
     if pin.switch_tab == '市场清单':
         put_input('search', placeholder ='输入市场名:')
-    put_row([
-        put_select('selectBase', options=['USDT', 'BTC']),
-        put_select('selectInterval', 
-        options=[
-            '3分钟','5分钟','15分钟',
-            '30分钟','1小时','2小时',
-            '6小时','1天','3天',
-            '7天','14天'
-            ],
-        value='1小时'
-            ),
-        #默认值是最近1天
-        put_select('selectPeriod', 
-        options=[
-            '最近1小时','最近2小时','最近6小时',
-            '最近12小时','最近1天','最近3天',
-            '最近7天','最近1月','最近3月',
-            '最近6月','最近1年'],
-            value='最近1天',
-            )
-    ])
+        put_row([
+            put_select('selectBase', options=['USDT', 'BTC']),
+            #默认值是最近1天
+            put_select('selectPeriod', 
+            options=[
+                '最近1小时','最近2小时','最近6小时',
+                '最近12小时','最近1天','最近3天',
+                '最近7天'],
+                value='最近1天',
+                )
+        ])
+    elif pin.switch_tab == '市场':
+        put_row([
+            put_select('selectInterval', 
+            options=[
+                '3分钟','5分钟','15分钟',
+                '30分钟','1小时','2小时',
+                '6小时','1天','3天',
+                '7天','14天'
+                ],
+            value='1天'
+                ),
+            #默认值是最近1天
+            put_select('selectPeriod', 
+            options=[
+                '最近1小时','最近2小时','最近6小时',
+                '最近12小时','最近1天','最近3天',
+                '最近7天','最近1月','最近3月',
+                '最近6月','最近1年'],
+                value='最近7天',
+                )
+        ])
     print('cli.symbol',cli.symbol)
     sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
     if pin.switch_tab == '市场':
@@ -45,10 +56,10 @@ def redraw_market_header(cli):
             put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
         ])
     put_scope('symbol_info')
-    cli.search = pin.search
-    cli.selectBase = pin.selectBase
-    cli.selectInterval = pin.selectInterval
-    cli.selectPeriod = pin.selectPeriod
+    cli.search = pin.search if "search" in pin else ''
+    cli.selectBase = pin.selectBase if "selectBase" in pin else 'USDT'
+    cli.selectInterval = pin.selectInterval if "selectInterval" in pin else '1天'
+    cli.selectPeriod = pin.selectPeriod if "selectPeriod" in pin else '最近7天'
 
 #内容重绘
 @use_scope('content', clear=True)

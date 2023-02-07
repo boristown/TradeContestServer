@@ -91,7 +91,7 @@ def draw_klines(symbol, interval='1h', start_time=None, end_time=None, indicator
     kline = kline.set_global_opts(
         xaxis_opts = opts.AxisOpts(is_scale=True),
         yaxis_opts = opts.AxisOpts(is_scale=True,splitarea_opts = yaxis_splitarea_opts),
-        datazoom_opts = [opts.DataZoomOpts(pos_bottom="0%")], 
+        datazoom_opts = [opts.DataZoomOpts(pos_bottom="0%",range_start=0,range_end=100)], 
         title_opts = title_opts
         )
     klinegrid=Grid(init_opts=opts.InitOpts(theme=ThemeType.LIGHT,width="350px", height=height,))
