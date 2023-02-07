@@ -48,14 +48,15 @@ def redraw_market_header(cli):
                 value='最近7天',
                 )
         ])
-    print('cli.symbol',cli.symbol)
-    sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
     if pin.switch_tab == '市场':
+        print('cli.symbol',cli.symbol)
+        sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
         put_row([
             put_input('symbol', value=sym2, readonly=False),
             put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
         ])
     put_scope('symbol_info')
+    print("pin.search",pin.search)
     cli.search = pin.search if "search" in pin else ''
     cli.selectBase = pin.selectBase if "selectBase" in pin else 'USDT'
     cli.selectInterval = pin.selectInterval if "selectInterval" in pin else '1天'
@@ -292,10 +293,11 @@ def update_header(cli):
 
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
+    print("redraw_market_table...",pin.switch_tab)
     if pin.switch_tab != '市场清单': return
-    selinterval = pin.selectInterval
+    #selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
-    cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
+    #cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
     cli.current_time = int(time.time() * 1000)
     cli.period_s = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
     print("redraw market table update header begin")
