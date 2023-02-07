@@ -14,7 +14,8 @@ import pywebio_battery
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
-    put_input('search', placeholder ='输入市场名:')
+    if pin.switch_tab == '市场清单':
+        put_input('search', placeholder ='输入市场名:')
     put_row([
         put_select('selectBase', options=['USDT', 'BTC']),
         put_select('selectInterval', 
