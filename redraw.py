@@ -326,13 +326,14 @@ def redraw_market_table(cli: client):
         sym2 = binanceAPI.SYM_DICT[sym][0]
         search_upper = pin.search.upper()
         if search_upper and search_upper not in sym and search_upper not in sym2: continue
-        row[0] = put_button(
-            sym2,
-            onclick=lambda cli=cli,
-            s=sym: on_event.set_symbol(cli,s),
-            color='success' if cli.symbol == sym else 'secondary',
-            small=True
-            )
+        row[0] = put_text(sym2)
+        # row[0] = put_button(
+        #     sym2,
+        #     onclick=lambda cli=cli,
+        #     s=sym: on_event.set_symbol(cli,s),
+        #     color='success' if cli.symbol == sym else 'secondary',
+        #     small=True
+        #     )
         mdata.append([row[0],row[1],row[3],'%.4g' % row[2]])
     put_table(mdata)
 
