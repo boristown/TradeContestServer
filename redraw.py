@@ -14,7 +14,7 @@ import pywebio_battery
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
-    if pin.switch_tab == '市场清单':
+    if pin.switch_tab == '市场':
         put_input('search', placeholder ='输入市场名:')
         put_row([
             put_select('selectBase', options=['USDT', 'BTC']),
@@ -29,7 +29,7 @@ def redraw_market_header(cli):
         ])
         cli.search = pin.search
         cli.selectBase = pin.selectBase
-    elif pin.switch_tab == '市场':
+    elif pin.switch_tab == '交易':
         put_row([
             put_select('selectInterval', 
             options=[
@@ -77,7 +77,7 @@ def redraw_content(cli):
             'pin.switch_tab', 
             commons.tab_pos[pin.switch_tab]
             )
-        if pin.switch_tab == '市场':
+        if pin.switch_tab == '交易':
             print('redraw market')
             if cli.switch_tab != pin.switch_tab: #切换tab，完全重绘
                 print('redraw market all')
@@ -117,7 +117,7 @@ def redraw_content(cli):
                     on_event.update_long_options(cli)
                 elif cli.trade_type == '做空':
                     on_event.update_short_options(cli)
-        elif pin.switch_tab == '模拟交易':
+        elif pin.switch_tab == '我的':
             print('redraw login')
             if cli.switch_tab != pin.switch_tab:
                 print('redraw login all')
@@ -126,7 +126,7 @@ def redraw_content(cli):
                 cli.switch_tab = temp_switch_tab
             else:
                 pass
-        elif pin.switch_tab == '比赛排行':
+        elif pin.switch_tab == '排行':
             print('redraw rank')
             if cli.switch_tab != pin.switch_tab:
                 print('redraw rank all')
@@ -135,7 +135,7 @@ def redraw_content(cli):
                 cli.switch_tab = temp_switch_tab
             else:
                 pass
-        elif pin.switch_tab == '市场清单':
+        elif pin.switch_tab == '市场':
             print('redraw list')
             if cli.switch_tab != pin.switch_tab:
                 print('redraw list all')
@@ -237,13 +237,13 @@ def redraw_login_welcome(cli: client):
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
-    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+    if pin.switch_tab == '交易' or pin.switch_tab == '市场': 
         redraw_market_header(cli)
-    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+    if pin.switch_tab == '交易' or pin.switch_tab == '市场': 
         redraw_market_kline(cli)
-    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+    if pin.switch_tab == '交易' or pin.switch_tab == '市场': 
         redraw_market_table(cli)
-    #if pin.switch_tab == '市场': redraw_sponsor(cli)
+    #if pin.switch_tab == '交易': redraw_sponsor(cli)
 
 @use_scope('sponsor', clear=True)
 def redraw_sponsor(cli: client):
@@ -289,7 +289,7 @@ def sort_button(cli,label):
         )
 
 def update_header(cli):
-    cli.header = ['市场', '价格', '幅', '成交']
+    cli.header = ['交易', '价格', '幅', '成交']
     suffix = commons.down_triangle if cli.sort_reverse else commons.up_triangle
     for i in range(len(cli.header)):
         if cli.header[i] == cli.sort_key:
@@ -300,7 +300,7 @@ def update_header(cli):
 @use_scope('market_table', clear=True)
 def redraw_market_table(cli: client):
     print("redraw_market_table...",pin.switch_tab)
-    if pin.switch_tab != '市场清单': return
+    if pin.switch_tab != '市场': return
     #selinterval = pin.selectInterval
     selperiod = pin.selectPeriod
     #cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
@@ -312,7 +312,7 @@ def redraw_market_table(cli: client):
     mdata = [cli.header_row]
     mbody = commons.get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
     print("redraw market table get market data end",cli.sort_key,cli.sort_reverse)
-    if cli.sort_key == '市场':
+    if cli.sort_key == '交易':
         mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
     elif cli.sort_key == '价格':
         mbody.sort(key=lambda x: x[1], reverse=cli.sort_reverse)
@@ -358,7 +358,7 @@ def redraw_rank(cli):
 
 @use_scope('market_kline', clear=True)
 def redraw_market_kline(cli: client):
-    if pin.switch_tab != '市场': return
+    if pin.switch_tab != '交易': return
     print("def redraw_market_kline")
     selinterval = pin.selectInterval
     selperiod = pin.selectPeriod

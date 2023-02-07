@@ -126,7 +126,7 @@ def pin_changed(cli):
     if cli.switch_tab != pin.switch_tab:
         changed['switch_tab'] = pin.switch_tab
         return pin_wait(changed)
-    if pin.switch_tab == '市场':
+    if pin.switch_tab == '交易':
         UI.chain_changed(cli,changed,[
             'search',
             'selectBase', 'selectInterval', 'selectPeriod',
@@ -137,7 +137,7 @@ def pin_changed(cli):
             'grid_first_price_perc', 'grid_interval_perc', 'grid_order_num', 'grid_order_amount', 'grid_order_amount_type', 'grid_leverage', 'grid_stop_loss_perc',
         ]
         )
-    elif pin.switch_tab == '市场清单':
+    elif pin.switch_tab == '市场':
         UI.chain_changed(cli,changed,[
             'search',
             'selectBase', 'selectInterval', 'selectPeriod',

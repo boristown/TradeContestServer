@@ -29,7 +29,7 @@ fees_ratio = 0.001
 def get_ts10():
     return int(time.time() / 10)
 
-tabs = ['市场', '模拟交易', '比赛排行', '市场清单']
+tabs = ['交易', '我的', '排行', '市场']
 tab_pos = {v: i+1 for i, v in enumerate(tabs)}
 
 def get_total_balance(user_account):

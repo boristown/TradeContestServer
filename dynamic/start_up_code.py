@@ -118,7 +118,7 @@ self.realtabledata = defaultdict(list)
 def market_page(self):
     self.search_input = FlexInput("输入币种名称执行搜索",self.on_search)
     self.search_button = FixedButton("搜索",self.on_search,100)
-    header = ['市场', '价格', '交易额', '涨幅%']
+    header = ['交易', '价格', '交易额', '涨幅%']
     #self.tabledata = await self.get_market_data()
     #self.tabledata = []
     #self.realtabledata = self.tabledata[:]
@@ -150,7 +150,7 @@ def market_page(self):
     self.interval_7d_toggle = FlexButton('7天',self.on_interval_7d_toggle)
     self.interval_1d_toggle.enabled = False
     self.interval = '1d'
-    self.symbol_sort_button = FlexButton('市场',self.on_symbol_sort)
+    self.symbol_sort_button = FlexButton('交易',self.on_symbol_sort)
     self.price_sort_button = FlexButton('价格',self.on_price_sort)
     self.volume_sort_button = FlexButton('交易额',self.on_volume_sort)
     self.change_sort_button = FlexButton('涨幅%',self.on_change_sort)
@@ -353,7 +353,7 @@ def symbol_chart_page(self,symbol):
 
 def symbol_chart_page_static(self):
     return LayoutBox([
-        [FlexButton('模拟交易',self.on_trade),FlexButton('市场主页面',self.on_market)],
+        [FlexButton('我的',self.on_trade),FlexButton('市场主页面',self.on_market)],
         [
             self.interval_selection,
             self.window_selection
@@ -486,7 +486,7 @@ def on_change_sort(self, widget):
 
 def update_sort_button(self):
     print("更新排序按钮")
-    self.symbol_sort_button.label = '市场'
+    self.symbol_sort_button.label = '交易'
     self.price_sort_button.label = '价格'
     self.volume_sort_button.label = '交易额'
     self.change_sort_button.label = '涨幅%'
