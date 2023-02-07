@@ -61,6 +61,7 @@ def redraw_market_header(cli):
     cli.selectBase = pin.selectBase if "selectBase" in pin else 'USDT'
     cli.selectInterval = pin.selectInterval if "selectInterval" in pin else '1天'
     cli.selectPeriod = pin.selectPeriod if "selectPeriod" in pin else '最近7天'
+    print('cli.selectBase',cli.selectBase)
 
 #内容重绘
 @use_scope('content', clear=True)
@@ -234,9 +235,12 @@ def redraw_login_welcome(cli: client):
 
 @use_scope('market', clear=True)
 def redraw_market(cli: client):
-    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': redraw_market_header(cli)
-    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': redraw_market_kline(cli)
-    if pin.switch_tab == '市场清单' or pin.switch_tab == '市场清单': redraw_market_table(cli)
+    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+        redraw_market_header(cli)
+    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+        redraw_market_kline(cli)
+    if pin.switch_tab == '市场' or pin.switch_tab == '市场清单': 
+        redraw_market_table(cli)
     #if pin.switch_tab == '市场': redraw_sponsor(cli)
 
 @use_scope('sponsor', clear=True)
