@@ -202,7 +202,7 @@ def redraw_login_welcome(cli: client):
     put_markdown('### 杠杆率：' + str(commons.get_leverage(user_account)))
     pie_chart_html = commons.get_pie_chart_html(user_account)
     print(pie_chart_html._repr_html_())
-    put_html(pie_chart_html)
+    put_html(pie_chart_html._repr_html_())
     users = db.users().read()
     user = users[cli.user_key]
     print("user", user)
