@@ -27,6 +27,8 @@ def redraw_market_header(cli):
                 value='最近1天',
                 )
         ])
+        cli.search = pin.search
+        cli.selectBase = pin.selectBase
     elif pin.switch_tab == '市场':
         put_row([
             put_select('selectInterval', 
@@ -48,20 +50,20 @@ def redraw_market_header(cli):
                 value='最近7天',
                 )
         ])
-    if pin.switch_tab == '市场':
         print('cli.symbol',cli.symbol)
         sym2 = binanceAPI.SYM_DICT[cli.symbol][0]
         put_row([
             put_input('symbol', value=sym2, readonly=False),
             put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
         ])
+        cli.selectInterval = pin.selectInterval
+    
     put_scope('symbol_info')
-    print("pin.search",pin.search)
-    cli.search = pin.search if "search" in pin else ''
-    cli.selectBase = pin.selectBase if "selectBase" in pin else 'USDT'
-    cli.selectInterval = pin.selectInterval if "selectInterval" in pin else '1天'
-    cli.selectPeriod = pin.selectPeriod if "selectPeriod" in pin else '最近7天'
-    print('cli.selectBase',cli.selectBase)
+    #print("pin.search",pin.search)
+
+    cli.selectPeriod = pin.selectPeriod
+    
+    #print('cli.selectBase',cli.selectBase)
 
 #内容重绘
 @use_scope('content', clear=True)
