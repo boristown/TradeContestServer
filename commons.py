@@ -11,6 +11,7 @@ import db
 from pyecharts.charts import Pie
 from pyecharts import options as opts
 from pyecharts.globals import ThemeType
+import pywebio.pin
 
 up_triangle = '▲'
 down_triangle = '▼'
@@ -181,6 +182,32 @@ def get_binance_ticker(cli,usdt_on,interval):
     data = ticker.read()
     cli.ticker_cache[key] = copy.deepcopy(data)
     return data
+
+def make_market_html(symbol, mdata):
+    #载入模板/template/market_template.html
+    with open('template/market_template.html', 'r', encoding='utf-8') as f:
+        html = f.read()
+    table_html = '<table cellpadding="0" id="table" style="text-align: center;">'
+    table_html += '<tr class="top" style="background-color: #CCCCCC; cursor: pointer;">'
+    table_html += '<td>市场</td>'
+    table_html += '<td>价格</td>'
+    table_html += '<td>涨幅</td>'
+    table_html += '<td>成交量</td>'
+    table_html += '</tr>'
+    for d in mdata:
+        sym = d[0]
+        sym2 = binanceAPI.SYM_DICT[sym][0]
+        search_upper = symbol.upper()
+        if search_upper and search_upper not in sym and search_upper not in sym2: continue
+        table_html += '<tr>'
+        table_html += '<td>' + sym2 + '</td>'
+        table_html += '<td>' + str(d[1]) + '</td>'
+        table_html += '<td>' + str(d[3]) + '</td>'
+        table_html += '<td>' + str('%.4g' % d[2]) + '</td>'
+        table_html += '</tr>'
+    table_html += '</table>'
+    html = html.replace('<!--my table-->', table_html)
+    return html
 
 #获取币种报价
 @functools.lru_cache

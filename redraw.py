@@ -314,6 +314,8 @@ def redraw_market_table(cli: client):
     mdata = [cli.header_row]
     mbody = commons.get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
     print("redraw market table get market data end",cli.sort_key,cli.sort_reverse)
+    put_html(commons.make_market_html(pin.search,mbody))
+    return
     if cli.sort_key == '交易':
         mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
     elif cli.sort_key == '价格':
