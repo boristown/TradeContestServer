@@ -195,7 +195,8 @@ def redraw_login_welcome(cli: client):
     put_markdown('## 账户信息：')
     user_account = cli.user_account
     for curr in user_account:
-        put_markdown("### " + curr + '：' + str(user_account[curr]))
+        if user_account[curr] != 0.0:
+            put_markdown('### ' + curr + ': ' + str(user_account[curr]))
     #put_text(res)
     put_markdown('### 估值：' + str(commons.get_total_balance(user_account)) + ' USDT')
     put_markdown('### 杠杆率：' + str(commons.get_leverage(user_account)))

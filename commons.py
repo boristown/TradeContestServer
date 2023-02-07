@@ -172,12 +172,6 @@ def get_binance_ticker(cli,usdt_on,interval):
         return cli.ticker_cache[key]
     if 'M' in interval or 'y' in interval:
         interval = '7d'
-    # if usdt_on:
-    #     url = local_url + "ticker_u/" + interval
-    # else:
-    #     url = local_url + "ticker_b/" + interval
-    # print(url)
-    # data = requests.get(url).json()
     if usdt_on:
         ticker = db.ticker('u',interval)
         # path = '/db/ticker_u/' + interval + '.json'
@@ -269,56 +263,16 @@ def get_pie_chart_html(user_account):
     print("def get_pie_chart_html")
     attr,val = get_account_percent(user_account)
     print(attr,val)
-    # chart = Pie("账户资产比例", title_pos='center', width=350)
     height = "350px"
     chart = Pie(init_opts=opts.InitOpts(width="350px", height=height, theme=ThemeType.LIGHT))
-    pair = [(k,v) for k,v in zip(attr,val)]
+    pair = [(k,v) for k,v in zip(attr,val) if v != 0]
     print(chart)
     chart.add(
         "", 
-        # attr, 
-        # val, 
         data_pair=pair,
-    # label_text_color=None,
-    # is_more_utils=True,
-    # is_random=True,
-    # is_label_show=True,
     rosetype='radius',
     radius=["40%", "55%"],
     center=["35%", "50%"],# 位置设置
-    # legend_orient="horizontal",
-    # legend_pos="bottom",
-    # label_opts=opts.LabelOpts(
-    #         position="outside",
-    #         formatter="{a|{a}}{abg|}\n{hr|}\n {b|{b}: }{c}  {per|{d}%}  ",
-    #         background_color="#eee",
-    #         border_color="#aaa",
-    #         border_width=1,
-    #         border_radius=4,
-    #         rich={
-    #             "a": {"color": "#999", "lineHeight": 22, "align": "center"},
-    #             "abg": {
-    #                 "backgroundColor": "#e3e3e3", #上面的背景设置
-    #                 "width": "100%",
-    #                 "align": "right",
-    #                 "height": 22,
-    #                 "borderRadius": [4, 4, 0, 0],
-    #             },
-    #             "hr": { #相当于中间的分割线样式设置
-    #                 "borderColor": "#aaa",
-    #                 "width": "100%",
-    #                 "borderWidth": 0.5,
-    #                 "height": 0,
-    #             },
-    #             "b": {"fontSize": 16, "lineHeight": 33},#名称文字样式
-    #             "per": { # 百分数的字体样式设置
-    #                 "color": "#eee",
-    #                 "backgroundColor": "#334455",
-    #                 "padding": [2, 4], #[高，宽]设置，那个背景矩形
-    #                 "borderRadius": 2, #圆角设置
-    #             },
-    #         },
-    # ),
     )
     print("chart",chart)
     chart.set_global_opts(
