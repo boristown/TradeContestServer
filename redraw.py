@@ -17,19 +17,19 @@ from collections import defaultdict
 def redraw_market_header(cli):
     if pin.switch_tab == '市场':
         put_input('search', placeholder ='输入市场名:')
-        put_row([
-            put_select('selectBase', options=['USDT', 'BTC']),
-            #默认值是最近1天
-            put_select('selectPeriod', 
-            options=[
-                '最近1小时','最近2小时','最近6小时',
-                '最近12小时','最近1天','最近3天',
-                '最近7天'],
-                value='最近1天',
-                )
-        ])
-        cli.search = pin.search
-        cli.selectBase = pin.selectBase
+        # put_row([
+        #     put_select('selectBase', options=['USDT', 'BTC']),
+        #     #默认值是最近1天
+        #     put_select('selectPeriod', 
+        #     options=[
+        #         '最近1小时','最近2小时','最近6小时',
+        #         '最近12小时','最近1天','最近3天',
+        #         '最近7天'],
+        #         value='最近1天',
+        #         )
+        # ])
+        # cli.search = pin.search
+        # cli.selectBase = pin.selectBase
     elif pin.switch_tab == '交易':
         put_row([
             put_select('selectInterval', 
@@ -58,11 +58,11 @@ def redraw_market_header(cli):
             put_button('切换', onclick=lambda cli=cli: on_event.switch_symbol(cli)),
         ])
         cli.selectInterval = pin.selectInterval
+        cli.selectPeriod = pin.selectPeriod
     
     put_scope('symbol_info')
     #print("pin.search",pin.search)
 
-    cli.selectPeriod = pin.selectPeriod
     
     #print('cli.selectBase',cli.selectBase)
 
