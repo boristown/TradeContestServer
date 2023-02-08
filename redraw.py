@@ -11,6 +11,7 @@ import UI
 import binanceAPI
 import db
 import pywebio_battery
+from collections import defaultdict
 
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
@@ -312,9 +313,25 @@ def redraw_market_table(cli: client):
     update_header(cli)
     print("redraw market table update header end")
     mdata = [cli.header_row]
-    mbody = commons.get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
+    # mbody = commons.get_market_data(cli,pin.selectBase == "USDT",cli.period_s)
+    mbody_1d = commons.get_market_data(cli,True,'1d') + commons.get_market_data(cli,False,'1d')
+    mbody_7d = commons.get_market_data(cli,True,'7d') + commons.get_market_data(cli,False,'7d')
+    mbody = []
+    body_dict = defaultdict(dict)
+    #合并1d、7d数据到dict
+    for i in range(len(mbody_1d)):
+        body_dict[mbody_1d[i][0]]['1d'] = mbody_1d[i]
+    for i in range(len(mbody_7d)):
+        body_dict[mbody_7d[i][0]]['7d'] = mbody_7d[i]
+    #合并1d、7d数据到list
+    for key in body_dict:
+        if '1d' in body_dict[key] and '7d' in body_dict[key]:
+            mbody.append(body_dict[key]['1d']+body_dict[key]['7d'][2:])
+    #按最后一个字段降序排列
+    mbody.sort(key=lambda x: x[-1], reverse=True)
     print("redraw market table get market data end",cli.sort_key,cli.sort_reverse)
-    put_html(commons.make_market_html(pin.search,mbody))
+    #put_html(commons.make_market_html(pin.search,mbody))
+    put_html(commons.make_market_html(mbody))
     return
     if cli.sort_key == '交易':
         mbody.sort(key=lambda x: x[0], reverse=cli.sort_reverse)
