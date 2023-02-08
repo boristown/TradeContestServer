@@ -28,8 +28,11 @@ def redraw_market_header(cli):
         #         value='最近1天',
         #         )
         # ])
-        # cli.search = pin.search
-        # cli.selectBase = pin.selectBase
+        cli.search = pin.search
+        cli.selectBase = 'USDT'
+        cli.selectInterval = '1天'
+        cli.selectPeriod = '最近7天'
+        
     elif pin.switch_tab == '交易':
         put_row([
             put_select('selectInterval', 
