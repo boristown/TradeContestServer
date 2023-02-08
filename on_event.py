@@ -485,6 +485,7 @@ def update_buy_options(cli: client):
     quote,base = commons.split_quote_base(symbol)
     print('quote,base',quote,base)
     base_asset = user_account.get(base,0)
+
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
     if not pin.buy_price:
         pin.buy_price = 0
@@ -703,8 +704,18 @@ def update_long_options(cli: client):
     #排除手续费的base
     real_base_can_long = base_can_long * (1.0 - commons.fees_ratio)
 
+    if cli.long_price_perc != pin.long_price_perc:
+        if not pin.long_price_perc:
+            pin.long_price_perc = 0
+        #调整到100以内
+        if pin.long_price_perc > 100:
+            pin.long_price_perc = 100
+        cli.long_price_perc = pin.long_price_perc
+
+    pin.long_price = pin.symbol_price * (1 - cli.long_price_perc / 100)
+    
     #最大可交易quote
-    real_quote_can_exchange = real_base_can_long / pin.symbol_price
+    real_quote_can_exchange = real_base_can_long / pin.long_price
     
     #最大可动用quote
     quote_can_long = usdt_can_long / quote_price + quote_asset
@@ -713,15 +724,7 @@ def update_long_options(cli: client):
     real_quote_can_long = quote_can_long * (1.0 - commons.fees_ratio)
 
     #最大可交易base
-    real_base_can_exchange = real_quote_can_long * pin.symbol_price
-
-    if cli.long_price_perc != pin.long_price_perc:
-        if not pin.long_price_perc:
-            pin.long_price_perc = 0
-        #调整到100以内
-        if pin.long_price_perc > 100:
-            pin.long_price_perc = 100
-        cli.long_price_perc = pin.long_price_perc
+    real_base_can_exchange = real_quote_can_long * pin.long_price
 
     #改变买入数量占总资产百分比，重绘买入数量
     if cli.long_leverage != pin.long_leverage \
@@ -743,7 +746,7 @@ def update_long_options(cli: client):
             #实际买入的基准货币金额
             real_base_amount = cli.long_base_amount - pin.long_fee
             #计算quote_amount数量
-            cli.long_quote_amount = real_base_amount / pin.symbol_price 
+            cli.long_quote_amount = real_base_amount / pin.long_price 
             #调整到正确的范围
             cli.long_base_amount = max(0, min(base_can_long, cli.long_base_amount))
             cli.long_quote_amount = max(0, min(real_quote_can_exchange, cli.long_quote_amount))
@@ -756,7 +759,7 @@ def update_long_options(cli: client):
             pin.long_quote_amount = max(0, min(real_quote_can_exchange, pin.long_quote_amount))
             cli.long_quote_amount = pin.long_quote_amount
             #按照quote_amount数量计算base_amount数量
-            cli.long_base_amount = pin.long_quote_amount * pin.symbol_price
+            cli.long_base_amount = pin.long_quote_amount * pin.long_price
             #含手续费的base_amount数量
             real_base_amount = cli.long_base_amount / (1 - commons.fees_ratio)
             #手续费
@@ -782,7 +785,7 @@ def update_long_options(cli: client):
             #实际买入的基准货币金额
             real_base_amount = cli.long_base_amount - pin.long_fee
             #计算quote_amount数量
-            cli.long_quote_amount = real_base_amount / pin.symbol_price
+            cli.long_quote_amount = real_base_amount / pin.long_price
             #调整到正确范围
             cli.long_quote_amount = max(0, min(real_quote_can_exchange, cli.long_quote_amount))
             cli.long_leverage = max(0, min(commons.max_leverage_ratio , cli.long_leverage))
@@ -815,6 +818,16 @@ def update_short_options(cli: client):
     
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
 
+    if cli.short_price_perc != pin.short_price_perc:
+        if not pin.short_price_perc:
+            pin.short_price_perc = 0
+        #调整到100以内
+        if pin.short_price_perc < -100.0:
+            pin.short_price_perc = -100.0
+        cli.short_price_perc = pin.short_price_perc
+    
+    pin.short_price = pin.symbol_price * (1 + pin.short_price_perc / 100)
+
     #最大可动用base
     base_can_short = usdt_can_short / base_price + base_asset
 
@@ -822,7 +835,7 @@ def update_short_options(cli: client):
     real_base_can_short = base_can_short * (1.0 - commons.fees_ratio)
 
     #最大可交易quote
-    real_quote_can_exchange = real_base_can_short / pin.symbol_price
+    real_quote_can_exchange = real_base_can_short / pin.short_price
     
     #最大可动用quote
     quote_can_short = usdt_can_short / quote_price + quote_asset
@@ -831,16 +844,7 @@ def update_short_options(cli: client):
     real_quote_can_short = quote_can_short * (1.0 - commons.fees_ratio)
 
     #最大可交易base
-    real_base_can_exchange = real_quote_can_short * pin.symbol_price
-
-    if cli.short_price_perc != pin.short_price_perc:
-        if not pin.short_price_perc:
-            pin.short_price_perc = 0
-        #调整到100以内
-        if pin.short_price_perc < -100.0:
-            pin.short_price_perc = -100.0
-        cli.short_price_perc = pin.short_price_perc
-
+    real_base_can_exchange = real_quote_can_short * pin.short_price
     if cli.short_leverage != pin.short_leverage:
         if not pin.short_leverage:
             pin.short_leverage = 0
@@ -853,7 +857,7 @@ def update_short_options(cli: client):
         #实际卖出的quote数量
         real_quote_asset = cli.short_quote_amount - pin.sell_fee
         #计算base_amount数量
-        cli.short_base_amount = real_quote_asset * pin.symbol_price
+        cli.short_base_amount = real_quote_asset * pin.short_price
         #调整到正确范围
         cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
         cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
@@ -870,7 +874,7 @@ def update_short_options(cli: client):
         #实际卖出的基准货币金额
         real_base_amount = cli.short_base_amount - pin.short_fee
         #计算quote_amount数量
-        cli.short_quote_amount = real_base_amount / pin.symbol_price
+        cli.short_quote_amount = real_base_amount / pin.short_price
         #调整到正确范围
         cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
         cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
@@ -886,7 +890,7 @@ def update_short_options(cli: client):
         #实际卖出的quote数量
         real_quote_amount = cli.short_quote_amount - pin.short_fee
         #计算base_amount数量
-        cli.short_base_amount = real_quote_amount * pin.symbol_price
+        cli.short_base_amount = real_quote_amount * pin.short_price
         #调整到正确范围
         cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
         cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
