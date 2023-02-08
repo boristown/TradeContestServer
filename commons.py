@@ -161,9 +161,11 @@ def get_market_data(cli,usdt_on,period):
         symbolinfo[symbol]["Change1d"] = d1d["priceChangePercent"]
         symbolinfo[symbol]["Volume1d"] = d1d["quoteVolume"]
     data = []
+    ts10 = get_ts10()
+    btc_price = get_base_price('BTC',ts10) if not usdt_on else 1
     for symbol in symbolinfo:
         info = symbolinfo[symbol]
-        data.append([symbol,float(info["price"]),float(info["Volume1d"]),float(info["Change1d"])])
+        data.append([symbol,float(info["price"]),float(info["Volume1d"]) * btc_price,float(info["Change1d"])])
     data = [[d[0],d[1],d[2],d[3]] for d in data]
     return data
 
