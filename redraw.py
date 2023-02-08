@@ -308,10 +308,10 @@ def redraw_market_table(cli: client):
     print("redraw_market_table...",pin.switch_tab)
     if pin.switch_tab != '市场': return
     #selinterval = pin.selectInterval
-    selperiod = pin.selectPeriod
+    selperiod = '最近1天'
     #cli.interval=selinterval.replace('分钟','m').replace('小时','h').replace('天','d')
     cli.current_time = int(time.time() * 1000)
-    cli.period_s = selperiod.replace('最近','').replace('小时', 'h').replace('天', 'd').replace('月', 'M').replace('年', 'y')
+    cli.period_s = '1d'
     print("redraw market table update header begin")
     update_header(cli)
     print("redraw market table update header end")
