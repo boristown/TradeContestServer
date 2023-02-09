@@ -674,12 +674,14 @@ def update_sell_options(cli):
 
 
 def update_long_options(cli: client):
+    print("update_long_options")
     ts10 = commons.get_ts10()
     if not cli.user_key: return
     user_account = cli.user_account
     symbol = cli.symbol
     #print('cli.symbol',symbol)
     quote,base = commons.split_quote_base(symbol)
+    print("quote,base",quote,base)
 
     base_asset = user_account.get(base,0)
 
@@ -704,6 +706,7 @@ def update_long_options(cli: client):
     #排除手续费的base
     real_base_can_long = base_can_long * (1.0 - commons.fees_ratio)
 
+    print("update_long_options 2")
     if cli.long_price_perc != pin.long_price_perc:
         if not pin.long_price_perc:
             pin.long_price_perc = 0
