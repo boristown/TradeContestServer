@@ -16,7 +16,7 @@ from collections import defaultdict
 @use_scope('market_header', clear=True)
 def redraw_market_header(cli):
     if pin.switch_tab == '市场':
-        put_input('search', placeholder ='输入市场名:')
+        #put_input('search', placeholder ='输入市场名:')
         # put_row([
         #     put_select('selectBase', options=['USDT', 'BTC']),
         #     #默认值是最近1天
@@ -28,7 +28,7 @@ def redraw_market_header(cli):
         #         value='最近1天',
         #         )
         # ])
-        cli.search = pin.search
+        cli.search = ''
         cli.selectBase = 'USDT'
         cli.selectInterval = '1天'
         cli.selectPeriod = '最近7天'
@@ -100,18 +100,6 @@ def redraw_content(cli):
                     redraw_market_kline(cli)
                     cli.selectInterval = temp_selectInterval
                     cli.selectPeriod = temp_selectPeriod
-                #改变搜索框或者切换交易货币或者切换时间窗口或者改变排序字段，重绘市场列表
-                if cli.search != pin.search or \
-                    cli.selectBase != pin.selectBase or \
-                    cli.selectPeriod != pin.selectPeriod:
-                    temp_search = pin.search
-                    temp_selectBase = pin.selectBase
-                    temp_selectPeriod = pin.selectPeriod
-                    print('redraw market table')
-                    redraw_market_table(cli)
-                    cli.selectPeriod = temp_selectPeriod
-                    cli.search = temp_search
-                    cli.selectBase = temp_selectBase
                 print("trade_type", cli.trade_type)
                 if cli.trade_type == '买入':
                     on_event.update_buy_options(cli)
