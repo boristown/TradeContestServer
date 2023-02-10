@@ -366,8 +366,8 @@ def redraw_rank(cli):
     for i in range(len(rank_list)):
         row = rank_list[i]
         data.append([
-            UI.user_name_button(cli,row[4]),
-            row[0], 
+            row[4],
+            UI.user_name_button(cli,row[0]),
             row[1], 
             row[2], 
             row[3]

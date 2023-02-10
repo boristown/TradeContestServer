@@ -905,5 +905,6 @@ def update_short_options(cli: client):
     pin.short_quote_amount = cli.short_quote_amount
 
 def user_name_click(cli,usr):
+    print("user_name_click")
     with use_scope("user_name_click",clear=True):
-        put_success("用户名："+usr)
+        put_success("用户名："+str(usr))
