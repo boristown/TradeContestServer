@@ -903,3 +903,7 @@ def update_short_options(cli: client):
     pin.short_leverage = cli.short_leverage
     pin.short_base_amount = cli.short_base_amount
     pin.short_quote_amount = cli.short_quote_amount
+
+def user_name_click(cli,usr):
+    with use_scope("user_name_click",clear=True):
+        put_success("用户名："+usr)
