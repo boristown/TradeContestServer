@@ -48,7 +48,7 @@ async def handler():
     uri = 'wss://stream.binance.com:9443/ws/stream?streams=' + uri_prefix
     while True:
         #异步执行handle_socket(uri)
-        await handle_socket(uri)
+        await asyncio.gather(handle_socket(uri))
         # connections = set()
         # for filename in os.listdir('db/orders'):
         #     if filename.endswith('.txt'):
