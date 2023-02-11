@@ -440,7 +440,7 @@ def redraw_trade_options(cli: client):
     if cli.trade_type == '买入':
         UI.trade_options_row(
             put_text('订单类型'),
-            put_select([
+            put_select('buy_order_type',[
                 '市价单',
                 '限价单',
                 '趋势追踪单',
