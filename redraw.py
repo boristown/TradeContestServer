@@ -439,6 +439,15 @@ def redraw_trade_options(cli: client):
         ], onclick=lambda btn,cli=cli:trade_btn_click(btn,cli), small=True)
     if cli.trade_type == '买入':
         UI.trade_options_row(
+            put_text('订单类型'),
+            put_select([
+                '市价单',
+                '限价单',
+                '趋势追踪单',
+                '转向追踪单',
+            ]),
+        )
+        UI.trade_options_row(
             put_text('低于市场价'),UI.float_input('buy_price_perc'),put_text(" "+'%'))
         UI.trade_options_row(
             put_text('使用'),UI.float_input('buy_base_amount'),put_text(" "+base))

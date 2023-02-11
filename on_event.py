@@ -672,7 +672,6 @@ def update_sell_options(cli):
     pin.sell_base_amount = cli.sell_base_amount
     pin.sell_quote_amount = cli.sell_quote_amount
 
-
 def update_long_options(cli: client):
     print("update_long_options")
     ts10 = commons.get_ts10()
