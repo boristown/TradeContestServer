@@ -203,3 +203,4 @@ for sym in SYM_BTC:
     rep = spl[0]+spl[1]
     SYM_DICT[rep] = [sym, spl[0], spl[1]]
     SYM_DICT2[sym] = [rep, spl[0], spl[1]]
+    

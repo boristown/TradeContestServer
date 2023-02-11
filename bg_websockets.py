@@ -4,57 +4,59 @@ import json
 import datetime
 import os
 from collections import Counter
+import binanceAPI
 
 # connections = set()
 # connections.add('wss://stream.binance.com:9443/stream?streams=btcusdt@ticker')
 # connections.add('wss://stream.binance.com:9443/stream?streams=ethusdt@ticker')
 # connections.add('wss://stream.binance.com:9443/stream?streams=fisusdt@ticker')
 
+# Payload:
+# {
+#   "e": "trade",     // Event type
+#   "E": 123456789,   // Event time
+#   "s": "BNBBTC",    // Symbol
+#   "t": 12345,       // Trade ID
+#   "p": "0.001",     // Price
+#   "q": "100",       // Quantity
+#   "b": 88,          // Buyer order ID
+#   "a": 50,          // Seller order ID
+#   "T": 123456785,   // Trade time
+#   "m": true,        // Is the buyer the market maker?
+#   "M": true         // Ignore
+# }
+
 def timestamp2yyyymmddhhmmss(timestamp):
     return datetime.datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
 
-counter = Counter()
-counter2 = Counter()
-counter3 = Counter()
+# counter = Counter()
+# counter2 = Counter()
+# counter3 = Counter()
 
-async def handle_socket(uri, ):
-    #global counter
-    #global counter2
-    #global counter3
-    #counter[uri] += 1
-    #print(f"[1]Connecting to {uri} ({counter[uri]})")
-    async with websockets.connect(uri) as websocket:
+def solve(data):
+    #time symbol price quantity
+    print(f"{timestamp2yyyymmddhhmmss(data['T'])} {data['s']} {data['p']} {data['q']}")
 
-        #counter2[uri] += 1
-        #print(f"[2]Connecting to {uri} ({counter2[uri]})")
-
-        async for message in websocket:
-
-            #counter3[uri] += 1
-            #print(f"[3]Connecting to {uri} ({counter3[uri]})")
-
-            message = json.loads(message)
-            data = message["data"]
-    
-            #订单处理
-            for d in data:
-                print(f"{timestamp2yyyymmddhhmmss(d['E'])} {d['s']} {d['c']} USDT")
-
+async def handle_socket(pair, ):
+    uri = f'wss://stream.binance.com:9443/stream?streams={pair}@trade'
+    path = f'db/orders/{pair}.txt'
+    while True:
+        #检测是否有挂单
+        #扫描db/orders下的所有文件*.txt，如果有文件，文件名就是交易对的名称（例如，btcusdt.txt）
+        # 就表示该交易对下有挂单，就需要订阅该交易对的ticker
+        if os.path.exists(path):
+            async with websockets.connect(uri) as websocket:
+                async for message in websocket:
+                    message = json.loads(message)
+                    data = message['data']
+                    solve(data)
+        else:
+            #如果没有挂单，就不需要订阅该交易对的ticker
+            #等待一秒，再检测是否有挂单
+            await asyncio.sleep(1)
 
 async def handler():
-    #扫描db/orders下的所有文件*.txt，如果有文件，文件名就是交易对的名称（例如，btcusdt.txt）
-    # 就表示该交易对下有挂单，就需要订阅该交易对的ticker
-    uri_prefix = '!miniTicker@arr'
-    uri = 'wss://stream.binance.com:9443/ws/stream?streams=' + uri_prefix
-    while True:
-        #异步执行handle_socket(uri)
-        await asyncio.gather(handle_socket(uri))
-        # connections = set()
-        # for filename in os.listdir('db/orders'):
-        #     if filename.endswith('.txt'):
-        #         pair = filename[:-4].lower()
-        #         connections.add(f'wss://stream.binance.com:9443/stream?streams={pair}@miniTicker')
-        # await asyncio.gather(*[handle_socket(uri) for uri in connections])
-        print("Restarting Websockets...")
+    sym_list = [a for a in binanceAPI.SYM_DICT]
+    await asyncio.gather(*[handle_socket(pair) for pair in sym_list])
 
 asyncio.get_event_loop().run_until_complete(handler())
