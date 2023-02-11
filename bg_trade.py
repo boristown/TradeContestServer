@@ -21,16 +21,16 @@ async def handle_socket(uri, ):
     global counter2
     global counter3
     counter[uri] += 1
-    print(f"Connecting to {uri} ({counter[uri]})")
+    print(f"[1]Connecting to {uri} ({counter[uri]})")
     async with websockets.connect(uri) as websocket:
 
         counter2[uri] += 1
-        print(f"Connecting to {uri} ({counter2[uri]})")
+        print(f"[2]Connecting to {uri} ({counter2[uri]})")
 
         async for message in websocket:
 
             counter3[uri] += 1
-            print(f"Connecting to {uri} ({counter3[uri]})")
+            print(f"[3]Connecting to {uri} ({counter3[uri]})")
 
             message = json.loads(message)
             data = message["data"]
