@@ -444,7 +444,7 @@ def redraw_trade_options(cli: client):
                 '市价单',
                 '限价单',
                 '趋势追踪单',
-                '转向追踪单',
+                '追踪止损单',
             ]),
         )
         UI.trade_options_row(
