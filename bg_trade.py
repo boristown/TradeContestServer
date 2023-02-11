@@ -16,7 +16,7 @@ async def handle_socket(uri, ):
     async with websockets.connect(uri) as websocket:
         
         async for message in websocket:
-            message = json.loads(message)            
+            message = json.loads(message)
             data = message["data"]
 
             #输出：yyyymmddhhmmss 流名称 最新价格 USDT
