@@ -41,10 +41,12 @@ async def handle_socket(pair, ):
     uri = f'wss://stream.binance.com:9443/stream?streams={pair}@trade'
     path = f'db/orders/{pair}.txt'
     while True:
+        print(f'checking: {path}')
         #检测是否有挂单
         #扫描db/orders下的所有文件*.txt，如果有文件，文件名就是交易对的名称（例如，btcusdt.txt）
         # 就表示该交易对下有挂单，就需要订阅该交易对的ticker
         if os.path.exists(path):
+            print("Connecting to", uri)
             async with websockets.connect(uri) as websocket:
                 async for message in websocket:
                     message = json.loads(message)
@@ -57,6 +59,7 @@ async def handle_socket(pair, ):
 
 async def handler():
     sym_list = [a for a in binanceAPI.SYM_DICT]
+    print(sym_list)
     await asyncio.gather(*[handle_socket(pair) for pair in sym_list])
 
 asyncio.get_event_loop().run_until_complete(handler())
