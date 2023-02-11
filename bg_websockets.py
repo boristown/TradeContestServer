@@ -5,7 +5,6 @@ import datetime
 import os
 from collections import Counter
 
-
 # connections = set()
 # connections.add('wss://stream.binance.com:9443/stream?streams=btcusdt@ticker')
 # connections.add('wss://stream.binance.com:9443/stream?streams=ethusdt@ticker')
@@ -36,24 +35,26 @@ async def handle_socket(uri, ):
 
             message = json.loads(message)
             data = message["data"]
-
+    
             #订单处理
-            #todo 
+            for d in data:
+                print(f"{timestamp2yyyymmddhhmmss(d['E'])} {d['s']} {d['c']} USDT")
 
-            #输出：yyyymmddhhmmss 流名称 最新价格 USDT
-            print(f"{timestamp2yyyymmddhhmmss(data['E'])} {message['stream']} {data['c']} USDT")
-            
 
 async def handler():
     #扫描db/orders下的所有文件*.txt，如果有文件，文件名就是交易对的名称（例如，btcusdt.txt）
     # 就表示该交易对下有挂单，就需要订阅该交易对的ticker
+    uri_prefix = '!miniTicker@arr'
+    uri = 'wss://stream.binance.com:9443/ws/stream?streams=' + uri_prefix
     while True:
-        connections = set()
-        for filename in os.listdir('db/orders'):
-            if filename.endswith('.txt'):
-                pair = filename[:-4]
-                connections.add(f'wss://stream.binance.com:9443/stream?streams={pair}@ticker')
-        await asyncio.gather(*[handle_socket(uri) for uri in connections])
+        #异步执行handle_socket(uri)
+        await handle_socket(uri)
+        # connections = set()
+        # for filename in os.listdir('db/orders'):
+        #     if filename.endswith('.txt'):
+        #         pair = filename[:-4].lower()
+        #         connections.add(f'wss://stream.binance.com:9443/stream?streams={pair}@miniTicker')
+        # await asyncio.gather(*[handle_socket(uri) for uri in connections])
         print("Restarting Websockets...")
 
 asyncio.get_event_loop().run_until_complete(handler())
