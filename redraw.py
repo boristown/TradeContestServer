@@ -446,6 +446,7 @@ def redraw_trade_options(cli: client):
                 '趋势追踪单',
                 '追踪止损单',
             ]),
+            None
         )
         UI.trade_options_row(
             put_text('低于市场价'),UI.float_input('buy_price_perc'),put_text(" "+'%'))

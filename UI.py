@@ -6,7 +6,7 @@ import on_event
 
 #交易选项行
 #三列布局：30% auto 30%
-def trade_options_row(left,middle,right):
+def trade_options_row(left,middle,right=None):
     return pywebio.output.put_row(
         [
             left,
