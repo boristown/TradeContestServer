@@ -23,7 +23,8 @@ async def handle_socket(uri, ):
             print(f"24h HIGH: {data['h']}")
             print("\n------\n")
 async def handler():
-    await asyncio.wait(handle_socket(connections[0]))
+    await asyncio.gather(*[handle_socket(uri) for uri in connections])
+    #await asyncio.wait(handle_socket(connections[0]))
     #await asyncio.wait([handle_socket(uri) for uri in connections])
 
 asyncio.get_event_loop().run_until_complete(handler())
