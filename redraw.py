@@ -470,6 +470,16 @@ def redraw_trade_options(cli: client):
         UI.trade_conf_button(cli)
     elif cli.trade_type == '卖出':
         UI.trade_options_row(
+            put_text('订单类型'),
+            put_select('sell_order_type',[
+                '市价单',
+                '限价单',
+                '趋势追踪单',
+                '追踪止损单',
+            ]),
+            None
+        )
+        UI.trade_options_row(
             put_text('高于市场价'),UI.float_input('sell_price_perc'),put_text(" "+'%'))
         UI.trade_options_row(
             put_text('卖出'),UI.float_input('sell_quote_amount'),put_text(" "+quote))
@@ -489,6 +499,16 @@ def redraw_trade_options(cli: client):
             put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '做多':
+        UI.trade_options_row(
+            put_text('订单类型'),
+            put_select('long_order_type',[
+                '市价单',
+                '限价单',
+                '趋势追踪单',
+                '追踪止损单',
+            ]),
+            None
+        )
         UI.trade_options_row(
             put_text('低于市场价'),UI.float_input('long_price_perc'),put_text(' %'))
         UI.trade_options_row(
@@ -510,6 +530,16 @@ def redraw_trade_options(cli: client):
             put_text(" "+base))
         UI.trade_conf_button(cli)
     elif cli.trade_type == '做空':
+        UI.trade_options_row(
+            put_text('订单类型'),
+            put_select('short_order_type',[
+                '市价单',
+                '限价单',
+                '趋势追踪单',
+                '追踪止损单',
+            ]),
+            None
+        )
         UI.trade_options_row(
             put_text('高于市场价'),UI.float_input('short_price_perc'),put_text(' %'))
         UI.trade_options_row(
