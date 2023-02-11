@@ -55,7 +55,7 @@ async def handle_socket(pair, ):
         else:
             #如果没有挂单，就不需要订阅该交易对的ticker
             #等待一秒，再检测是否有挂单
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
 
 async def handler():
     sym_list = [a for a in binanceAPI.SYM_DICT]
