@@ -38,6 +38,7 @@ def solve(data):
     print(f"{timestamp2yyyymmddhhmmss(data['T'])} {data['s']} {data['p']} {data['q']}")
 
 async def handle_socket(pair, ):
+    pair = pair.lower()
     uri = f'wss://stream.binance.com:9443/stream?streams={pair}@trade'
     path = f'db/orders/{pair}.txt'
     while True:
