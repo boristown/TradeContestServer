@@ -12,6 +12,8 @@ from collections import defaultdict
 from pywebio.platform.fastapi import webio_routes
 import pywebio_app as myapp
 import pywebio.session
+import websockets
+import order
 
 app = FastAPI()
 
@@ -148,6 +150,15 @@ async def acme(s):
         print(s)
         return s
 
+#定义全局活动订单对象，维护open状态的订单
+#第一维度：symbol
+#第二维度：user_id
+#第三维度：order_id
+global_orders = defaultdict(lambda:defaultdict(list))
+
+#初始化全局活动订单对象
+order.init_orders(global_orders)
+
 def pywebio_task():
     pywebio.session.run_js('WebIO._state.CurrentSession.on_session_close(()=>{setTimeout(()=>location.reload(), 4000})')
     myapp.pywebio_run()
@@ -155,6 +166,9 @@ def pywebio_task():
 # `pywebio_task` is PyWebIO task function
 app.mount("/", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
+
+#开启websocket监听
+websockets.start_listening(global_orders)
 
 # 运行指令：
 '''

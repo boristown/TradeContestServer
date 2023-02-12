@@ -13,3 +13,7 @@ def make_order(ts, symbol, side, type, price, amount, currency,target_amount, ta
             'fee': fee,
             'status': status,
             }
+
+#初始化全局活动订单对象
+def init_orders(global_orders):
+    pass
