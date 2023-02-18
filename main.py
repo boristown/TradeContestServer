@@ -12,7 +12,7 @@ from collections import defaultdict
 from pywebio.platform.fastapi import webio_routes
 import pywebio_app as myapp
 import pywebio.session
-#import websockets
+import my_websockets
 import order
 
 app = FastAPI()
@@ -168,7 +168,7 @@ app.mount("/", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
 
 #开启websocket监听
-#websockets.start_listening(global_orders)
+#my_websockets.start_listening(global_orders)
 
 # 运行指令：
 '''

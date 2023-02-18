@@ -1,5 +1,5 @@
 import asyncio
-import websockets
+import my_websockets
 import json
 import datetime
 import os
@@ -171,7 +171,7 @@ async def handle_socket(pair, global_orders_pair):
         # 就表示该交易对下有挂单，就需要订阅该交易对的ticker
         if os.path.exists(path):
             print(f"Connecting to {uri}")
-            async with websockets.connect(uri) as websocket:
+            async with my_websockets.connect(uri) as websocket:
                 async for message in websocket:
                     message = json.loads(message)
                     data = message['data']
