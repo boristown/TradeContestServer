@@ -12,7 +12,7 @@ from collections import defaultdict
 from pywebio.platform.fastapi import webio_routes
 import pywebio_app as myapp
 import pywebio.session
-import websockets
+#import websockets
 import order
 
 app = FastAPI()
