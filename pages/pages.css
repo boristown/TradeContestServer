@@ -1,0 +1,12 @@
+/* 全部内容居中显示
+h1标题字体大小xxx-large
+h2标题字体大小xx-large */
+* {
+    text-align: center;
+}
+h1 {
+    font-size: xxx-large;
+}
+h2 {
+    font-size: xx-large;
+}
