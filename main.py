@@ -170,7 +170,8 @@ def pywebio_task():
     myapp.pywebio_run()
     
 # `pywebio_task` is PyWebIO task function
-app.mount("/home", FastAPI(routes=webio_routes(pywebio_task),debug=True))
+#取消PyWebIO入口
+# app.mount("/home", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
 
 #开启websocket监听
