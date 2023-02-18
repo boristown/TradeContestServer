@@ -495,7 +495,7 @@ def update_buy_options(cli: client):
     #实际可用基准货币资产余额
     aval_base_asset = base_asset - tot_fee
     #print('cli.buy_price_perc',pin.buy_price)
-    if cli.buy_price_perc != pin.buy_price_perc:
+    if cli.buy_price_perc != pin.buy_price_perc and pin.buy_price_perc != '':
         if not pin.buy_price_perc:
             pin.buy_price_perc = 0
         #调整到100以内
@@ -512,10 +512,10 @@ def update_buy_options(cli: client):
         or cli.buy_quote_amount != pin.buy_quote_amount:
         #分情况讨论
         #1. 百分比修改，无论数量是否修改，都按照百分比计算
-        if cli.buy_amount_perc != pin.buy_amount_perc:
+        if cli.buy_amount_perc != pin.buy_amount_perc and pin.buy_amount_perc != '':
             #空置为0
-            if not pin.buy_amount_perc:
-                pin.buy_amount_perc = 0
+            if not pin.buy_amount_perc: return
+            #    pin.buy_amount_perc = 0
             #调整到0~100之间
             pin.buy_amount_perc = max(0, min(100, pin.buy_amount_perc))
             cli.buy_amount_perc = pin.buy_amount_perc
@@ -531,10 +531,10 @@ def update_buy_options(cli: client):
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_quote_amount = max(0, min(quote_can_buy, cli.buy_quote_amount))
         #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
-        elif cli.buy_quote_amount != pin.buy_quote_amount:
+        elif cli.buy_quote_amount != pin.buy_quote_amount and pin.buy_quote_amount != '':
             #空置为0
-            if not pin.buy_quote_amount:
-                pin.buy_quote_amount = 0
+            if not pin.buy_quote_amount: return
+            #    pin.buy_quote_amount = 0
             #调整到0~最大能买入的数量之间
             pin.buy_quote_amount = max(0, min(quote_can_buy, pin.buy_quote_amount))
             cli.buy_quote_amount = pin.buy_quote_amount
@@ -551,10 +551,10 @@ def update_buy_options(cli: client):
             cli.buy_base_amount = max(0, min(base_asset, cli.buy_base_amount))
             cli.buy_amount_perc = max(0, min(100, cli.buy_amount_perc))
         #3. 百分比未修改，quote_amount数量也未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
-        elif cli.buy_base_amount != pin.buy_base_amount:
+        elif cli.buy_base_amount != pin.buy_base_amount and pin.buy_base_amount != '':
             #空置为0
-            if not pin.buy_base_amount:
-                pin.buy_base_amount = 0
+            if not pin.buy_base_amount: return
+            #    pin.buy_base_amount = 0
             #调整到0~最大能买入的数量之间
             pin.buy_base_amount = max(0, min(base_asset, pin.buy_base_amount))
             cli.buy_base_amount = pin.buy_base_amount
@@ -594,7 +594,7 @@ def update_sell_options(cli):
     #最大能卖出的金额
     base_can_sell = real_quote_asset * pin.sell_price
     #print('base_can_sell',base_can_sell)
-    if cli.sell_price_perc != pin.sell_price_perc:
+    if cli.sell_price_perc != pin.sell_price_perc and pin.sell_price_perc != '':
         if not pin.sell_price_perc:
             pin.sell_price_perc = 0
         #调整到100以内
@@ -604,11 +604,11 @@ def update_sell_options(cli):
     pin.sell_price = pin.symbol_price * (1 + pin.sell_price_perc / 100)
     #改变卖出数量占总资产百分比，重绘卖出界面
     #1. 百分比修改，按照百分比计算base_amount数量和quote_amount数量
-    if cli.sell_amount_perc != pin.sell_amount_perc:
+    if cli.sell_amount_perc != pin.sell_amount_perc and pin.sell_amount_perc != '':
         #print('百分比修改，按照百分比计算base_amount数量和quote_amount数量')
         #空置为0
-        if not pin.sell_amount_perc:
-            pin.sell_amount_perc = 0
+        if not pin.sell_amount_perc: return 
+        #    pin.sell_amount_perc = 0
         #调整到0~100之间
         pin.sell_amount_perc = max(0, min(100, pin.sell_amount_perc))
         cli.sell_amount_perc = pin.sell_amount_perc
@@ -624,11 +624,11 @@ def update_sell_options(cli):
         cli.sell_quote_amount = max(0, min(quote_asset, cli.sell_quote_amount))
         cli.sell_base_amount = max(0, min(base_can_sell, cli.sell_base_amount))
     #2. 百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
-    elif cli.sell_base_amount != pin.sell_base_amount:
+    elif cli.sell_base_amount != pin.sell_base_amount and pin.sell_base_amount != '':
         #print('百分比未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量')
         #空置为0
-        if not pin.sell_base_amount:
-            pin.sell_base_amount = 0
+        if not pin.sell_base_amount: return
+        #    pin.sell_base_amount = 0
         #调整到0~最大能卖出的数量之间
         pin.sell_base_amount = max(0, min(base_can_sell, pin.sell_base_amount))
         cli.sell_base_amount = pin.sell_base_amount
@@ -645,11 +645,11 @@ def update_sell_options(cli):
         cli.sell_quote_amount = max(0, min(quote_asset, cli.sell_quote_amount))
         cli.sell_amount_perc = max(0, min(100, cli.sell_amount_perc))
     #3. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
-    elif cli.sell_quote_amount != pin.sell_quote_amount:
+    elif cli.sell_quote_amount != pin.sell_quote_amount and pin.sell_quote_amount != '':
         #print('百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量')
         #空置为0
-        if not pin.sell_quote_amount:
-            pin.sell_quote_amount = 0
+        if not pin.sell_quote_amount: return
+        #    pin.sell_quote_amount = 0
         #调整到0~最大能卖出的数量之间
         pin.sell_quote_amount = max(0, min(quote_asset, pin.sell_quote_amount))
         cli.sell_quote_amount = pin.sell_quote_amount
@@ -706,7 +706,7 @@ def update_long_options(cli: client):
     real_base_can_long = base_can_long * (1.0 - commons.fees_ratio)
 
     print("update_long_options 2")
-    if cli.long_price_perc != pin.long_price_perc:
+    if cli.long_price_perc != pin.long_price_perc and pin.long_price_perc != '':
         if not pin.long_price_perc:
             pin.long_price_perc = 0
         #调整到100以内
@@ -734,10 +734,10 @@ def update_long_options(cli: client):
         or cli.long_quote_amount != pin.long_quote_amount:
         #分情况讨论
         #1. 百分比修改，无论数量是否修改，都按照百分比计算
-        if cli.long_leverage != pin.long_leverage:
+        if cli.long_leverage != pin.long_leverage and pin.long_leverage != '':
             #空置为0
-            if not pin.long_leverage:
-                pin.long_leverage = 0
+            if not pin.long_leverage: return
+            #    pin.long_leverage = 0
             #调整到0~max_leverage_ratio之间
             pin.long_leverage = max(0, min(commons.max_leverage_ratio, pin.long_leverage))
             cli.long_leverage = pin.long_leverage
@@ -753,10 +753,10 @@ def update_long_options(cli: client):
             cli.long_base_amount = max(0, min(base_can_long, cli.long_base_amount))
             cli.long_quote_amount = max(0, min(real_quote_can_exchange, cli.long_quote_amount))
         #2. 百分比未修改，quote_amount数量修改，按照quote_amount数量计算百分比和base_amount数量
-        elif cli.long_quote_amount != pin.long_quote_amount:
+        elif cli.long_quote_amount != pin.long_quote_amount and pin.long_quote_amount != '':
             #空置为0
-            if not pin.long_quote_amount:
-                pin.long_quote_amount = 0
+            if not pin.long_quote_amount: return
+            #     pin.long_quote_amount = 0
             #调整到0~最大能买入的数量之间
             pin.long_quote_amount = max(0, min(real_quote_can_exchange, pin.long_quote_amount))
             cli.long_quote_amount = pin.long_quote_amount
@@ -773,10 +773,10 @@ def update_long_options(cli: client):
             cli.long_base_amount = max(0, min(base_can_long, cli.long_base_amount))
             cli.long_leverage = max(0, min(commons.max_leverage_ratio , cli.long_leverage))
         #3. 百分比未修改，quote_amount数量也未修改，base_amount数量修改，按照base_amount数量计算百分比和quote_amount数量
-        elif cli.long_base_amount != pin.long_base_amount:
+        elif cli.long_base_amount != pin.long_base_amount and pin.long_base_amount != '':
             #空置为0
-            if not pin.long_base_amount:
-                pin.long_base_amount = 0
+            if not pin.long_base_amount: return
+            #     pin.long_base_amount = 0
             #调整到0~最大能买入的数量之间
             pin.long_base_amount = max(0, min(base_can_long, pin.long_base_amount))
             cli.long_base_amount = pin.long_base_amount
@@ -820,9 +820,9 @@ def update_short_options(cli: client):
     
     pin.symbol_price = commons.get_price_symbol(symbol, ts10)
 
-    if cli.short_price_perc != pin.short_price_perc:
-        if not pin.short_price_perc:
-            pin.short_price_perc = 0
+    if cli.short_price_perc != pin.short_price_perc and pin.short_price_perc != '':
+        #if not pin.short_price_perc:
+            #pin.short_price_perc = 0
         #调整到100以内
         if pin.short_price_perc < -100.0:
             pin.short_price_perc = -100.0
@@ -847,9 +847,9 @@ def update_short_options(cli: client):
 
     #最大可交易base
     real_base_can_exchange = real_quote_can_short * pin.short_price
-    if cli.short_leverage != pin.short_leverage:
-        if not pin.short_leverage:
-            pin.short_leverage = 0
+    if cli.short_leverage != pin.short_leverage and pin.short_leverage != '':
+        if not pin.short_leverage: return
+        #     pin.short_leverage = 0
         pin.short_leverage = max(0, min(commons.max_leverage_ratio,pin.short_leverage))
         cli.short_leverage = pin.short_leverage
         #计算卖出的资产数量
@@ -864,9 +864,9 @@ def update_short_options(cli: client):
         cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
         cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
 
-    elif cli.short_base_amount != pin.short_base_amount:
-        if not pin.short_base_amount:
-            pin.short_base_amount = 0
+    elif cli.short_base_amount != pin.short_base_amount and pin.short_base_amount != '':
+        if not pin.short_base_amount: return
+        #     pin.short_base_amount = 0
         pin.short_base_amount = max(0, min(base_can_short, pin.short_base_amount))
         cli.short_base_amount = pin.short_base_amount
         #计算卖出的百分比
@@ -880,9 +880,9 @@ def update_short_options(cli: client):
         #调整到正确范围
         cli.short_quote_amount = max(0, min(quote_can_short, cli.short_quote_amount))
         cli.short_base_amount = max(0, min(real_base_can_exchange, cli.short_base_amount))
-    elif cli.short_quote_amount != pin.short_quote_amount:
-        if not pin.short_quote_amount:
-            pin.short_quote_amount = 0
+    elif cli.short_quote_amount != pin.short_quote_amount and pin.short_quote_amount != '':
+        if not pin.short_quote_amount: return
+        #     pin.short_quote_amount = 0
         pin.short_quote_amount = max(0, min(quote_can_short, pin.short_quote_amount))
         cli.short_quote_amount = pin.short_quote_amount
         #计算卖出的百分比
