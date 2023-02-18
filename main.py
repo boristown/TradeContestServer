@@ -159,7 +159,7 @@ async def index():
 #当访问*.html时，链接到pages/*.html
 #如果该页面不存在，则链接到pages/404.html
 @app.get("/{page}.html", response_class=HTMLResponse)
-async def page(page):
+async def page_html(page):
     filename = 'pages/' + page + '.html'
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -167,6 +167,16 @@ async def page(page):
     else:
         with open('pages/404.html', 'r', encoding='utf-8') as f:
             return f.read()
+
+#当访问*.css时，链接到pages/*.css
+@app.get("/{page}.css", response_class=PlainTextResponse)
+async def page_css(page):
+    filename = 'pages/' + page + '.css'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return ''
 
 #定义全局活动订单对象，维护open状态的订单
 #第一维度：symbol
