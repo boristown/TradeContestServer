@@ -168,7 +168,7 @@ app.mount("/", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
 
 #开启websocket监听
-websockets.start_listening(global_orders)
+#websockets.start_listening(global_orders)
 
 # 运行指令：
 '''
