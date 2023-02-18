@@ -150,6 +150,12 @@ async def acme(s):
         print(s)
         return s
 
+#链接到index.html
+@app.get("/", response_class=HTMLResponse)
+async def index():
+    with open('pages/index.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
 #定义全局活动订单对象，维护open状态的订单
 #第一维度：symbol
 #第二维度：user_id
@@ -164,7 +170,7 @@ def pywebio_task():
     myapp.pywebio_run()
     
 # `pywebio_task` is PyWebIO task function
-app.mount("/", FastAPI(routes=webio_routes(pywebio_task),debug=True))
+app.mount("/home", FastAPI(routes=webio_routes(pywebio_task),debug=True))
 
 
 #开启websocket监听
