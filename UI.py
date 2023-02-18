@@ -19,7 +19,7 @@ def trade_options_row(left,middle,right=None):
 #检测UI输入是否改变
 def chain_changed(cli,changed,chain):
     for var in chain:
-        if getattr(cli,var) != pywebio.pin.pin[var]:
+        if getattr(cli,var) != pywebio.pin.pin[var] and pywebio.pin.pin[var] != "":
             changed[var] = pywebio.pin.pin[var]
 
 #默认零值的浮点数输入框
