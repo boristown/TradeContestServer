@@ -1,6 +1,6 @@
 /* 全部内容居中显示
-h1标题字体大小xxx-large
-h2标题字体大小xx-large */
+h1标题字体大小100px
+h2标题字体大小80px */
 * {
     text-align: center;
 }
