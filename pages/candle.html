@@ -7,16 +7,18 @@
     用js生成数据，用canvas绘制图表
 -->
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>市场：FIL/USDT</title>
-        <link rel="stylesheet" href="pages.css">
-    </head>
-    <body>
-        <h2>市场：FIL/USDT</h2>
-        <canvas id="candleCanvas"  width="1200" height="1200" style="border:1px solid #000000;">
-        </canvas>
-        <!-- 
+
+<head>
+    <meta charset="utf-8">
+    <title>市场：FIL/USDT</title>
+    <link rel="stylesheet" href="pages.css">
+</head>
+
+<body>
+    <h2>市场：FIL/USDT</h2>
+    <canvas id="candleCanvas" width="1200" height="1200" style="border:1px solid #000000;">
+    </canvas>
+    <!-- 
             生成31组随机的价格数据，
             每组包含时间、开盘价、收盘价、最高价、最低价、成交量
             注意生成的数据应该是按时间顺序排列的，相邻两组数据的价格波动不要超过30%，影线不要超过10%
@@ -32,45 +34,87 @@
             在k线图的左侧，显示价格刻度，并显示最高价和最低价
             在k线图的底部，显示时间刻度，并显示开始时间和结束时间
         -->
-        <script>
-            var data = [];
-            var date = new Date(2023, 0, 1);
-            var start_price = 21123.45;
-            var max_range = 0.3;
-            var max_range2 = 0.1;
-            for (var i = 0; i < 31; i++) {
-                var open = start_price;
-                var close = open * (1 + (Math.random() - 0.5) * max_range);
-                var high = Math.max(open, close) * (1 + Math.random() * max_range2);
-                var low = Math.min(open, close) * (1 - Math.random() * max_range2);
-                var volume = Math.random() * 100000;
-                //数据保留两位小数
-                data.push({
-                    date: date.toLocaleDateString(),
-                    open: open.toFixed(2),
-                    close: close.toFixed(2),
-                    high: high.toFixed(2),
-                    low: low.toFixed(2),
-                    volume: volume.toFixed(2)
-                });
-                date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-                start_price = close;
+    <script>
+        var data = [];
+        var date = new Date(2023, 0, 1);
+        var start_price = 21123.45;
+        var max_range = 0.3;
+        var max_range2 = 0.1;
+        for (var i = 0; i < 31; i++) {
+            var open = start_price;
+            var close = open * (1 + (Math.random() - 0.5) * max_range);
+            var high = Math.max(open, close) * (1 + Math.random() * max_range2);
+            var low = Math.min(open, close) * (1 - Math.random() * max_range2);
+            var volume = Math.random() * 100000;
+            //数据保留两位小数
+            data.push({
+                date: date.toLocaleDateString(),
+                open: open.toFixed(2),
+                close: close.toFixed(2),
+                high: high.toFixed(2),
+                low: low.toFixed(2),
+                volume: volume.toFixed(2)
+            });
+            date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+            start_price = close;
+        }
+        var canvas = document.getElementById("candleCanvas");
+        var ctx = canvas.getContext("2d");
+        var width = canvas.width;
+        var height = canvas.height;
+        var padding = 50;
+        var barWidth = 20;
+        var barGap = 5;
+        var barWidth = (width - 2 * padding) / data.length;
+        var max = 0;
+        var min = 100000;
+        for (var i = 0; i < data.length; i++) {
+            max = Math.max(max, data[i].high);
+            min = Math.min(min, data[i].low);
+        }
+        var k = (height - 2 * padding) / (max - min);
+        draw();
+
+        //当鼠标悬浮在某条K线附近时（距离3px以内），显示一个悬浮框
+        //该悬浮窗可以跟随鼠标移动
+        //注意当悬浮窗移动的时候，要先重绘图表，再绘制悬浮窗
+        // 在悬浮框中显示鼠标所在K线的开盘价、收盘价、最高价、最低价、成交量
+        //当鼠标移走时，悬浮矩形框消失
+        canvas.onmousemove = function (e) {
+            draw();
+            var x = e.offsetX;
+            var y = e.offsetY;
+            var index = Math.floor((x - padding) / (barWidth + barGap));
+            if (index >= 0 && index < data.length) {
+                var left = padding + index * (barWidth + barGap);
+                var top = height - padding - (data[index].high - min) * k;
+                var right = left + barWidth;
+                var bottom = height - padding - (data[index].low - min) * k;
+                if (x >= left && x <= right && y >= top && y <= bottom) {
+                    ctx.beginPath();
+                    ctx.fillStyle = "rgba(0,0,0,0.5)";
+                    ctx.fillRect(x + 10, y + 10, 200, 170);
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.font = "20px Arial";
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "left";
+                    ctx.fillText("开盘价：" + data[index].open, x + 20, y + 40);
+                    ctx.fillText("收盘价：" + data[index].close, x + 20, y + 70);
+                    ctx.fillText("最高价：" + data[index].high, x + 20, y + 100);
+                    ctx.fillText("最低价：" + data[index].low, x + 20, y + 130);
+                    ctx.fillText("成交量：" + data[index].volume, x + 20, y + 160);
+                    ctx.closePath();
+                }
             }
-            var canvas = document.getElementById("candleCanvas");
-            var ctx = canvas.getContext("2d");
-            var width = canvas.width;
-            var height = canvas.height;
-            var padding = 50;
-            var barWidth = (width - 2 * padding) / data.length;
-            var max = 0;
-            var min = 100000;
-            for (var i = 0; i < data.length; i++) {
-                max = Math.max(max, data[i].high);
-                min = Math.min(min, data[i].low);
-            }
-            var k = (height - 2 * padding) / (max - min);
-            var barWidth = 20;
-            var barGap = 5;
+        }
+        canvas.onmouseout = function () {
+            ctx.clearRect(0, 0, width, height);
+            draw();
+        }
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.setLineDash([0]);
             for (var i = 0; i < data.length; i++) {
                 var x = padding + i * (barWidth + barGap);
                 var y = height - padding - (data[i].close - min) * k;
@@ -95,7 +139,7 @@
             // 文字的位置应该在虚线的上方，与图表右侧的间距为10px
             ctx.beginPath();
             ctx.moveTo(padding, height - padding - (data[data.length - 1].close - min) * k);
-            ctx.lineTo(width - padding, height - padding - (data[data.length - 1].close - min) * k);
+            ctx.lineTo(width + padding * 2, height - padding - (data[data.length - 1].close - min) * k);
             ctx.strokeStyle = "black";
             ctx.setLineDash([5, 5]);
             ctx.stroke();
@@ -104,7 +148,7 @@
             ctx.font = "20px Arial";
             ctx.fillStyle = "black";
             ctx.textAlign = "right";
-            ctx.fillText(data[data.length - 1].close, width - padding - 10, height - padding - (data[data.length - 1].close - min) * k - 10);
+            ctx.fillText(data[data.length - 1].close, width + padding - 10, height - padding - (data[data.length - 1].close - min) * k - 10);
             ctx.closePath();
             //图表的左下角显示开始日期
             ctx.beginPath();
@@ -148,6 +192,8 @@
             ctx.textAlign = "left";
             ctx.fillText(minLow, padding + minLowIndex * (barWidth + barGap), height - padding - (minLow - min) * k + 30);
             ctx.closePath();
-        </script>
-    </body>
+        }
+    </script>
+</body>
+
 </html>
