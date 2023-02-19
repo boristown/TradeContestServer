@@ -1,7 +1,7 @@
 <!-- 
     K线图页面 
     用canvas绘制一张K线图
-    市场名：BTCUSDT
+    市场名：FILUSDT
     时间粒度：1天
     数据随机生成：时间、开盘价、收盘价、最高价、最低价
     用js生成数据，用canvas绘制图表
@@ -9,17 +9,18 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>市场：BTC/USDT</title>
+        <title>市场：FIL/USDT</title>
         <link rel="stylesheet" href="pages.css">
     </head>
     <body>
-        <h2>市场：BTC/USDT</h2>
-        <canvas id="candleCanvas"  width="1000" height="1000" style="border:1px solid #000000;">
+        <h2>市场：FIL/USDT</h2>
+        <canvas id="candleCanvas"  width="1200" height="1200" style="border:1px solid #000000;">
         </canvas>
         <!-- 
             生成31组随机的价格数据，
             每组包含时间、开盘价、收盘价、最高价、最低价、成交量
-            注意生成的数据应该是按时间顺序排列的，相邻两组数据的价格波动不要超过20%
+            注意生成的数据应该是按时间顺序排列的，相邻两组数据的价格波动不要超过30%，影线不要超过10%
+            注意后一条K线的开盘价应该等于前一条K线的收盘价
             每组数据的上涨或者下跌应该是随机的
             开始时间：2023-01-01
             结束时间：2023-01-31
@@ -28,25 +29,29 @@
             每条K线的颜色由收盘价决定，收盘价高于开盘价为绿色，收盘价低于开盘价为红色
             每条K线的上下影线由最高价和最低价决定
             上下影线的宽度为2px，位于K线中间（与K线颜色一致）
+            在k线图的左侧，显示价格刻度，并显示最高价和最低价
+            在k线图的底部，显示时间刻度，并显示开始时间和结束时间
         -->
         <script>
             var data = [];
             var date = new Date(2023, 0, 1);
             var start_price = 21123.45;
-            var max_range = 0.2;
+            var max_range = 0.3;
+            var max_range2 = 0.1;
             for (var i = 0; i < 31; i++) {
-                var open = start_price * (1 + (Math.random() - 0.5) * max_range);
+                var open = start_price;
                 var close = open * (1 + (Math.random() - 0.5) * max_range);
-                var high = Math.max(open, close) * (1 + Math.random() * max_range);
-                var low = Math.min(open, close) * (1 - Math.random() * max_range);
+                var high = Math.max(open, close) * (1 + Math.random() * max_range2);
+                var low = Math.min(open, close) * (1 - Math.random() * max_range2);
                 var volume = Math.random() * 100000;
+                //数据保留两位小数
                 data.push({
-                    date: date,
-                    open: open,
-                    close: close,
-                    high: high,
-                    low: low,
-                    volume: volume
+                    date: date.toLocaleDateString(),
+                    open: open.toFixed(2),
+                    close: close.toFixed(2),
+                    high: high.toFixed(2),
+                    low: low.toFixed(2),
+                    volume: volume.toFixed(2)
                 });
                 date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
                 start_price = close;
@@ -73,7 +78,7 @@
                 var w = barWidth;
                 ctx.beginPath();
                 ctx.rect(x, y, w, h);
-                var color = data[i].close > data[i].open ? "green" : "red";
+                var color = data[i].close > data[i].open ? "black" : "red";
                 ctx.fillStyle = color;
                 ctx.fill();
                 ctx.closePath();
@@ -85,6 +90,64 @@
                 ctx.stroke();
                 ctx.closePath();
             }
+            // 显示一条横跨图表的黑色的虚线，代表最后一个收盘价
+            // 并在右侧用数字显示最后一个收盘价
+            // 文字的位置应该在虚线的上方，与图表右侧的间距为10px
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding - (data[data.length - 1].close - min) * k);
+            ctx.lineTo(width - padding, height - padding - (data[data.length - 1].close - min) * k);
+            ctx.strokeStyle = "black";
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.beginPath();
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "right";
+            ctx.fillText(data[data.length - 1].close, width - padding - 10, height - padding - (data[data.length - 1].close - min) * k - 10);
+            ctx.closePath();
+            //图表的左下角显示开始日期
+            ctx.beginPath();
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "left";
+            ctx.fillText(data[0].date, padding, height - padding + 30);
+            ctx.closePath();
+            //图表的右下角显示结束日期
+            ctx.beginPath();
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "right";
+            ctx.fillText(data[data.length - 1].date, width - padding, height - padding + 30);
+            ctx.closePath();
+            //在最高价的上影线的上方用数字输出最高价
+            //在最低价的下影线的下方用数字输出最低价
+            var maxHigh = 0;
+            var maxHighIndex = 0;
+            var minLow = 100000;
+            var minLowIndex = 0;
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].high > maxHigh) {
+                    maxHigh = data[i].high;
+                    maxHighIndex = i;
+                }
+                if (data[i].low < minLow) {
+                    minLow = data[i].low;
+                    minLowIndex = i;
+                }
+            }
+            ctx.beginPath();
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "left";
+            ctx.fillText(maxHigh, padding + maxHighIndex * (barWidth + barGap), height - padding - (maxHigh - min) * k - 10);
+            ctx.closePath();
+            ctx.beginPath();
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "left";
+            ctx.fillText(minLow, padding + minLowIndex * (barWidth + barGap), height - padding - (minLow - min) * k + 30);
+            ctx.closePath();
         </script>
     </body>
 </html>
