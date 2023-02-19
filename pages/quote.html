@@ -12,3 +12,95 @@
     ...
     （点击市场名可以进入市场详情页面）
 -->
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>市场行情</title>
+    <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+    <h1>市场行情</h1>
+    <table>
+        <tr>
+            <th>市场名</th>
+            <th>价格</th>
+            <th>24h涨幅</th>
+            <th>24h成交量</th>
+            <th>24h最高</th>
+            <th>24h最低</th>
+            <th>7d涨幅</th>
+            <th>7d成交量</th>
+            <th>7d最高</th>
+            <th>7d最低</th>
+        </tr>
+        <tr>
+            <td>BTC/USDT</td>
+            <td>12345.67</td>
+            <td>1.23</td>
+            <td>1234567.89</td>
+            <td>12345.67</td>
+            <td>12345.67</td>
+            <td>7.28</td>
+            <td>3234567.89</td>
+            <td>12345.67</td>
+            <td>12345.67</td>
+        </tr>
+        <tr>
+            <td>ETH/USDT</td>
+            <td>1234.567</td>
+            <td>3.21</td>
+            <td>1034567.89</td>
+            <td>1234.567</td>
+            <td>1234.567</td>
+            <td>5.21</td>
+            <td>423456.789</td>
+            <td>1234.567</td>
+            <td>1234.567</td>
+        </tr>
+    </table>
+    <!-- 
+        实现点击表头排序 
+        排序后的字段后面添加标记（▲升序 或 ▼降序）
+        当点击表头字段时，如果当前排序字段与点击的字段相同，则切换排序方式（升序变降序，降序变升序）
+        如果当前排序字段与点击的字段不同，则切换排序字段并移除之前的字段上的▲和▼标记，同时切换排序方式为升序
+    -->
+    <script>
+        var table = document.getElementsByTagName('table')[0];
+        var ths = table.getElementsByTagName('th');
+        var trs = table.getElementsByTagName('tr');
+        var sortField = 0;
+        var sortType = 1;
+        for (var i = 0; i < ths.length; i++) {
+            ths[i].index = i;
+            ths[i].onclick = function () {
+                if (sortField == this.index) {
+                    sortType = -sortType;
+                } else {
+                    sortField = this.index;
+                    sortType = 1;
+                }
+                var arr = [];
+                for (var i = 1; i < trs.length; i++) {
+                    arr.push(trs[i]);
+                }
+                arr.sort(function (a, b) {
+                    var aVal = a.getElementsByTagName('td')[sortField].innerHTML;
+                    var bVal = b.getElementsByTagName('td')[sortField].innerHTML;
+                    if (sortField == 0) {
+                        return sortType * (aVal.localeCompare(bVal));
+                    } else {
+                        return sortType * (aVal - bVal);
+                    }
+                });
+                for (var i = 0; i < arr.length; i++) {
+                    table.appendChild(arr[i]);
+                }
+                for (var i = 0; i < ths.length; i++) {
+                    ths[i].innerHTML = ths[i].innerHTML.replace('▲', '').replace('▼', '');
+                }
+                ths[sortField].innerHTML += sortType == 1 ? '▲' : '▼';
+            }
+        }
+    </script>
+</body>
+</html>

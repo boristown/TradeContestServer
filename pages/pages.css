@@ -10,3 +10,8 @@ h1 {
 h2 {
     font-size: 80px;
 }
+/* 表头，黑底白字 */
+th {
+    background-color: black;
+    color: white;
+}
