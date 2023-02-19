@@ -1,0 +1,90 @@
+<!-- 
+    K线图页面 
+    用canvas绘制一张K线图
+    市场名：BTCUSDT
+    时间粒度：1天
+    数据随机生成：时间、开盘价、收盘价、最高价、最低价
+    用js生成数据，用canvas绘制图表
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>市场：BTC/USDT</title>
+        <link rel="stylesheet" href="pages.css">
+    </head>
+    <body>
+        <h2>市场：BTC/USDT</h2>
+        <canvas id="candleCanvas"  width="1000" height="1000" style="border:1px solid #000000;">
+        </canvas>
+        <!-- 
+            生成31组随机的价格数据，
+            每组包含时间、开盘价、收盘价、最高价、最低价、成交量
+            注意生成的数据应该是按时间顺序排列的，相邻两组数据的价格波动不要超过20%
+            每组数据的上涨或者下跌应该是随机的
+            开始时间：2023-01-01
+            结束时间：2023-01-31
+            然后根据这些数据绘制一张简单的K线图（烛线图） 
+            每条K线的宽度为20px，每条K线之间的间隔为5px
+            每条K线的颜色由收盘价决定，收盘价高于开盘价为绿色，收盘价低于开盘价为红色
+            每条K线的上下影线由最高价和最低价决定
+            上下影线的宽度为2px，位于K线中间（与K线颜色一致）
+        -->
+        <script>
+            var data = [];
+            var date = new Date(2023, 0, 1);
+            var start_price = 21123.45;
+            var max_range = 0.2;
+            for (var i = 0; i < 31; i++) {
+                var open = start_price * (1 + (Math.random() - 0.5) * max_range);
+                var close = open * (1 + (Math.random() - 0.5) * max_range);
+                var high = Math.max(open, close) * (1 + Math.random() * max_range);
+                var low = Math.min(open, close) * (1 - Math.random() * max_range);
+                var volume = Math.random() * 100000;
+                data.push({
+                    date: date,
+                    open: open,
+                    close: close,
+                    high: high,
+                    low: low,
+                    volume: volume
+                });
+                date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+                start_price = close;
+            }
+            var canvas = document.getElementById("candleCanvas");
+            var ctx = canvas.getContext("2d");
+            var width = canvas.width;
+            var height = canvas.height;
+            var padding = 50;
+            var barWidth = (width - 2 * padding) / data.length;
+            var max = 0;
+            var min = 100000;
+            for (var i = 0; i < data.length; i++) {
+                max = Math.max(max, data[i].high);
+                min = Math.min(min, data[i].low);
+            }
+            var k = (height - 2 * padding) / (max - min);
+            var barWidth = 20;
+            var barGap = 5;
+            for (var i = 0; i < data.length; i++) {
+                var x = padding + i * (barWidth + barGap);
+                var y = height - padding - (data[i].close - min) * k;
+                var h = (data[i].close - data[i].open) * k;
+                var w = barWidth;
+                ctx.beginPath();
+                ctx.rect(x, y, w, h);
+                var color = data[i].close > data[i].open ? "green" : "red";
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.moveTo(x + w / 2, height - padding - (data[i].high - min) * k);
+                ctx.lineTo(x + w / 2, height - padding - (data[i].low - min) * k);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+            }
+        </script>
+    </body>
+</html>
