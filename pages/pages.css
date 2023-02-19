@@ -15,3 +15,7 @@ th {
     background-color: black;
     color: white;
 }
+/* 表格：居中显示 */
+table {
+    margin: 0 auto;
+}
