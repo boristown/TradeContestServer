@@ -1,0 +1,159 @@
+<!-- 
+    交易页面
+
+    标题：创建订单
+    
+    市场选择下拉框(按市场名降序排列)[BTC/USDT，ETH/USDT, EOS/USDT，FIL/USDT，ZEC/USDT]
+
+    勾选框：杠杆交易
+
+    勾选框：市价交易（如果勾选，下方价格输入框以及买一价，卖一价按钮变为不可用；如果没勾选，则相反）
+
+    价格输入框 按钮：买一价  按钮：卖一价
+    
+    数量输入框 按钮：最大可买量 按钮：最大可卖量
+
+    买入按钮    卖出按钮
+
+ -->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>交易页面</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- 标题：创建订单 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>创建订单</h1>
+            </div>
+        </div>
+    </div>
+    <!-- 市场选择下拉框(按市场名降序排列)[BTC/USDT，ETH/USDT, EOS/USDT，FIL/USDT，ZEC/USDT] -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="market">市场</label>
+                    <select class="form-control" id="market">
+                        <option>BTC/USDT</option>
+                        <option>ETH/USDT</option>
+                        <option>EOS/USDT</option>
+                        <option>FIL/USDT</option>
+                        <option>ZEC/USDT</option>
+                        <option>ETH/BTC</option>
+                        <option>EOS/BTC</option>
+                        <option>FIL/BTC</option>
+                        <option>ZEC/BTC</option>
+                        <option>EOS/ETH</option>
+                        <option>FIL/ETH</option>
+                        <option>ZEC/ETH</option>
+                        <option>LTC/USDT</option>
+                        <option>NEO/USDT</option>
+                        <option>LTC/BTC</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 勾选框：杠杆交易 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="leverage">杠杆交易
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 勾选框：市价交易（如果勾选，下方价格输入框以及买一价，卖一价按钮变为不可用；如果没勾选，则相反） -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="market_price">市价交易
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 价格输入框 按钮：买一价  按钮：卖一价 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- 显示一个价格输入框
+                    在价格输入框的右边，显示一个买一价按钮和卖一价按钮
+                    点击买一价按钮，价格输入框的值变为买一价（9999）
+                    点击卖一价按钮，价格输入框的值变为卖一价（10001） -->
+                <input type="text" class="form-control" id="price" placeholder="价格">
+                <button type="button" class="btn btn-default btn-lg" id="buy_one_price">买一价</button>
+                <button type="button" class="btn btn-default btn-lg" id="sell_one_price">卖一价</button>
+                <!-- 数量输入框 按钮：最大可买量 按钮：最大可卖量 -->
+                <!-- 显示一个数量输入框
+                在数量输入框的右边，显示一个最大可买量按钮和最大可卖量按钮
+                点击最大可买量按钮，数量输入框的值变为最大可买量（9999）
+                点击最大可卖量按钮，数量输入框的值变为最大可卖量（10001） -->
+                <input type="text" class="form-control" id="amount" placeholder="数量">
+                <button type="button" class="btn btn-default btn-lg" id="max_buy">最大可买量</button>
+                <button type="button" class="btn btn-default btn-lg" id="max_sell">最大可卖量</button>
+                <!-- 按钮：买入 按钮：卖出 -->
+                <!-- 显示两个按钮：买入和卖出 -->
+                <!--换行-->
+                <br>
+                <!-- 买入和卖出按钮要拉伸到整行-->
+                <button type="button" class="btn btn-primary btn-block" id="buy">买入</button>
+                <button type="button" class="btn btn-primary btn-block" id="sell">卖出</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 买一价按钮
+        $('#buy_one_price').click(function () {
+            $('#price').val(9999);
+        });
+        // 卖一价按钮
+        $('#sell_one_price').click(function () {
+            $('#price').val(10001);
+        });
+        // 最大可买量按钮
+        $('#max_buy').click(function () {
+            $('#amount').val(9999);
+        });
+        // 最大可卖量按钮
+        $('#max_sell').click(function () {
+            $('#amount').val(10001);
+        });
+        // 市价交易勾选框
+        $('#market_price').click(function () {
+            if ($('#market_price').is(':checked')) {
+                $('#price').attr('disabled', true);
+                $('#buy_price').attr('disabled', true);
+                $('#sell_price').attr('disabled', true);
+            } else {
+                $('#price').attr('disabled', false);
+                $('#buy_price').attr('disabled', false);
+                $('#sell_price').attr('disabled', false);
+            }
+        });
+        //点击买入按钮，弹框提示买入成功！
+        $('#buy').click(function () {
+            alert('买入成功！');
+        });
+        //点击卖出按钮，弹框提示卖出成功！
+        $('#sell').click(function () {
+            alert('卖出成功！');
+        });
+    </script>
+</body>
+
+</html>
