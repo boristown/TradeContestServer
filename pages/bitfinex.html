@@ -64,10 +64,18 @@
         // 1.获取bitfinex的全部交易对
         // 1.1.获取bitfinex的全部交易对的url
         var bitfinex_url = "/bitfinex/public_tickers";
+        //获取btcusd的最新价格
+        var btcusdt = 0;
         // 1.2.使用ajax请求bitfinex的全部交易对的url
         $.get(bitfinex_url, function (data) {
             // 1.3.获取bitfinex的全部交易对的数据
             var bitfinex_data = data;
+            //从数据中找到btcusdt的最新价格
+            for (var i = 0; i < bitfinex_data.length; i++) {
+                if (bitfinex_data[i][0] == "tBTCUSD") {
+                    btcusdt = bitfinex_data[i][7];
+                }
+            }
             // 1.4.将bitfinex的全部交易对的数据显示在页面上
             // 1.4.1.清空页面上的数据
             $("#bitfinex_tbody").empty();
@@ -81,6 +89,10 @@
                 var last_price = bitfinex_data[i][8];
                 // 1.4.5.获取交易量
                 var volume = bitfinex_data[i][7];
+                //如果市场是以BTC结尾的，那么将交易量转换成BTC
+                if (symbol.endsWith("BTC")) {
+                    volume = volume * btcusdt;
+                }
                 // 1.4.6.获取24h涨幅
                 var daily_change_perc = bitfinex_data[i][6];
                 //将涨跌幅转换为百分比
