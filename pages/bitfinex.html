@@ -36,26 +36,22 @@
             <div class="col-md-12">
                 <h1>bitfinex</h1>
                     <table class="table table-bordered">
-                        <h1>
                             <thead>
                                 <tr>
-                                    <th>交易对</th>
-                                    <th>最新价格</th>
-                                    <th>24h交易量▼</th>
-                                    <th>24h涨幅%</th>
+                                    <th><h1>交易对</h1></th>
+                                    <th><h1>最新价格</h1></th>
+                                    <th><h1>24h交易量▼</h1></th>
+                                    <th><h1>24h涨幅%</h1></th>
                                 </tr>
                             </thead>
-                        </h1>
-                        <h2>
                             <tbody id="bitfinex_tbody">
                                 <tr>
-                                    <td>loading...</td>
-                                    <td>loading...</td>
-                                    <td>loading...</td>
-                                    <td>loading...</td>
+                                    <td><h2>loading...</h2></td>
+                                    <td><h2>loading...</h2></td>
+                                    <td><h2>loading...</h2></td>
+                                    <td><h2>loading...</h2></td>
                                 </tr>
                             </tbody>
-                        </h2>
                     </table>
             </div>
         </div>
@@ -86,9 +82,9 @@
                 //移除交易对的第一个字符
                 symbol = symbol.substring(1);
                 // 1.4.4.获取最新价格
-                var last_price = bitfinex_data[i][8];
+                var last_price = bitfinex_data[i][7];
                 // 1.4.5.获取交易量
-                var volume = bitfinex_data[i][7];
+                var volume = bitfinex_data[i][8];
                 //如果市场是以BTC结尾的，那么将交易量转换成BTC
                 if (symbol.endsWith("BTC")) {
                     volume = volume * btcusdt;
@@ -132,8 +128,8 @@
                     } else {
                         sort_order = 1;
                     }
-                    //清空原来的图标
-                    $("th").eq(i).text(titles[i]);
+                    //清空原来的图标,注意文字是h1格式
+                    $("th").eq(i).html("<h1>" + titles[i] + "</h1>");
                     break;
                 }
             }
@@ -146,8 +142,8 @@
                 sort_index = index;
                 sort_order = 1;
             }
-            //添加排序图标
-            $("th").eq(sort_index).text(titles[sort_index] + suffex[sort_order]);
+            //添加排序图标,注意文字是h1格式
+            $("th").eq(sort_index).html("<h1>" + titles[sort_index] + suffex[sort_order] + "</h1>");
             //获取表格的所有行
             var trs = $("#bitfinex_tbody").children();
             //将trs按第sort_index列排序（sort_order=0时升序，否则降序）
