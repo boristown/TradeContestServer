@@ -2,3 +2,4 @@ fastapi[all]
 pyecharts
 pywebio
 pywebio-battery
+bitfinex-api-py

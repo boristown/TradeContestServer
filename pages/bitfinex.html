@@ -1,0 +1,77 @@
+<!-- 
+    使用bootstrap框架 
+    1.引入bootstrap.css
+    2.引入bootstrap.js
+    3.引入jquery.js
+    
+    获取bitfinex的全部交易对，交易对的交易量，以及交易对的最新价格
+    1.获取bitfinex的全部交易对
+    2.获取交易对的最新价格
+    3.将交易对和最新价格显示在页面上
+
+    1.获取bitfinex的全部交易对
+    1.1.获取bitfinex的全部交易对的url
+    1.2.使用ajax请求bitfinex的全部交易对的url
+    1.3.获取bitfinex的全部交易对的数据
+    1.4.将bitfinex的全部交易对的数据显示在页面上
+
+    注意：bitfinex网站无法直接访问
+    使用以下方式访问：
+    /bitfinex/public_tickers
+    返回值：
+    [ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bitfinex</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>bitfinex</h1>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>交易对</th>
+                            <th>最新价格</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bitfinex_tbody">
+                        <tr>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 1.获取bitfinex的全部交易对
+        // 1.1.获取bitfinex的全部交易对的url
+        var bitfinex_url = "/bitfinex/public_tickers";
+        // 1.2.使用ajax请求bitfinex的全部交易对的url
+        $.get(bitfinex_url, function (data) {
+            // 1.3.获取bitfinex的全部交易对的数据
+            var bitfinex_data = data;
+            // 1.4.将bitfinex的全部交易对的数据显示在页面上
+            // 1.4.1.清空页面上的数据
+            $("#bitfinex_tbody").empty();
+            // 1.4.2.遍历bitfinex的全部交易对的数据
+            for (var i = 0; i < bitfinex_data.length; i++) {
+                // 1.4.3.获取交易对
+                var symbol = bitfinex_data[i][0];
+                // 1.4.4.获取最新价格
+                var last_price = bitfinex_data[i][8];
+                // 1.4.5.将交易对和最新价格显示在页面上
+                $("#bitfinex_tbody").append("<tr><td>" + symbol + "</td><td>" + last_price + "</td></tr>");
+            }
+        });
+    </script>
+</html>
