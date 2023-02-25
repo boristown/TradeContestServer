@@ -134,30 +134,25 @@
             }
             //添加排序图标
             $("th").eq(sort_index).text(titles[sort_index] + suffex[sort_order]);
-            //排序
             //获取表格的所有行
             var trs = $("#bitfinex_tbody").children();
-            //遍历所有行
-            for (var i = 0; i < trs.length; i++) {
-                //获取当前行的第sort_index列的值
-                var value1 = trs.eq(i).children().eq(sort_index).text();
-                //获取下一行的第sort_index列的值
-                var value2 = trs.eq(i + 1).children().eq(sort_index).text();
-                //判断value1和value2的大小
-                if (sort_order == 0) {
-                    //升序
-                    if (value1 > value2) {
-                        //交换两行的位置
-                        trs.eq(i).after(trs.eq(i + 1));
-                    }
-                } else {
-                    //降序
-                    if (value1 < value2) {
-                        //交换两行的位置
-                        trs.eq(i).after(trs.eq(i + 1));
-                    }
+            //将trs按第sort_index列排序（sort_order=0时升序，否则降序）
+            trs.sort(function (a, b) {
+                //获取第sort_index列的值
+                var a_val = $(a).children().eq(sort_index).text();
+                var b_val = $(b).children().eq(sort_index).text();
+                //如果是数字，转换为数字类型
+                if (!isNaN(a_val)) {
+                    a_val = parseFloat(a_val);
+                    b_val = parseFloat(b_val);
                 }
-            }
+                //如果是升序
+                if (sort_order == 0) {
+                    return a_val - b_val;
+                } else {
+                    return b_val - a_val;
+                }
+            });
         });
     </script>
 </html>
