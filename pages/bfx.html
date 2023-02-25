@@ -42,10 +42,12 @@
         var bitfinex_url = "/bfx/public_tickers";
         //获取btcusd的价格
         var btcusdt = 0;
+        var market_data = [];
         // 1.2.使用ajax请求bitfinex的全部符号的url
         $.get(bitfinex_url, function (data) {
             // 1.3.获取bitfinex的全部符号的数据
             var bitfinex_data = data;
+            market_data = bitfinex_data;
             //从数据中找到btcusdt的价格
             for (var i = 0; i < bitfinex_data.length; i++) {
                 if (bitfinex_data[i][0] == "tBTCUSD") {
@@ -154,6 +156,53 @@
             $("#bitfinex_tbody").empty();
             for (var i = 0; i < trs.length; i++) {
                 $("#bitfinex_tbody").append(trs[i]);
+            }
+        });
+        //当点击表格中的某一行时，展开或收缩该行的详细信息
+        //显示的内容为：最高价，最低价，开盘价，收盘价，成交量
+        //注意：每次只能展开一行，再次点击时，收缩之前展开的行
+        //注意：展开的行的背景色为：#f5f5f5
+        //注意：展开的行的高度为：50px
+        //使用全局变量market_data中保存所有的市场数据
+        //market_data中的行数据格式为：
+        //[ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
+        //注意：每次点击时，先判断当前行是否已经展开，如果已经展开，则收缩该行
+        $("#bitfinex_tbody").on("click", "tr", function () {
+            //获取当前行的SYMBOL
+            var symbol = $(this).children().eq(0).text();
+            //获取当前行的详细信息
+            var detail = '';
+            for (var i = 0; i < market_data.length; i++) {
+                if (market_data[i][0] == symbol) {
+                    detail = market_data[i];
+                    break;
+                }
+            }
+            //获取当前行的详细信息的html
+            var html = "<tr><td colspan='10'>";
+            html += "<table class='table table-bordered table-hover'>";
+            html += "<tr><td>最高价</td><td>" + detail[9] + "</td></tr>";
+            html += "<tr><td>最低价</td><td>" + detail[10] + "</td></tr>";
+            html += "<tr><td>开盘价</td><td>" + detail[6] + "</td></tr>";
+            html += "<tr><td>收盘价</td><td>" + detail[7] + "</td></tr>";
+            html += "<tr><td>成交量</td><td>" + detail[8] + "</td></tr>";
+            html += "</table>";
+            html += "</td></tr>";
+            //判断当前行是否已经展开
+            if ($(this).next().children().length == 0) {
+                //当前行没有展开，展开当前行
+                $(this).after(html);
+                //设置当前行的背景色
+                $(this).css("background-color", "#f5f5f5");
+                //设置当前行的高度
+                $(this).css("height", "50px");
+            } else {
+                //当前行已经展开，收缩当前行
+                $(this).next().remove();
+                //设置当前行的背景色
+                $(this).css("background-color", "");
+                //设置当前行的高度
+                $(this).css("height", "");
             }
         });
     </script>
