@@ -92,6 +92,8 @@
                 if (symbol.endsWith("BTC")) {
                     volume = volume * btcusdt;
                 }
+                //交易量保留整数
+                volume = parseInt(volume);
                 // 1.4.6.获取24h涨幅
                 var daily_change_perc = bitfinex_data[i][6];
                 //将涨跌幅转换为百分比
