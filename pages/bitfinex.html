@@ -35,24 +35,26 @@
         <div class="row">
             <div class="col-md-12">
                 <h1>bitfinex</h1>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>交易对</th>
-                            <th>最新价格</th>
-                            <th>交易量</th>
-                            <th>24h涨幅</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bitfinex_tbody">
-                        <tr>
-                            <td>loading...</td>
-                            <td>loading...</td>
-                            <td>loading...</td>
-                            <td>loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h2>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>交易对</th>
+                                <th>最新价格</th>
+                                <th>24h交易量▼</th>
+                                <th>24h涨幅%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bitfinex_tbody">
+                            <tr>
+                                <td>loading...</td>
+                                <td>loading...</td>
+                                <td>loading...</td>
+                                <td>loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </h2>
             </div>
         </div>
     </div>
@@ -71,14 +73,90 @@
             for (var i = 0; i < bitfinex_data.length; i++) {
                 // 1.4.3.获取交易对
                 var symbol = bitfinex_data[i][0];
+                //移除交易对的第一个字符
+                symbol = symbol.substring(1);
                 // 1.4.4.获取最新价格
                 var last_price = bitfinex_data[i][8];
                 // 1.4.5.获取交易量
                 var volume = bitfinex_data[i][7];
                 // 1.4.6.获取24h涨幅
                 var daily_change_perc = bitfinex_data[i][6];
-                // 1.4.7.将交易对和最新价格显示在页面上
-                $("#bitfinex_tbody").append("<tr><td>" + symbol + "</td><td>" + last_price + "</td><td>" + volume + "</td><td>" + daily_change_perc + "</td></tr>");
+                //将涨跌幅转换为百分比
+                daily_change_perc = daily_change_perc * 100;
+                // 1.4.7.将交易对和最新价格显示在页面上,字体h2
+                $("#bitfinex_tbody").append("<tr><td><h2>" + symbol + "</h2></td><td><h2>" + last_price + "</h2></td><td><h2>" + volume + "</h2></td><td><h2>" + daily_change_perc + "</h2></td></tr>");
+            }
+        });
+        //添加表格标题的点击事件
+        //点击后，按照该列排序，再次点击，按照该列倒序排序
+        //默认按交易量排序，显示为：交易量▼
+        //排序字段的文字末尾添加三角形字符，例如：交易对▲，交易对▼
+        //注意添加三角形图标的时候，需要先清空原来的图标
+        $("th").click(function () {
+            titles = ["交易对", "最新价格", "24h交易量", "24h涨幅%"];
+            suffex = ["▲", "▼"]; //升序，降序
+            //当前点击的标题
+            var title = $(this).text();
+            //移除标题末尾的三角形字符
+            for (var i = 0; i < suffex.length; i++) {
+                title = title.replace(suffex[i], "");
+            }
+            //当前点击的是第几列？
+            var index = titles.indexOf(title);
+            //枚举表格的所有标题，找到存在suffix的标题
+            var sort_index = -1;
+            var sort_order = -1;
+            for (var i = 0; i < titles.length; i++) {
+                //页面的第i个标题
+                var page_title = $("th").eq(i).text();
+                //该标题存在suffix
+                if (page_title.indexOf(suffex[0]) != -1 || page_title.indexOf(suffex[1]) != -1) {
+                    sort_index = i;
+                    //判断是升序还是降序
+                    if (page_title.indexOf(suffex[0]) != -1) {
+                        sort_order = 0;
+                    } else {
+                        sort_order = 1;
+                    }
+                    //清空原来的图标
+                    $("th").eq(i).text(titles[i]);
+                    break;
+                }
+            }
+            //判断当前点击的标题是否是排序字段
+            if (title == titles[sort_index]) {
+                //是排序字段，切换排序方式
+                sort_order = (sort_order + 1) % 2;
+            } else {
+                //不是排序字段，按照默认的方式排序
+                sort_index = index;
+                sort_order = 1;
+            }
+            //添加排序图标
+            $("th").eq(sort_index).text(titles[sort_index] + suffex[sort_order]);
+            //排序
+            //获取表格的所有行
+            var trs = $("#bitfinex_tbody").children();
+            //遍历所有行
+            for (var i = 0; i < trs.length; i++) {
+                //获取当前行的第sort_index列的值
+                var value1 = trs.eq(i).children().eq(sort_index).text();
+                //获取下一行的第sort_index列的值
+                var value2 = trs.eq(i + 1).children().eq(sort_index).text();
+                //判断value1和value2的大小
+                if (sort_order == 0) {
+                    //升序
+                    if (value1 > value2) {
+                        //交换两行的位置
+                        trs.eq(i).after(trs.eq(i + 1));
+                    }
+                } else {
+                    //降序
+                    if (value1 < value2) {
+                        //交换两行的位置
+                        trs.eq(i).after(trs.eq(i + 1));
+                    }
+                }
             }
         });
     </script>
