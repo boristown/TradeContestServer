@@ -4,16 +4,16 @@
     2.引入bootstrap.js
     3.引入jquery.js
     
-    获取bitfinex的全部交易对，交易对的交易量，以及交易对的最新价格
-    1.获取bitfinex的全部交易对
-    2.获取交易对的最新价格
-    3.将交易对和最新价格显示在页面上
+    获取bitfinex的全部符号，符号的交易量，以及符号的最新价格
+    1.获取bitfinex的全部符号
+    2.获取符号的最新价格
+    3.将符号和最新价格显示在页面上
 
-    1.获取bitfinex的全部交易对
-    1.1.获取bitfinex的全部交易对的url
-    1.2.使用ajax请求bitfinex的全部交易对的url
-    1.3.获取bitfinex的全部交易对的数据
-    1.4.将bitfinex的全部交易对的数据显示在页面上
+    1.获取bitfinex的全部符号
+    1.1.获取bitfinex的全部符号的url
+    1.2.使用ajax请求bitfinex的全部符号的url
+    1.3.获取bitfinex的全部符号的数据
+    1.4.将bitfinex的全部符号的数据显示在页面上
 
     注意：bitfinex网站无法直接访问
     使用以下方式访问：
@@ -27,7 +27,7 @@
     <meta charset="UTF-8">
     <title>bitfinex</title>
     <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <!-- <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/mhDoLbDldZc3qpsJHpLogda//BVZbgYuw6kof4u2FrCedxOtgRZDTHgHUhOCVim" crossorigin="anonymous"></script>
@@ -40,7 +40,7 @@
                     <table class="table table-striped">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th><h1>交易对</h1></th>
+                                    <th><h1>符号</h1></th>
                                     <th><h1>最新价格</h1></th>
                                     <th><h1>24h交易量▼</h1></th>
                                     <th><h1>24h涨幅%</h1></th>
@@ -59,14 +59,14 @@
         </div>
     </div>
     <script>
-        // 1.获取bitfinex的全部交易对
-        // 1.1.获取bitfinex的全部交易对的url
+        // 1.获取bitfinex的全部符号
+        // 1.1.获取bitfinex的全部符号的url
         var bitfinex_url = "/bfx/public_tickers";
         //获取btcusd的最新价格
         var btcusdt = 0;
-        // 1.2.使用ajax请求bitfinex的全部交易对的url
+        // 1.2.使用ajax请求bitfinex的全部符号的url
         $.get(bitfinex_url, function (data) {
-            // 1.3.获取bitfinex的全部交易对的数据
+            // 1.3.获取bitfinex的全部符号的数据
             var bitfinex_data = data;
             //从数据中找到btcusdt的最新价格
             for (var i = 0; i < bitfinex_data.length; i++) {
@@ -74,14 +74,14 @@
                     btcusdt = bitfinex_data[i][7];
                 }
             }
-            // 1.4.将bitfinex的全部交易对的数据显示在页面上
+            // 1.4.将bitfinex的全部符号的数据显示在页面上
             // 1.4.1.清空页面上的数据
             $("#bitfinex_tbody").empty();
-            // 1.4.2.遍历bitfinex的全部交易对的数据
+            // 1.4.2.遍历bitfinex的全部符号的数据
             for (var i = 0; i < bitfinex_data.length; i++) {
-                // 1.4.3.获取交易对
+                // 1.4.3.获取符号
                 var symbol = bitfinex_data[i][0];
-                //移除交易对的第一个字符
+                //移除符号的第一个字符
                 symbol = symbol.substring(1);
                 // 1.4.4.获取最新价格
                 var last_price = bitfinex_data[i][7];
@@ -95,17 +95,17 @@
                 var daily_change_perc = bitfinex_data[i][6];
                 //将涨跌幅转换为百分比
                 daily_change_perc = daily_change_perc * 100;
-                // 1.4.7.将交易对和最新价格显示在页面上,字体h2
+                // 1.4.7.将符号和最新价格显示在页面上,字体h2
                 $("#bitfinex_tbody").append("<tr><td><h2>" + symbol + "</h2></td><td><h2>" + last_price + "</h2></td><td><h2>" + volume + "</h2></td><td><h2>" + daily_change_perc + "</h2></td></tr>");
             }
         });
         //添加表格标题的点击事件
         //点击后，按照该列排序，再次点击，按照该列倒序排序
         //默认按交易量排序，显示为：交易量▼
-        //排序字段的文字末尾添加三角形字符，例如：交易对▲，交易对▼
+        //排序字段的文字末尾添加三角形字符，例如：符号▲，符号▼
         //注意添加三角形图标的时候，需要先清空原来的图标
         $("th").click(function () {
-            titles = ["交易对", "最新价格", "24h交易量", "24h涨幅%"];
+            titles = ["符号", "最新价格", "24h交易量", "24h涨幅%"];
             suffex = ["▲", "▼"]; //升序，降序
             //当前点击的标题
             var title = $(this).text();
