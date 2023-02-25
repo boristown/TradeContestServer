@@ -184,14 +184,62 @@ async def page_css(page):
 ## 获取交易对列表
 @app.get("/bitfinex/public_tickers")
 async def bitfinex_symbols():
-    # @param symbols Array<string>: 
-    # array of symbols i.e [tBTCUSD, tETHUSD] 
-    # @return Array [ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
     rest = bfx_rest.BfxRest(
         API_KEY="",
         API_SECRET="",
     )
-    return await rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
+    return await rest.get_public_tickers(
+        [
+        'tBTCUSD', 
+        'tETHUSD', 
+        'tETHBTC',
+        'tXRPUSD',
+        'tSOLUSD',
+        'tLTCUSD',
+        'tADAUSD',
+        'tEOSUSD',
+        'tFILUSD',
+        'tAPTUSD',
+        'tNEOUSD',
+        'tXRPBTC',
+        'tMATICUSD',
+        'tDOGEUSD',
+        'tIOTAUSD',
+        'tFTMUSD',
+        'tYFIUSD',
+        'tDOTUSD',
+        'tETHWUSD',
+        'tLINKUSD',
+        'tADABTC',
+        'tLEOUSD',
+        'tSUSHIUSD',
+        'tXTZUSD',
+        'tXMRUSD',
+        'tDOGEBTC',
+        'tDASHUSD',
+        'tXTZBTC',
+        'tETCUSD',
+        'tXLMUSD',
+        'tATOMUSD',
+        'tNEOBTC',
+        'tZECUSD',
+        'tBCHNUSD',
+        'tZRXUSD',
+        'tUNIUSD',
+        'tEOSBTC',
+        'tXMRBTC',
+        'tTRXUSD',
+        'tAPEUSD',
+        'tSHIBUSD',
+        'tMATICBTC',
+        'tXLMBTC',
+        'tALGOUSD',
+        'tOMGUSD',
+        'tSOLBTC',
+        'tLTCBTC',
+        'tDOTBTC',
+        ]
+        )
 
 #定义全局活动订单对象，维护open状态的订单
 #第一维度：symbol
