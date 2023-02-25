@@ -84,11 +84,11 @@
                 // 1.4.4.获取最新价格
                 var last_price = bitfinex_data[i][7];
                 // 1.4.5.获取交易量
-                var volume = bitfinex_data[i][8];
+                var volume = bitfinex_data[i][8] * last_price;
                 //如果市场是以BTC结尾的，那么将交易量转换成BTC
-                // if (symbol.endsWith("BTC")) {
-                //     volume = volume * btcusdt;
-                // }
+                if (symbol.endsWith("BTC")) {
+                    volume = volume * btcusdt;
+                }
                 // 1.4.6.获取24h涨幅
                 var daily_change_perc = bitfinex_data[i][6];
                 //将涨跌幅转换为百分比
