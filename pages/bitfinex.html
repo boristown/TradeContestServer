@@ -157,10 +157,13 @@
                     b_val = parseFloat(b_val);
                 }
                 //如果是升序
+                //注意要支持文字排序
                 if (sort_order == 0) {
-                    return a_val - b_val;
+                    return a_val > b_val ? 1 : -1;
+                    //return a_val - b_val;
                 } else {
-                    return b_val - a_val;
+                    return a_val < b_val ? 1 : -1;
+                    //return b_val - a_val;
                 }
             });
             //将排序后的trs重新添加到页面
