@@ -15,6 +15,7 @@ import pywebio.session
 import my_websockets
 import order
 import bfxapi
+import bfxapi.rest.bfx_rest as bfx_rest
 
 app = FastAPI()
 
@@ -186,7 +187,8 @@ async def bitfinex_symbols():
     # @param symbols Array<string>: 
     # array of symbols i.e [tBTCUSD, tETHUSD] 
     # @return Array [ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
-    return bfxapi.BfxRest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
+    rest = bfx_rest()
+    return rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
 
 #定义全局活动订单对象，维护open状态的订单
 #第一维度：symbol
