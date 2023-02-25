@@ -182,12 +182,13 @@ async def page_css(page):
 
 # bitfinex接口
 ## 获取交易对列表
-@app.get("/bitfinex/public_tickers")
-async def bitfinex_symbols():
+@app.get("/bfx/public_tickers")
+async def bfx_symbols():
     rest = bfx_rest.BfxRest(
         API_KEY="",
         API_SECRET="",
     )
+    #日交易量排名前20的交易对
     return await rest.get_public_tickers(
         [
         'tBTCUSD', 
@@ -238,6 +239,20 @@ async def bitfinex_symbols():
         'tSOLBTC',
         'tLTCBTC',
         'tDOTBTC',
+        'tEGLDUSD',
+        'tMKRUSD',
+        'tAXSUSD',
+        'tDAIUSD',
+        'tCOMPUSD',
+        'tPNTUSD',
+        'tAVAXUSD',
+        'tLTCBTC',
+        'tIOTABTC',
+        'tETCBTC',
+        'tDASHBTC',
+        'tAVAXBTC',
+        'tOMGBTC',
+        'tZECBTC',
         ]
         )
 
