@@ -190,6 +190,27 @@ async def page_js(page):
     else:
         return ''
 
+#当访问/css/*.map时，链接到pages/css/*.map
+@app.get("/css/{page}.map", response_class=PlainTextResponse)
+async def page_cssmap(page):
+    filename = 'pages/css/' + page + '.map'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return ''
+
+#当访问/js/*.map时，链接到pages/js/*.map
+@app.get("/js/{page}.map", response_class=PlainTextResponse)
+async def page_jsmap(page):
+    filename = 'pages/js/' + page + '.map'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return ''
+
+
 # bitfinex接口
 ## 获取交易对列表
 @app.get("/bfx/public_tickers")
