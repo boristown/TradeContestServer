@@ -187,7 +187,7 @@ async def bitfinex_symbols():
     # @param symbols Array<string>: 
     # array of symbols i.e [tBTCUSD, tETHUSD] 
     # @return Array [ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
-    rest = bfx_rest()
+    rest = bfx_rest.BfxRest()
     return rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
 
 #定义全局活动订单对象，维护open状态的订单
