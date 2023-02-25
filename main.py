@@ -188,8 +188,8 @@ async def bitfinex_symbols():
     # array of symbols i.e [tBTCUSD, tETHUSD] 
     # @return Array [ SYMBOL, BID, BID_SIZE, ASK, ASK_SIZE, DAILY_CHANGE, DAILY_CHANGE_PERC, LAST_PRICE, VOLUME, HIGH, LOW ]
     rest = bfx_rest.BfxRest(
-        api_key="",
-        api_secret="",
+        API_KEY="",
+        API_SECRET="",
     )
     return rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
 
