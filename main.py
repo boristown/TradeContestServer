@@ -277,7 +277,6 @@ async def bfx_symbols():
         'tCOMPUSD',
         'tPNTUSD',
         'tAVAXUSD',
-        'tLTCBTC',
         'tIOTABTC',
         'tETCBTC',
         'tDASHBTC',

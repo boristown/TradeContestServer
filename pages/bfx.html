@@ -96,6 +96,8 @@
                 var daily_change_perc = bitfinex_data[i][6];
                 //将涨跌幅转换为百分比
                 daily_change_perc = daily_change_perc * 100;
+                //保留两位小数
+                daily_change_perc = daily_change_perc.toFixed(2);
                 // 1.4.7.将符号和价格显示在页面上,字体h2
                 $("#bitfinex_tbody").append("<tr><td><h2>" + symbol + "</h2></td><td><h2>" + last_price + "</h2></td><td><h2>" + volume + "</h2></td><td><h2>" + daily_change_perc + "</h2></td></tr>");
             }
