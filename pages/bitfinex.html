@@ -40,10 +40,14 @@
                         <tr>
                             <th>交易对</th>
                             <th>最新价格</th>
+                            <th>交易量</th>
+                            <th>24h涨幅</th>
                         </tr>
                     </thead>
                     <tbody id="bitfinex_tbody">
                         <tr>
+                            <td>loading...</td>
+                            <td>loading...</td>
                             <td>loading...</td>
                             <td>loading...</td>
                         </tr>
@@ -69,8 +73,12 @@
                 var symbol = bitfinex_data[i][0];
                 // 1.4.4.获取最新价格
                 var last_price = bitfinex_data[i][8];
-                // 1.4.5.将交易对和最新价格显示在页面上
-                $("#bitfinex_tbody").append("<tr><td>" + symbol + "</td><td>" + last_price + "</td></tr>");
+                // 1.4.5.获取交易量
+                var volume = bitfinex_data[i][7];
+                // 1.4.6.获取24h涨幅
+                var daily_change_perc = bitfinex_data[i][6];
+                // 1.4.7.将交易对和最新价格显示在页面上
+                $("#bitfinex_tbody").append("<tr><td>" + symbol + "</td><td>" + last_price + "</td><td>" + volume + "</td><td>" + daily_change_perc + "</td></tr>");
             }
         });
     </script>
