@@ -191,7 +191,7 @@ async def bitfinex_symbols():
         API_KEY="",
         API_SECRET="",
     )
-    return rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
+    return await rest.get_public_tickers(['tBTCUSD', 'tETHUSD', 'tETHBTC'])
 
 #定义全局活动订单对象，维护open状态的订单
 #第一维度：symbol
