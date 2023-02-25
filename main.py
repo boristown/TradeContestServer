@@ -170,10 +170,20 @@ async def page_html(page):
         with open('pages/404.html', 'r', encoding='utf-8') as f:
             return f.read()
 
-#当访问*.css时，链接到pages/*.css
-@app.get("/{page}.css", response_class=PlainTextResponse)
+#当访问/css/*.css时，链接到pages/css/*.css
+@app.get("/css/{page}.css", response_class=PlainTextResponse)
 async def page_css(page):
-    filename = 'pages/' + page + '.css'
+    filename = 'pages/css/' + page + '.css'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return ''
+
+#当访问/js/*.js时，链接到pages/js/*.js
+@app.get("/js/{page}.js", response_class=PlainTextResponse)
+async def page_js(page):
+    filename = 'pages/js/' + page + '.js'
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
             return f.read()
