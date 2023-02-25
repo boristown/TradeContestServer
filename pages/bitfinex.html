@@ -153,6 +153,11 @@
                     return b_val - a_val;
                 }
             });
+            //将排序后的trs重新添加到页面
+            $("#bitfinex_tbody").empty();
+            for (var i = 0; i < trs.length; i++) {
+                $("#bitfinex_tbody").append(trs[i]);
+            }
         });
     </script>
 </html>
